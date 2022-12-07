@@ -18,6 +18,7 @@
 #include "kernel.h"
 #include "chars.h"
 #include "util.h"
+#include <cstdlib>
 
 #ifdef NOCACHE
 #include "local_request_nocache.cc"
@@ -47,7 +48,7 @@ int Worker::ProcessLocalHTable(WorkRequest* pwr) {
     } else return SUCCESS;
 }
 #endif // DHT
-
+//using namespace std;
 int Worker::ProcessLocalMalloc(WorkRequest* wr) {
   epicAssert(!(wr->flag & ASYNC));
   if ((wr->flag & REMOTE) || (wr->addr && !IsLocal(wr->addr))) {  //remote alloc
@@ -125,7 +126,7 @@ int Worker::ProcessLocalMalloc(WorkRequest* wr) {
     wr->addr = TO_GLOB(addr, base, GetWorkerId());
     wr->status = SUCCESS;
     ghost_size += wr->size;
-    if (abs(ghost_size.load()) > conf->ghost_th)
+    if (ghost_size.load() > conf->ghost_th)
       SyncMaster();
   } else {
     wr->status = ALLOC_ERROR;
@@ -159,7 +160,7 @@ int Worker::ProcessLocalFree(WorkRequest* wr) {
     void* addr = ToLocal(wr->addr);
     Size size = sb.sb_free(addr);
     ghost_size -= size;
-    if (abs(ghost_size.load()) > conf->ghost_th)
+    if (ghost_size.load() > conf->ghost_th)
       SyncMaster();
   } else {
     Client* cli = GetClient(wr->addr);
