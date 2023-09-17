@@ -53,6 +53,7 @@ int Log::reserve(Size sz) {
       }
     }
   }
+  return 0;
 }
 
 void Log::write() {
@@ -66,10 +67,10 @@ void Log::write() {
   epicLog(LOG_WARNING, " start reclaim: avail = %llu MB", avail >> 20);
 
   if (start < end) {
-    ::write(fd_, buf_ + start, end - start);
+    int temp = ::write(fd_, buf_ + start, end - start);
   } else {
-    ::write(fd_, buf_ + end, BUF_SIZE - end);
-    ::write(fd_, buf_, start);
+      int temp = ::write(fd_, buf_ + end, BUF_SIZE - end);
+      temp = ::write(fd_, buf_, start);
   }
 
   fsync(fd_);
@@ -84,7 +85,7 @@ int Log::writeToBuf(void* ptr, Size size, int spos) {
   } else {
     int bytesToEnd = BUF_SIZE - spos;
     memcpy(spos + buf_, ptr, bytesToEnd);
-    memcpy(buf_, ptr + bytesToEnd, size - bytesToEnd);
+    memcpy(buf_, (char*)ptr + bytesToEnd, size - bytesToEnd);
     return size - bytesToEnd;
   }
 }

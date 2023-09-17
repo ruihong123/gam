@@ -68,7 +68,8 @@ class GAlloc {
 
   int Try_RLock(const GAddr addr, const Size count);
   int Try_WLock(const GAddr addr, const Size count);
-
+    // Put and Get funciton as memcached whcih can synchronize(memory barrier)
+    // btween the memory servers.
   Size Put(uint64_t key, const void* value, Size count);
   Size Get(uint64_t key, void* value);
 

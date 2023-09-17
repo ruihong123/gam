@@ -219,6 +219,7 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
   gen_accesses.insert(TOBLOCK(access[0]));
   stat_lock.unlock();
 #endif
+  // Access is the address of future acesses.
   for (int i = 1; i < ITERATION; i++) {
     //PopulateOneBlock(alloc, data, ldata, i, l_remote_ratio, l_space_locality, seedp);
     GAddr next;
