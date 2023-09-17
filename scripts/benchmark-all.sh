@@ -33,7 +33,7 @@ run() {
     	echo ""
     	echo "slave = $slave, ip = $ip, port = $port"
     	echo "$SRC_HOME/benchmark --cache_th $cache_th --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port" | tee -a "$log_file".$ip
-    	ssh -i ~/.ssh/id_rsa :$ip	"$SRC_HOME/benchmark --cache_th $cache_th --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port | tee -a '$log_file'.$ip" &
+    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --cache_th $cache_th --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
     	if [ "$i" = "$node" ]; then
