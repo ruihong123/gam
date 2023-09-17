@@ -28,7 +28,7 @@ run() {
     		is_master=0
     	fi
     	if [ $port == $ip ]; then
-    		port=1234
+    		port=12345
     	fi
     	echo ""
     	echo "slave = $slave, ip = $ip, port = $port"
