@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
-SRC_HOME=$bin/../test
+SRC_HOME=$bin/../src
 slaves=$bin/slaves
 log_file=$bin/log
 master_ip=db1.cs.purdue.edu
