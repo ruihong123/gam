@@ -5,7 +5,7 @@ SRC_HOME=$bin/../src
 slaves=$bin/slaves
 log_file=$bin/log
 master_ip=db1.cs.purdue.edu
-master_port=1231
+master_port=12311
 
 run() {
     echo "run for result_file=$result_file, 
