@@ -343,7 +343,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
         alloc->UnLock(to_access, item_size);
         break;
       }
-      case 2:  //rlock+read/wlock+write
+      case 2:  //rlock+read/wlock+write Is this GAM PSO
       {
         if (TrueOrFalse(read_ratio, seedp)) {
           alloc->RLock(to_access, item_size);

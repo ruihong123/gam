@@ -2,13 +2,13 @@ CPP = g++ -std=c++11 -O3 -DNDEBUG
 INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src
 #INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src -I/users/zhongle/local/include
 #LIBS = ../src/libgalloc.a -libverbs -lpthread ../lib/libcuckoo/cityhash-1.1.1/src/.libs/libcityhash.a /users/zhongle/local/lib/libboost_thread.so /users/zhongle/local/lib/libboost_system.so
-LIBS = ./libgalloc.a -libverbs -lpthread ../lib/libcuckoo/cityhash-1.1.1/src/.libs/libcityhash.a -lboost_thread -lboost_system
+LIBS = ./libgalloc.a -libverbs -lpthread  -lboost_thread -lboost_system -lcityhash
 CFLAGS += -rdynamic
 ifdef dht
 	CFLAGS += -DDHT
 endif
 
-
+#../lib/libcuckoo/cityhash-1.1.1/src/.libs/libcityhash.a
 
 SRC = gfunc.cc ae.cc client.cc server.cc worker.cc gallocator.cc master.cc tcp.cc worker_handle.cc anet.cc rdma.cc util.cc zmalloc.cc log.cc slabs.cc workrequest.cc cache.cc directory.cc local_request.cc remote_request.cc pending_request.cc MurmurHash.cc logging.cc
 OBJ = gfunc.o ae.o client.o server.o worker.o gallocator.o master.o tcp.o worker_handle.o anet.o rdma.o util.o zmalloc.o log.o slabs.o workrequest.o cache.o directory.o remote_request.o local_request.o pending_request.o MurmurHash.o logging.o
