@@ -54,7 +54,7 @@ struct Conf {
   int maxclients = 1024;
   int maxthreads = 10;
   int backlog = TCP_BACKLOG;
-  int loglevel = LOG_WARNING;
+  int loglevel = LOG_DEBUG;
   std::string* logfile = nullptr;
   int timeout = 10;  //ms
   int eviction_period = 100;  //ms

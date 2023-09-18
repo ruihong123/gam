@@ -45,7 +45,7 @@ run() {
 	for slave in `cat $slaves`
 	do
 		ip=`echo $slave | cut -d ' ' -f1`
-		ssh $ip killall benchmark > /dev/null 2>&1
+		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
 		j=$((j+1))
 		if [ $j = $node ]; then
 			break;
