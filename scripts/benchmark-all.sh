@@ -398,7 +398,7 @@ for time_locality in $time_range
 do
 for node in $node_range
 do
-  echo node
+  echo $node
 for thread in $thread_range
 do
 #    remote_ratio=`echo "($node-1)*100/$node" | bc`
