@@ -17,7 +17,7 @@ run() {
     old_IFS=$IFS
     IFS=$'\n'
     i=0
-    cat $slaves
+    echo `cat $slaves`
     for slave in `cat "$slaves"`
     do
     	ip=`echo $slave | cut -d ' ' -f1`
