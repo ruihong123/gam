@@ -375,13 +375,13 @@ run_node_test() {
 echo "**************************run node test****************************"
 result_file=$bin/results/node
 node_range="1"
-thread_range="1"
+thread_range="4"
 remote_range="0" #"20 40 60 80 100"
 shared_range="0 20 50 80 100"
 read_range="0"
 space_range="0"
 time_range="0"
-op_range="0 1 2 3"
+op_range="2"
 cache_th=0.5
 
 for remote_ratio in $remote_range

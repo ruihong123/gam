@@ -1,6 +1,6 @@
 CPP = g++ -std=c++11 -O3
 INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src
-LIBS = ../src/libgalloc.a -libverbs -lpthread ../lib/libcuckoo/cityhash-1.1.1/src/.libs/libcityhash.a -lboost_thread -lboost_system
+LIBS = ../src/libgalloc.a -libverbs -lpthread -lcityhash -lboost_thread -lboost_system
 CFLAGS += -g -rdynamic
 
 build: benchmark lru_test example example-r worker master slab_test rw_test fence_test lock_test hashtable_test hashtable_throw_test garray_test cs_test
