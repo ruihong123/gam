@@ -5,6 +5,8 @@ SRC_HOME=$bin/../src
 compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
+cache_mem_size = 1 # 10 gb Remote memory size
+remote_mem_size = 10 # 10 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
 
@@ -34,8 +36,8 @@ run() {
     	fi
     	echo ""
     	echo "compute = $compute, ip = $ip, port = $port"
-    	echo "$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port" | tee -a "$log_file".$ip
-    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port | tee -a '$log_file'.$ip" &
+    	echo "$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size" | tee -a "$log_file".$ip
+    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
     	if [ "$i" = "$node" ]; then
@@ -57,9 +59,9 @@ run() {
         		port=12345
         	fi
         	echo ""
-        	echo "slave = $slave, ip = $ip, port = $port"
+        	echo "memory = $slave, ip = $ip, port = $port"
         	echo "$SRC_HOME/memory_server --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port" | tee -a "$log_file".$ip
-        	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/memory_server --cache_th $cache_th --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port | tee -a '$log_file'.$ip" &
+        	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/memory_server --cache_th $cache_th --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --allocated_mem_size $remote_mem_size | tee -a '$log_file'.$ip" &
         	sleep 1
         	i=$((i+1))
         	if [ "$i" = "$node" ]; then
