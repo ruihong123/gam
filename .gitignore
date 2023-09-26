@@ -3,6 +3,8 @@
 .vscode
 .DS_Store
 *.o
+*.a
+*.orig
 
 # Build directory.
 build/
