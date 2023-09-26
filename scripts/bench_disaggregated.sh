@@ -5,7 +5,7 @@ SRC_HOME=$bin/../src
 compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
-master_ip=db1.cs.purdue.edu
+master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
 
 run() {
@@ -68,15 +68,26 @@ run() {
         done # for slave
 	wait
 	j=0
-	for slave in `cat $slaves`
+	for compute in `cat $compute_nodes`
 	do
-		ip=`echo $slave | cut -d ' ' -f1`
+		ip=`echo $compute | cut -d ' ' -f1`
 		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
 		j=$((j+1))
 		if [ $j = $node ]; then
 			break;
 		fi
 	done
+
+	j=0
+  	for memory in `cat $memory_nodes`
+  	do
+  		ip=`echo $memory | cut -d ' ' -f1`
+  		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
+  		j=$((j+1))
+  		if [ $j = $node ]; then
+  			break;
+  		fi
+  	done
 
     IFS="$old_IFS"
 }
