@@ -47,8 +47,10 @@ struct Conf {
   std::string worker_bindaddr;
   std::string worker_ip = "localhost";
   Size size = 1024 * 1024L * 512;  //per-server size of memory pre-allocated
+//  Size cache_size = 1024 * 1024L * 512;  //per-server size of memory pre-allocated
   Size ghost_th = 1024 * 1024;
-  double cache_th = 0.15;  //if free mem is below this threshold, we start to allocate memory from remote nodes
+  //TODO remove cache_th
+  double cache_th = 0;  //if free mem is below this threshold, we start to allocate memory from remote nodes
   int unsynced_th = 1;
   double factor = 1.25;
   int maxclients = 1024;

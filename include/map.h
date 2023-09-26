@@ -126,7 +126,7 @@ public:
     throw std::out_of_range("key not found in table");
     //return mapped_type{};
   }
-
+  // find the target cache line by key k.
   size_t count(const key_type& k) {
     size_t hv = hashfn()(k) & hashmask;
     Bucket* b = buckets_[hv];

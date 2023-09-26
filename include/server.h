@@ -19,7 +19,6 @@ class ServerFactory;
 class Server;
 class Client;
 
-//TODO: seperate client from server. Create a new class called ClientServer. And rename the worker as memory server.
 class Server {
   private:
     //unordered_map<uint32_t, Client*> qpCliMap; /* rdma clients */

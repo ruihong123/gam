@@ -66,6 +66,7 @@ struct RDMASendData {
 };
 #endif
 
+//TODO: seperate client from server. Create a new class called ClientServer. And rename the worker as memory server.
 class Worker : public Server {
   friend class Cache;
 
@@ -151,7 +152,7 @@ class Worker : public Server {
 #ifdef DHT
   void* htable = nullptr;
 #endif
-
+    //Shall we disable the log?
   Log* log;
 
 #ifndef USE_BOOST_QUEUE

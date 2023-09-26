@@ -14,10 +14,10 @@
 #ifdef GFUNC_SUPPORT
 #include "gfunc.h"
 #endif
-
+enum NodeType  {ComputeNode, MemoryNode};
 class GAlloc {
   WorkerHandle* wh;  //handle to communicate with local worker
-
+    NodeType nodeType;
   int Lock(Work op, const GAddr addr, const Size count, Flag flag = 0);
  public:
   GAlloc(Worker* worker);

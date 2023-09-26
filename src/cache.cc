@@ -538,6 +538,7 @@ Cache::Cache(Worker* w)
       {
   this->worker = w;
   max_cache_mem = w->conf->cache_th * w->conf->size;
+//  max_cache_mem = w->conf->cache_size;
 }
 
 void Cache::SetWorker(Worker* w) {

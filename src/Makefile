@@ -25,6 +25,9 @@ libgalloc.a: $(OBJ)
 benchmark: ../test/benchmark.cc
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
+memory_server: ../test/Memory_node.cc
+	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
+
 lock_test: ../test/lock_test.cc
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
@@ -52,7 +55,7 @@ map_test: ../test/map_test.cc
 gfunc_test: ../test/gfunc_test.cc
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
-all: libgalloc.a lock_test example example-r worker master rw_test fence_test benchmark map_test gfunc_test
+all: libgalloc.a lock_test example example-r worker master rw_test fence_test benchmark map_test gfunc_test memory_server
 test: libgalloc.a lock_test example example-r worker master rw_test fence_test benchmark map_test gfunc_test
 build: libgalloc.a libgalloc.so
 
