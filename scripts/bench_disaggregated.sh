@@ -5,12 +5,12 @@ SRC_HOME=$bin/../src
 compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
-cache_mem_size = 1 # 10 gb Remote memory size
-remote_mem_size = 10 # 10 gb Remote memory size
+cache_mem_size=1 # 10 gb Remote memory size
+remote_mem_size=10 # 10 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
-compute_num = 0
-memory_num = 0
+#compute_num = 0
+#memory_num = 0
 run() {
     echo "run for result_file=$result_file,
     node=$node, thread=$thread,
@@ -26,8 +26,8 @@ run() {
 #    echo $compute_nodes_arr
 #    echo $memory_nodes_arr
     echo $(wc -l < $compute_nodes)
-    compute_num = $(wc -l < $compute_nodes)
-    memory_num = $(wc -l < $memory_nodes)
+    compute_num=$(wc -l < $compute_nodes)
+    memory_num=$(wc -l < $memory_nodes)
 #    echo `cat $slaves`
     for compute in `cat "$compute_nodes"`
     do
@@ -44,8 +44,8 @@ run() {
     	fi
     	echo ""
     	echo "compute = $compute, ip = $ip, port = $port"
-    	echo "$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num" | tee -a "$log_file".$ip
-    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
+    	echo "$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num" | tee -a "$log_file".$ip
+    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
     	if [ "$i" = "$node" ]; then

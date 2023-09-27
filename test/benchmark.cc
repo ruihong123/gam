@@ -41,7 +41,7 @@ const char* result_file = "result.csv";
 long ITERATION = 2000000;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
-int no_node = 1;
+//int no_node = 1;
 //int remote_ratio = 0;  //0..100
 int shared_ratio = 10;  //0..100
 int space_locality = 10;  //0..100
@@ -439,7 +439,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
 
 void Benchmark(int id) {
   GAlloc* alloc = GAllocFactory::CreateAllocator();
-  unsigned int seedp = no_node * alloc->GetID() + id;
+  unsigned int seedp = compute_num * alloc->GetID() + id;
   epicLog(LOG_INFO, "seedp = %d", seedp);
 
 #ifdef PERF_MALLOC
@@ -538,15 +538,15 @@ void Benchmark(int id) {
   alloc->WLock(data[0], BLOCK_SIZE);
   alloc->UnLock(data[0], BLOCK_SIZE);
 #endif
-  uint64_t SYNC_RUN_BASE = SYNC_KEY + no_node * 2;
-  int sync_id = SYNC_RUN_BASE + no_node * node_id + id;
+  uint64_t SYNC_RUN_BASE = SYNC_KEY + compute_num * 2;
+  int sync_id = SYNC_RUN_BASE + compute_num * node_id + id;
   alloc->Put(sync_id, &sync_id, sizeof(int));
 
   for (int i = 1; i <= compute_num; i++) {
     for (int j = 0; j < no_thread; j++) {
       epicLog(LOG_WARNING, "waiting for node %d, thread %d", i, j);
-      alloc->Get(SYNC_RUN_BASE + no_node * i + j, &sync_id);
-      epicAssert(sync_id == SYNC_RUN_BASE + no_node * i + j);
+      alloc->Get(SYNC_RUN_BASE + compute_num * i + j, &sync_id);
+      epicAssert(sync_id == SYNC_RUN_BASE + compute_num * i + j);
       epicLog(LOG_WARNING, "get sync_id %d from node %d, thread %d", sync_id, i,
               j);
     }
@@ -605,8 +605,8 @@ int main(int argc, char* argv[]) {
       time_locality = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--op_type") == 0) {
       op_type = atoi(argv[++i]);  //0..100
-    } else if (strcmp(argv[i], "--no_node") == 0) {
-      no_node = atoi(argv[++i]);  //0..100
+//    } else if (strcmp(argv[i], "--compute_num") == 0) {
+//      compute_num = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--result_file") == 0) {
       result_file = argv[++i];  //0..100
     } else if (strcmp(argv[i], "--item_size") == 0) {
@@ -634,13 +634,13 @@ int main(int argc, char* argv[]) {
 #endif
   printf("Currently configuration is: ");
   printf(
-      "master: %s:%d, worker: %s:%d, is_master: %s, no_thread: %d, no_node: %d\n",
+      "master: %s:%d, worker: %s:%d, is_master: %s, no_thread: %d, compute_num: %d\n",
       ip_master.c_str(), port_master, ip_worker.c_str(), port_worker,
-      is_master == 1 ? "true" : "false", no_thread, no_node);
+      is_master == 1 ? "true" : "false", no_thread, compute_num);
   printf(
-      "no_node = %d, no_thread = %d, shared_ratio: %d, read_ratio: %d, "
+      "compute_num = %d, no_thread = %d, shared_ratio: %d, read_ratio: %d, "
       "space_locality: %d, time_locality: %d, op_type = %s, memory_type = %s, item_size = %d, cache_th = %f, result_file = %s\n",
-      no_node,
+      compute_num,
       no_thread,
 //      remote_ratio,
       shared_ratio,
@@ -678,7 +678,7 @@ int main(int argc, char* argv[]) {
   printf("This node id is %d\n", node_id);
   //synchronize here.
   alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
-  for (int i = 1; i <= no_node; i++) {
+  for (int i = 1; i <= compute_num; i++) {
     alloc->Get(SYNC_KEY + i, &id);
     epicAssert(id == i);
   }
@@ -726,22 +726,22 @@ int main(int argc, char* argv[]) {
   res[0] = t_thr;  //total throughput for the current node
   res[1] = a_thr;  //avg throuhgput for the current node
   res[2] = a_lat;  //avg latency for the current node
-  alloc->Put(SYNC_KEY + no_node + node_id, res, sizeof(long) * 3);
+  alloc->Put(SYNC_KEY + compute_num + node_id, res, sizeof(long) * 3);
   t_thr = a_thr = a_lat = 0;
   for (int i = 1; i <= compute_num; i++) {
     memset(res, 0, sizeof(long) * 3);
-    alloc->Get(SYNC_KEY + no_node + i, &res);
+    alloc->Get(SYNC_KEY + compute_num + i, &res);
     t_thr += res[0];
     a_thr += res[1];
     a_lat += res[2];
   }
-  a_thr /= no_node;
-  a_lat /= no_node;
+  a_thr /= compute_num;
+  a_lat /= compute_num;
 
   if (is_master) {
     ofstream result;
     result.open(result_file, ios::app);
-    result << no_node << "," << no_thread << ","  << ","
+    result << compute_num << "," << no_thread << ","  << ","
            << shared_ratio << "," << read_ratio << "," << space_locality << ","
            << time_locality << "," << op_type << "," << memory_type << ","
            << item_size << "," << t_thr << "," << a_thr << "," << a_lat << ","
@@ -749,10 +749,10 @@ int main(int argc, char* argv[]) {
     epicLog(
         LOG_WARNING,
         "results for all the nodes: "
-        "no_node: %d, no_thread: %d, shared_ratio: %d, read_ratio: %d, space_locality: %d, "
+        "compute_num: %d, no_thread: %d, shared_ratio: %d, read_ratio: %d, space_locality: %d, "
         "time_locality: %d, op_type = %d, memory_type = %d, item_size = %d, "
         "total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld, cache_th = %f\n\n",
-        no_node, no_thread, shared_ratio, read_ratio,
+        compute_num, no_thread, shared_ratio, read_ratio,
         space_locality, time_locality, op_type, memory_type, item_size, t_thr,
         a_thr, a_lat, cache_th);
     result.close();
@@ -767,7 +767,7 @@ int main(int argc, char* argv[]) {
       real_accesses.size(), gen_accesses.size());
 #endif
 
-//	long time = no_thread*no_node*(double)(100-read_ratio)/100+1;
+//	long time = no_thread*compute_num*(double)(100-read_ratio)/100+1;
 //	time /= 2;
 //	if(time < 2) time += 1;
   long time = 1;
