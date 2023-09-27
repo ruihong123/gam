@@ -500,6 +500,7 @@ Client* Worker::GetClient(GAddr addr) {
     if (!cli) {
       epicLog(LOG_WARNING, "cannot find the client for addr (%d:%d)", wid,
           OFF(addr));
+        assert(false);
     }
   }
   //UNLOCK_MICRO(widCliMap, 0);

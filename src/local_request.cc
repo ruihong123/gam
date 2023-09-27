@@ -96,6 +96,7 @@ int Worker::ProcessLocalMalloc(WorkRequest* wr) {
   //we reserve a minimum conf->cache_th size for cache
   if (cache.GetUsedBytes() + sb.get_avail() < conf->size * conf->cache_th) {
     Client* cli = GetClient();
+    //TODO: WHY CLI be nullptr here?
     cli->lock();// this is buggy, we should lock the client inside the if clause.
     if (cli) {
       epicLog(LOG_DEBUG, "allocate remotely at worker %d", cli->GetWorkerId());
