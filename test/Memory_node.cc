@@ -159,12 +159,13 @@ int main(int argc, char* argv[]) {
     GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
     int id;
     node_id = alloc->GetID();
-    printf("This node id is %d\n", node_id);
+
     alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
     for (int i = 1; i <= no_node; i++) {
         alloc->Get(SYNC_KEY + i, &id);
         epicAssert(id == i);
     }
+    printf("This node id is %d\n", node_id);
     while(1);
   return 0;
 }
