@@ -21,8 +21,11 @@ run() {
     IFS=$'\n'
     i=0
     compute_nodes_arr = `cat "$compute_nodes"`
+    memory_nodes_arr = `cat "$memory_nodes"`
     echo $compute_nodes_arr
+    echo $memory_nodes_arr
     compute_num = ${#compute_nodes_arr[@]}
+    memory_num = ${#memory_nodes_arr[@]}
 #    echo `cat $slaves`
     for compute in `cat "$compute_nodes"`
     do
