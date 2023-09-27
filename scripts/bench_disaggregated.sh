@@ -9,7 +9,8 @@ cache_mem_size = 1 # 10 gb Remote memory size
 remote_mem_size = 10 # 10 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
-
+compute_num = 0
+memory_num = 0
 run() {
     echo "run for result_file=$result_file,
     node=$node, thread=$thread,
