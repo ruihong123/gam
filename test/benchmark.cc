@@ -741,7 +741,7 @@ int main(int argc, char* argv[]) {
   if (is_master) {
     ofstream result;
     result.open(result_file, ios::app);
-    result << no_node << "," << no_thread << "," << remote_ratio << ","
+    result << no_node << "," << no_thread << ","  << ","
            << shared_ratio << "," << read_ratio << "," << space_locality << ","
            << time_locality << "," << op_type << "," << memory_type << ","
            << item_size << "," << t_thr << "," << a_thr << "," << a_lat << ","
@@ -749,10 +749,10 @@ int main(int argc, char* argv[]) {
     epicLog(
         LOG_WARNING,
         "results for all the nodes: "
-        "no_node: %d, no_thread: %d, remote_ratio: %d, shared_ratio: %d, read_ratio: %d, space_locality: %d, "
+        "no_node: %d, no_thread: %d, shared_ratio: %d, read_ratio: %d, space_locality: %d, "
         "time_locality: %d, op_type = %d, memory_type = %d, item_size = %d, "
         "total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld, cache_th = %f\n\n",
-        no_node, no_thread, remote_ratio, shared_ratio, read_ratio,
+        no_node, no_thread, shared_ratio, read_ratio,
         space_locality, time_locality, op_type, memory_type, item_size, t_thr,
         a_thr, a_lat, cache_th);
     result.close();
