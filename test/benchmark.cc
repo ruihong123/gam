@@ -667,6 +667,8 @@ int main(int argc, char* argv[]) {
   //check all the workers are started
   int id;
   node_id = alloc->GetID();
+  printf("This node id is %d\n", node_id);
+  //synchronize here.
   alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
   for (int i = 1; i <= no_node; i++) {
     alloc->Get(SYNC_KEY + i, &id);
