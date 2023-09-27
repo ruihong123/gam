@@ -54,7 +54,7 @@ run() {
     		break
     	fi
     done # for compute
-    sleep 3
+    sleep 3 #is this wait time too long
     for memory in `cat "$memory_nodes"`
         do
         	ip=`echo $memory | cut -d ' ' -f1`
