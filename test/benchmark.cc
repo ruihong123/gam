@@ -42,12 +42,14 @@ long ITERATION = 2000000;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
 int no_node = 1;
-int remote_ratio = 0;  //0..100
+//int remote_ratio = 0;  //0..100
 int shared_ratio = 10;  //0..100
 int space_locality = 10;  //0..100
 int time_locality = 10;  //0..100 (how probable it is to re-visit the current position)
 int read_ratio = 10;  //0..100
 int op_type = 0;  //0: read/write; 1: rlock/wlock; 2: rlock+read/wlock+write
+int compute_num = 100;
+int memory_num = 100;
 
 float cache_th = 0.15;  //0.15
 long cache_size = 0;
@@ -145,7 +147,7 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
           unsigned int* seedp) {
   epicLog(LOG_WARNING, "start init");
 
-  int l_remote_ratio = remote_ratio;
+//  int l_remote_ratio = remote_ratio;
   int l_space_locality = space_locality;
   int l_shared_ratio = shared_ratio;
 
@@ -164,11 +166,11 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
       epicAssert(!ret);
       epicAssert(data[i] % BLOCK_SIZE == 0);
 #else
-      if (TrueOrFalse(remote_ratio, seedp)) {
+//      if (TrueOrFalse(remote_ratio, seedp)) {
         data[i] = alloc->AlignedMalloc(BLOCK_SIZE, REMOTE);
-      } else {
-        data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
-      }
+//      } else {
+//        data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
+//      }
 #endif
       if (shared_ratio != 0)
           //Register the allocation for master into a key value store.
@@ -192,26 +194,26 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
         epicAssert(ret == addr_size);
         data[i] = addr;
         //revise the l_remote_ratio accordingly if we get the shared addr violate the remote probability
-        if (TrueOrFalse(l_remote_ratio, seedp)) {  //should be remote
-          if (alloc->GetID() == WID(addr)) {  //false negative
-            l_remote_ratio = Revise(l_remote_ratio, STEPS - i - 1, false);
-          }
-        } else {  //shouldn't be remote
-          if (alloc->GetID() != WID(addr)) {  //false positive
-            l_remote_ratio = Revise(l_remote_ratio, STEPS - i - 1, true);
-          }
-        }
+//        if (TrueOrFalse(l_remote_ratio, seedp)) {  //should be remote
+//          if (alloc->GetID() == WID(addr)) {  //false negative
+//            l_remote_ratio = Revise(l_remote_ratio, STEPS - i - 1, false);
+//          }
+//        } else {  //shouldn't be remote
+//          if (alloc->GetID() != WID(addr)) {  //false positive
+//            l_remote_ratio = Revise(l_remote_ratio, STEPS - i - 1, true);
+//          }
+//        }
         shared[i] = true;
       } else {
 #ifdef LOCAL_MEMORY
         int ret = posix_memalign((void **)&data[i], BLOCK_SIZE, BLOCK_SIZE);
         epicAssert(data[i] % BLOCK_SIZE == 0);
 #else
-        if (TrueOrFalse(remote_ratio, seedp)) {
+//        if (TrueOrFalse(remote_ratio, seedp)) {
           data[i] = alloc->AlignedMalloc(BLOCK_SIZE, REMOTE);
-        } else {
-          data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
-        }
+//        } else {
+//          data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
+//        }
 #endif
         shared[i] = false;
       }
@@ -539,6 +541,7 @@ void Benchmark(int id) {
   uint64_t SYNC_RUN_BASE = SYNC_KEY + no_node * 2;
   int sync_id = SYNC_RUN_BASE + no_node * node_id + id;
   alloc->Put(sync_id, &sync_id, sizeof(int));
+
   for (int i = 1; i <= no_node; i++) {
     for (int j = 0; j < no_thread; j++) {
       epicLog(LOG_WARNING, "waiting for node %d, thread %d", i, j);
@@ -590,8 +593,8 @@ int main(int argc, char* argv[]) {
       is_master = atoi(argv[++i]);
     } else if (strcmp(argv[i], "--no_thread") == 0) {
       no_thread = atoi(argv[++i]);
-    } else if (strcmp(argv[i], "--remote_ratio") == 0) {
-      remote_ratio = atoi(argv[++i]);  //0..100
+//    } else if (strcmp(argv[i], "--remote_ratio") == 0) {
+//      remote_ratio = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--shared_ratio") == 0) {
       shared_ratio = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--read_ratio") == 0) {
@@ -609,9 +612,14 @@ int main(int argc, char* argv[]) {
     } else if (strcmp(argv[i], "--item_size") == 0) {
       item_size = atoi(argv[++i]);
       items_per_block = BLOCK_SIZE / item_size;
+
     } else if (strcmp(argv[i], "--allocated_mem_size") == 0) {
         allocated_mem_size = atoi(argv[++i]);
         allocated_mem_size = allocated_mem_size * 1024ull * 1024 * 1024;
+    } else if (strcmp(argv[i], "--compute_num") == 0) {
+        compute_num = atoi(argv[++i]);
+    } else if (strcmp(argv[i], "--memory_num") == 0) {
+        memory_num = atoi(argv[++i]);
     } else if (strcmp(argv[i], "--cache_th") == 0) {
       cache_th = atof(argv[++i]);
     } else {
@@ -630,11 +638,11 @@ int main(int argc, char* argv[]) {
       ip_master.c_str(), port_master, ip_worker.c_str(), port_worker,
       is_master == 1 ? "true" : "false", no_thread, no_node);
   printf(
-      "no_node = %d, no_thread = %d, remote_ratio: %d, shared_ratio: %d, read_ratio: %d, "
+      "no_node = %d, no_thread = %d, shared_ratio: %d, read_ratio: %d, "
       "space_locality: %d, time_locality: %d, op_type = %s, memory_type = %s, item_size = %d, cache_th = %f, result_file = %s\n",
       no_node,
       no_thread,
-      remote_ratio,
+//      remote_ratio,
       shared_ratio,
       read_ratio,
       space_locality,
@@ -720,7 +728,7 @@ int main(int argc, char* argv[]) {
   res[2] = a_lat;  //avg latency for the current node
   alloc->Put(SYNC_KEY + no_node + node_id, res, sizeof(long) * 3);
   t_thr = a_thr = a_lat = 0;
-  for (int i = 1; i <= no_node; i++) {
+  for (int i = 1; i <= compute_num; i++) {
     memset(res, 0, sizeof(long) * 3);
     alloc->Get(SYNC_KEY + no_node + i, &res);
     t_thr += res[0];

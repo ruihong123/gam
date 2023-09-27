@@ -20,6 +20,9 @@ run() {
     old_IFS=$IFS
     IFS=$'\n'
     i=0
+    compute_nodes_arr = `cat "$compute_nodes"`
+    echo $compute_nodes_arr
+    compute_num = ${#compute_nodes_arr[@]}
 #    echo `cat $slaves`
     for compute in `cat "$compute_nodes"`
     do
@@ -36,15 +39,15 @@ run() {
     	fi
     	echo ""
     	echo "compute = $compute, ip = $ip, port = $port"
-    	echo "$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size" | tee -a "$log_file".$ip
-    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size | tee -a '$log_file'.$ip" &
+    	echo "$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num" | tee -a "$log_file".$ip
+    	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_node $node --no_thread $thread --remote_ratio $remote_ratio --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
     	if [ "$i" = "$node" ]; then
     		break
     	fi
-    done # for slave
-
+    done # for compute
+    sleep 3
     for memory in `cat "$memory_nodes"`
         do
         	ip=`echo $memory | cut -d ' ' -f1`
