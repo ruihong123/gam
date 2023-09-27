@@ -542,7 +542,7 @@ void Benchmark(int id) {
   int sync_id = SYNC_RUN_BASE + no_node * node_id + id;
   alloc->Put(sync_id, &sync_id, sizeof(int));
 
-  for (int i = 1; i <= no_node; i++) {
+  for (int i = 1; i <= compute_num; i++) {
     for (int j = 0; j < no_thread; j++) {
       epicLog(LOG_WARNING, "waiting for node %d, thread %d", i, j);
       alloc->Get(SYNC_RUN_BASE + no_node * i + j, &sync_id);
