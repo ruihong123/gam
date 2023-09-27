@@ -5,6 +5,7 @@
 *.o
 *.a
 *.orig
+scripts/log.*
 
 # Build directory.
 build/
