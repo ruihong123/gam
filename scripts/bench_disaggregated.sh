@@ -25,10 +25,12 @@ run() {
 #    memory_nodes_arr = `cat "$memory_nodes"`
 #    echo $compute_nodes_arr
 #    echo $memory_nodes_arr
-    echo $(wc -l < $compute_nodes)
+
     compute_num=$(wc -l < $compute_nodes)
     memory_num=$(wc -l < $memory_nodes)
 #    echo `cat $slaves`
+    echo $compute_num
+    echo $memory_num
     for compute in `cat "$compute_nodes"`
     do
     	ip=`echo $compute | cut -d ' ' -f1`
