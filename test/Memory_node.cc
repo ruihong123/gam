@@ -41,7 +41,7 @@ int read_ratio = 10;  //0..100
 int op_type = 0;  //0: read/write; 1: rlock/wlock; 2: rlock+read/wlock+write
 
 float cache_th = 0.15;  //0.15
-uint64_t remote_mem_size = 0;
+uint64_t allocated_mem_size = 0;
 //runtime statistics
 atomic<long> remote_access(0);
 atomic<long> shared_access(0);
@@ -103,9 +103,9 @@ int main(int argc, char* argv[]) {
         } else if (strcmp(argv[i], "--item_size") == 0) {
             item_size = atoi(argv[++i]);
             items_per_block = BLOCK_SIZE / item_size;
-        } else if (strcmp(argv[i], "--remote_mem_size") == 0) {
-            remote_mem_size = atoi(argv[++i]);
-            remote_mem_size = remote_mem_size*1024ull*1024*1024;
+        } else if (strcmp(argv[i], "--allocated_mem_size") == 0) {
+            allocated_mem_size = atoi(argv[++i]);
+            allocated_mem_size = allocated_mem_size*1024ull*1024*1024;
         } else if (strcmp(argv[i], "--cache_th") == 0) {
             cache_th = atof(argv[++i]);
         } else {
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
     conf.master_port = port_master;
     conf.worker_ip = ip_worker;
     conf.worker_port = port_worker;
-    conf.size = remote_mem_size;
+    conf.size = allocated_mem_size;
     long size = ((long) BLOCK_SIZE) * STEPS * no_thread * 4;
     conf.size = size < conf.size ? conf.size : size;
 //    conf.cache_size = cache_size;
