@@ -173,6 +173,9 @@ int main(int argc, char* argv[]) {
         epicAssert(id == i);
     }
     printf("This node id is %d\n", node_id);
-    while(1);
+    long res[3];
+    for (int i = 1; i <= compute_num; i++) {
+        alloc->Get(SYNC_KEY + compute_num + i, &res);
+    }
   return 0;
 }
