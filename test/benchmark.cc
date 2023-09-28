@@ -41,7 +41,7 @@ const char* result_file = "result.csv";
 long ITERATION = 2000000;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
-//int no_node = 1;
+int no_node = 0;
 //int remote_ratio = 0;  //0..100
 int shared_ratio = 10;  //0..100
 int space_locality = 10;  //0..100
@@ -667,6 +667,7 @@ int main(int argc, char* argv[]) {
   conf.size = allocated_mem_size;
   conf.cache_th = 1;
 //  conf.cache_size = cache_size;
+    no_node = compute_num + memory_num;
   GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
 
   sleep(1);
@@ -678,7 +679,7 @@ int main(int argc, char* argv[]) {
   printf("This node id is %d\n", node_id);
   //synchronize here.
   alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
-  for (int i = 1; i <= compute_num; i++) {
+  for (int i = 1; i <= no_node; i++) {
     alloc->Get(SYNC_KEY + i, &id);
     epicAssert(id == i);
   }

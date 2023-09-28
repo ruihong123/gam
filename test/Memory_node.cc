@@ -42,6 +42,8 @@ int op_type = 0;  //0: read/write; 1: rlock/wlock; 2: rlock+read/wlock+write
 
 float cache_th = 0.15;  //0.15
 uint64_t allocated_mem_size = 0;
+int compute_num = 100;
+int memory_num = 100;
 //runtime statistics
 atomic<long> remote_access(0);
 atomic<long> shared_access(0);
@@ -106,6 +108,10 @@ int main(int argc, char* argv[]) {
         } else if (strcmp(argv[i], "--allocated_mem_size") == 0) {
             allocated_mem_size = atoi(argv[++i]);
             allocated_mem_size = allocated_mem_size*1024ull*1024*1024;
+        } else if (strcmp(argv[i], "--compute_num") == 0) {
+            compute_num = atoi(argv[++i]);
+        } else if (strcmp(argv[i], "--memory_num") == 0) {
+            memory_num = atoi(argv[++i]);
         } else if (strcmp(argv[i], "--cache_th") == 0) {
             cache_th = atof(argv[++i]);
         } else {
@@ -159,6 +165,7 @@ int main(int argc, char* argv[]) {
     GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
     int id;
     node_id = alloc->GetID();
+    no_node = compute_num + memory_num;
 
     alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
     for (int i = 1; i <= no_node; i++) {
