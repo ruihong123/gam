@@ -27,8 +27,8 @@ run() {
 #    echo $memory_nodes_arr
 #    compute_num=${#$compute_nodes_arr[@]}
 #    memory_num=${#$memory_nodes_arr[@]}
-    compute_num=$($(wc -l < $compute_nodes)+1)
-    memory_num=$($(wc -l < $memory_nodes)+1)
+    compute_num=$((wc -l < $compute_nodes)+1)
+    memory_num=$((wc -l < $memory_nodes)+1)
 
 #    echo `cat $slaves`
     echo $compute_num
