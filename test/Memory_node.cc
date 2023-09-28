@@ -177,5 +177,6 @@ int main(int argc, char* argv[]) {
     for (int i = 1; i <= compute_num; i++) {
         alloc->Get(SYNC_KEY + compute_num + i, &res);
     }
+    printf("Memory ndoe %d quit\n", node_id);
   return 0;
 }
