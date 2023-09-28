@@ -13,7 +13,7 @@ master_port=12311
 #memory_num = 0
 run() {
     echo "run for result_file=$result_file,
-    node=$node, thread=$thread,
+    thread=$thread,
     remote_ratio=$remote_ratio, shared_ratio=$shared_ratio,
     read_ratio=$read_ratio, op_type=$op_type,
     space_locality=$space_locality, time_locality=$time_locality"
@@ -53,9 +53,9 @@ run() {
     	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --allocated_mem_size $cache_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
-    	if [ "$i" = "$node" ]; then
-    		break
-    	fi
+#    	if [ "$i" = "$node" ]; then
+#    		break
+#    	fi
     done # for compute
     for memory in `cat "$memory_nodes"`
         do
@@ -424,7 +424,7 @@ run_node_test() {
 # node test
 echo "**************************run node test****************************"
 result_file=$bin/results/node
-node_range=$(wc -l < $compute_nodes)
+#node_range=$(wc -l < $compute_nodes)
 thread_range="1"
 remote_range="0" #"20 40 60 80 100"
 shared_range="0"
@@ -446,8 +446,8 @@ for space_locality in $space_range
 do
 for time_locality in $time_range
 do
-for node in $node_range
-do
+#for node in $node_range
+#do
   echo $node
 for thread in $thread_range
 do
@@ -465,7 +465,7 @@ done
 done
 done
 done
-done
+#done
 done
 done
 }
