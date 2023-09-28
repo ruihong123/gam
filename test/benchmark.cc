@@ -727,11 +727,11 @@ int main(int argc, char* argv[]) {
   res[0] = t_thr;  //total throughput for the current node
   res[1] = a_thr;  //avg throuhgput for the current node
   res[2] = a_lat;  //avg latency for the current node
-  alloc->Put(SYNC_KEY + compute_num + node_id, res, sizeof(long) * 3);
+  alloc->Put(SYNC_KEY + no_node + node_id, res, sizeof(long) * 3);
   t_thr = a_thr = a_lat = 0;
   for (int i = 1; i <= compute_num; i++) {
     memset(res, 0, sizeof(long) * 3);
-    alloc->Get(SYNC_KEY + compute_num + i, &res);
+    alloc->Get(SYNC_KEY + no_node + i, &res);
     t_thr += res[0];
     a_thr += res[1];
     a_lat += res[2];

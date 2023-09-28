@@ -47,3 +47,6 @@ add_custom_target(
 add_executable(executable main.cpp)
 target_link_libraries(executable ./src/libgalloc.a)
 add_dependencies(executable GAM)
+
+add_executable(memory_server main.cpp)
+target_link_libraries(executable ./src/libgalloc.a)
