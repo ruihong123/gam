@@ -166,13 +166,12 @@ int main(int argc, char* argv[]) {
     int id;
     node_id = alloc->GetID();
     no_node = compute_num + memory_num;
-
+    printf("This node id is %d\n", node_id);
     alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
     for (int i = 1; i <= no_node; i++) {
         alloc->Get(SYNC_KEY + i, &id);
         epicAssert(id == i);
     }
-    printf("This node id is %d\n", node_id);
     long res[3];
     for (int i = 1; i <= compute_num; i++) {
         alloc->Get(SYNC_KEY + no_node + i, &res);
