@@ -48,7 +48,7 @@ class Client {
     inline void SetMemStat(int size, int free) {
       this->size = size;
       this->free = free;
-        epicLog(LOG_WARNING, "worker with node_id %d's free size is %d ", wid, free);
+//        epicLog(LOG_WARNING, "worker with node_id %d's free size is %d ", wid, free);
     }
     inline Size GetFreeMem() {
       return this->free;
