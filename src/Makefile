@@ -60,7 +60,7 @@ test: libgalloc.a lock_test example example-r worker master rw_test fence_test b
 build: libgalloc.a libgalloc.so
 
 clean_test:
-	rm -rf benchmark example worker master example-r rw_test fence_test lock_test
+	rm -rf benchmark memory_server example worker master example-r rw_test fence_test lock_test
 
 clean:
-	rm -rf gfunc_test benchmark example worker master example-r rw_test fence_test lock_test map_test *.o *.a *.so *.d
+	rm -rf gfunc_test benchmark memory_server example worker master example-r rw_test fence_test lock_test map_test *.o *.a *.so *.d
