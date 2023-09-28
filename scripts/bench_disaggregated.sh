@@ -87,9 +87,9 @@ run() {
 		ip=`echo $compute | cut -d ' ' -f1`
 		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
 		j=$((j+1))
-		if [ $j = $node ]; then
-			break;
-		fi
+#		if [ $j = $node ]; then
+#			break;
+#		fi
 	done
 
 	j=0
@@ -98,9 +98,9 @@ run() {
   		ip=`echo $memory | cut -d ' ' -f1`
   		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
   		j=$((j+1))
-  		if [ $j = $node ]; then
-  			break;
-  		fi
+#  		if [ $j = $node ]; then
+#  			break;
+#  		fi
   	done
 
     IFS="$old_IFS"
@@ -425,7 +425,7 @@ run_node_test() {
 echo "**************************run node test****************************"
 result_file=$bin/results/node
 #node_range=$(wc -l < $compute_nodes)
-thread_range="1"
+thread_range="1 16"
 remote_range="0" #"20 40 60 80 100"
 shared_range="0"
 read_range="0"
