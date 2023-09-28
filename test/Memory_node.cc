@@ -159,6 +159,7 @@ int main(int argc, char* argv[]) {
     conf.size = allocated_mem_size;
     long size = ((long) BLOCK_SIZE) * STEPS * no_thread * 4;
     conf.size = size < conf.size ? conf.size : size;
+    epicLog(LOG_WARNING, "Memory node size is %ld", conf.size);
 //    conf.cache_size = cache_size;
 //    conf.cache_size = 0;
     conf.cache_th = 0;
