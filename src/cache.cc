@@ -537,7 +537,8 @@ Cache::Cache(Worker* w)
 #endif
       {
   this->worker = w;
-  max_cache_mem = w->conf->cache_th * w->conf->size;
+  max_cache_mem = w->conf->cache_th * w->conf->size - 100*1024ul*1024;
+          epicAssert(w->conf->cache_th * w->conf->size > 100*1024ul*1024);
 //  max_cache_mem = w->conf->cache_size;
 }
 
@@ -682,7 +683,7 @@ void Cache::Evict() {
 int Cache::Evict(int n) {
     //TODO: Where does the cache recycle the registered memory
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
-  if (used < 0 || used <= max_cache_mem - BLOCK_SIZE * 64)// need some rooms for free page. otherwise, there will be no registered memory to be allocated
+  if (used < 0 || used <= max_cache_mem)// need some rooms for free page. otherwise, there will be no registered memory to be allocated
     return 0;
 
   int max = (used - max_cache_mem) / BLOCK_SIZE;
