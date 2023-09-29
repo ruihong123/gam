@@ -117,8 +117,8 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
           Client* lc = unsynced_workers.front();
           n += sprintf(buf + n, "%u:%d:%ld:%ld", lc->GetQP(), lc->GetWorkerId(),
                        lc->GetTotalMem(), lc->GetFreeMem());
-//            epicLog(LOG_WARNING, "UPDATE_MEM_STATS buffer is %s total mem is%ld, %zu, %llu, free mem is %ld,"
-//                                 " %zu, %llu\n", buf,lc->GetTotalMem(), lc->GetTotalMem(), lc->GetTotalMem(), lc->GetFreeMem(), lc->GetFreeMem(), lc->GetFreeMem());
+            epicLog(LOG_WARNING, "UPDATE_MEM_STATS buffer is %s total mem is%ld, %zu, %llu, free mem is %ld,"
+                                 " %zu, %llu\n", buf,lc->GetTotalMem(), lc->GetTotalMem(), lc->GetTotalMem(), lc->GetFreeMem(), lc->GetFreeMem(), lc->GetFreeMem());
 
             unsynced_workers.pop();
         }
@@ -158,7 +158,7 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
                      lc->GetTotalMem(), lc->GetFreeMem());
         i++;
       }
-//        epicLog(LOG_WARNING, "FETCH_MEM_STATS_REPLY buffer is %s\n", buf);
+        epicLog(LOG_WARNING, "FETCH_MEM_STATS_REPLY buffer is %s\n", buf);
 
       lwr.size = i;  //widCliMapWorker.size()-1;
       epicAssert(widCliMapWorker.size() == i);
