@@ -11,8 +11,8 @@
 #include "log.h"
 #include "locked_unordered_map.h"
 
-//typedef size_t Size;
-typedef uint64_t Size;
+typedef size_t Size;
+//typedef uint64_t Size;
 typedef unsigned char byte;
 
 #define DEFAULT_SPLIT_CHAR ':'
