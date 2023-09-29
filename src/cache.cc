@@ -544,7 +544,7 @@ Cache::Cache(Worker* w)
 
 void Cache::SetWorker(Worker* w) {
   this->worker = w;
-  max_cache_mem = w->conf->cache_th * w->conf->size;
+    max_cache_mem = w->conf->cache_th * w->conf->size - 100*1024ul*1024;
 }
 
 void* Cache::GetLine(GAddr addr) {
