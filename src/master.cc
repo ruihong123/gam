@@ -155,6 +155,8 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
                      lc->GetTotalMem(), lc->GetFreeMem());
         i++;
       }
+        epicLog(LOG_DEBUG,
+                "Serialized buffer is %s", buf);
       lwr.size = i;  //widCliMapWorker.size()-1;
       epicAssert(widCliMapWorker.size() == i);
       lwr.ptr = buf;

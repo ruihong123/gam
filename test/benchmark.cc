@@ -23,7 +23,7 @@
 //#define LOCAL_MEMORY
 
 #define STEPS 204800 //100M much larger than 10M L3 cache
-#define DEBUG_LEVEL LOG_WARNING
+#define DEBUG_LEVEL LOG_DEBUG
 
 #define SYNC_KEY STEPS
 
