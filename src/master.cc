@@ -117,9 +117,10 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
           Client* lc = unsynced_workers.front();
           n += sprintf(buf + n, "%u:%d:%ld:%ld", lc->GetQP(), lc->GetWorkerId(),
                        lc->GetTotalMem(), lc->GetFreeMem());
-          unsynced_workers.pop();
+            epicLog(LOG_WARNING, "UPDATE_MEM_STATS buffer is %s free mem is %ld, %zu\n", buf, lc->GetFreeMem(), lc->GetFreeMem());
+
+            unsynced_workers.pop();
         }
-        epicLog(LOG_WARNING, "UPDATE_MEM_STATS buffer is %s\n", buf);
         lwr.size = conf->unsynced_th;
         lwr.ptr = buf;
         int len = 0;
