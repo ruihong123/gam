@@ -351,8 +351,11 @@ void SlabAllocator::do_slabs_free(void *ptr, const size_t size,
 
   p->sl_curr++;
   p->requested -= size;
-  if (size)
-    mem_free += p->size;
+  if (size){
+      mem_free += p->size;
+      mem_avail+= p->size;//New added line.
+  }
+
   return;
 }
 
