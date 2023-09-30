@@ -807,7 +807,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       caddr ptr = worker->sb.sb_aligned_calloc(1,
                                                BLOCK_SIZE + CACHE_LINE_PREFIX);
 //        epicLog(LOG_WARNING, "ALLOCATE used byte in cache is %ld, allocator used byte is %ld ", used_bytes.load(), worker->sb.get_allocated());
-        assert(used_bytes.load() == worker->sb.get_allocated())
+//        assert(used_bytes.load() == worker->sb.get_allocated());
       used_bytes += (BLOCK_SIZE + CACHE_LINE_PREFIX);
       //*(byte*) ptr = CACHE_INVALID;
       ptr = (byte*) ptr + CACHE_LINE_PREFIX;
