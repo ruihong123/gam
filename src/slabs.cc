@@ -248,7 +248,7 @@ int SlabAllocator::do_slabs_newslab(const unsigned int id) {
   int len = slab_reassign ? item_size_max : p->size * p->perslab;
   char *ptr;
 
-  if ((mem_limit && mem_free > len && p->slabs > 0)//
+  if ((mem_limit && mem_free < len && p->slabs > 0) //mem_free > len can be removed.
       || (grow_slab_list(id) == 0)
       || ((ptr = (char *) memory_allocate((size_t) len)) == 0)) {
 //      assert(mem_free == 0);
