@@ -83,7 +83,7 @@ class SlabAllocator {
   /* powers-of-N allocation structures */
   slabclass_t slabclass[MAX_NUMBER_OF_SLAB_CLASSES];
   size_t mem_limit = 0;
-  size_t mem_malloced = 0;
+  size_t mem_malloced = 0;//DO not use this
   int power_largest;
 
   char *mem_base = NULL;
