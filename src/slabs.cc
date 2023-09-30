@@ -91,6 +91,10 @@ void SlabAllocator::mmap_free(void* ptr) {
 size_t SlabAllocator::get_avail() {
   return mem_free;
 }
+size_t SlabAllocator::get_allocated(){
+    return mem_malloced;
+}
+
 
 /**
  * Determines the chunk sizes and initializes the slab class descriptors

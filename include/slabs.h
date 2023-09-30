@@ -177,7 +177,7 @@ class SlabAllocator {
   void* slabs_init(const size_t limit, const double factor,
                    const bool prealloc);
   size_t get_avail();
-
+    size_t get_allocated();
   void *sb_calloc(size_t count, size_t size);
   void *sb_malloc(size_t size);
   void* sb_aligned_malloc(size_t size, size_t block = BLOCK_SIZE);
