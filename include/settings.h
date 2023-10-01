@@ -62,7 +62,7 @@ using namespace std;
 #define MAX_SHARED_LOCK 254 //MAX(unsigned char)-1
 #define EXCLUSIVE_LOCK_TAG 255 //MAX(unsigned char)
 
-#define BLOCK_POWER 9 // 9 = 512, 10 = 1024, 11 = 2048, 12 = 4096
+#define BLOCK_POWER 11 // 9 = 512, 10 = 1024, 11 = 2048, 12 = 4096
 #define BLOCK_MASK 0xFFFFFFFFFFFFFE00L
 #define BLOCK_SIZE (1 << BLOCK_POWER)
 
