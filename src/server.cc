@@ -43,7 +43,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
   }
 
   if (wc.status != IBV_WC_SUCCESS) {
-    epicLog(LOG_WARNING, "Completion with error on server %d, op = %d (%d:%s)",  cli->GetWorkerId(), wc.opcode,
+    epicLog(LOG_WARNING, "Completion with error to server node %d, op = %d (%d:%s)",  cli->GetWorkerId(), wc.opcode,
             wc.status, ibv_wc_status_str(wc.status));
     epicAssert(false);
     return;
@@ -62,7 +62,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       break;
     case IBV_WC_RDMA_WRITE:
       //update pending_msg
-      epicLog(LOG_WARNING, "get write completion event from worker node %d", cli->GetWorkerId());
+      epicLog(LOG_WARNING, "get write completion event to worker node %d", cli->GetWorkerId());
       id = cli->WriteComp(wc);
       //write check initiated locally
       CompletionCheck(id);
