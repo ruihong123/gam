@@ -207,6 +207,8 @@ void Worker::ProcessRemoteEvictDirty(Client* client, WorkRequest* wr) {
   }
   directory.Clear(entry, client->ToGlobal(wr->ptr));
   directory.unlock(laddr);
+    epicLog(LOG_INFO, "write with immediate\n",
+            directory.GetState(entry));
   client->WriteWithImm(nullptr, nullptr, 0, wr->id);
   delete wr;
   wr = nullptr;
