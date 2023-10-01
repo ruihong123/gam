@@ -636,7 +636,8 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
     sge_list.addr = (uintptr_t) src;
     sge_list.lkey = resource->bmr->lkey;
     wr.wr.rdma.remote_addr = (uintptr_t) dest;
-      epicLog(LOG_WARNING, "RDMA write destination is %p, %llu", dest,dest);
+      if (((uint64_t )dest & (0x1ull <<63)) == 0)
+        epicLog(LOG_WARNING, "RDMA write destination is %p, %llu", dest,dest);
       assert((uint64_t)dest != 0);
     wr.wr.rdma.rkey = rkey;
     if (op == IBV_WR_RDMA_WRITE_WITH_IMM) {
