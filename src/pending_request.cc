@@ -690,7 +690,7 @@ void Worker::ProcessRequest(Client* cli, unsigned int work_id) {
   epicLog(LOG_WARNING, "shouldn't come here");
   return;
 #endif
-  epicLog(LOG_WARNING, "callback function work_id = %u, reply from %d", work_id,
+  epicLog(LOG_DEBUG, "callback function work_id = %u, reply from %d", work_id,
           cli->GetWorkerId());
   WorkRequest* wr = GetPendingWork(work_id);
   epicAssert(wr);
