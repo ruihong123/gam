@@ -597,7 +597,7 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
 
   if (pending_msg >= max_pending_msg) {
     //add the send request to the waiting queue
-    epicLog(LOG_INFO, "Rdma device is busy; will try later");
+    epicLog(LOG_WARNING, "Rdma device is busy; will try later");
     pending_requests.push(RdmaRequest { op, src, len, id, signaled, dest, imm, oldval, newval });
     epicAssert(
                pending_requests.back().op == op && pending_requests.back().src == src

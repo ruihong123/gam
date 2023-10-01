@@ -62,7 +62,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       break;
     case IBV_WC_RDMA_WRITE:
       //update pending_msg
-      epicLog(LOG_DEBUG, "get write completion event");
+      epicLog(LOG_WARNING, "get write completion event");
       id = cli->WriteComp(wc);
       //write check initiated locally
       CompletionCheck(id);

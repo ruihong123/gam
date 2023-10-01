@@ -586,7 +586,7 @@ void Worker::ProcessPendingInvalidateForward(Client* cli, WorkRequest* wr) {
 
     if (WRITE == parent->op) {
       lcli->Write(parent->ptr, laddr, parent->size);
-      epicLog(LOG_DEBUG, "write the data (size = %ld) to destination",
+      epicLog(LOG_WARNING, "write the data (size = %ld) to destination",
               parent->size);
     } else {  //WRITE_PERMISSION_ONLY
       epicAssert(WRITE_PERMISSION_ONLY == parent->op);
