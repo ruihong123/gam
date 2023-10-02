@@ -71,7 +71,9 @@ set<GAddr> gen_accesses;
 set<GAddr> real_accesses;
 LockWrapper stat_lock;
 
+//The GAM read write will always involve block_size data transfer.
 int addr_size = sizeof(GAddr);
+//int addr_size = BLOCK_SIZE;
 int item_size = addr_size;
 int items_per_block = BLOCK_SIZE / item_size;
 
