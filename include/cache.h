@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <set>
+#include <map>
 #include <atomic>
 #include "settings.h"
 #include "structure.h"
