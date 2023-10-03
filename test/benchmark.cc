@@ -682,7 +682,10 @@ int main(int argc, char* argv[]) {
 //  conf.cache_size = cache_size;
     no_node = compute_num + memory_num;
   GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
-  STEPS = NUMOFBLOCKS/no_thread;
+  // The formula below is to guranttee that the  Global allocated data is a constant even if
+  // the thread number and share_ratio varied.
+  STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
+  printf("number of steps is %d\n", STEPS);
   ITERATION = ITERATION_TOTAL/no_thread;
   sleep(1);
 
