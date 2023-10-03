@@ -683,10 +683,10 @@ void Cache::Evict() {
  */
 int Cache::Evict(int n) {
     //TODO: Where does the cache recycle the registered memory
-    assert(false);
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
   if (used < 0 || used <= max_cache_mem)// need some rooms for free page. otherwise, there will be no registered memory to be allocated
     return 0;
+    assert(false);
 
   int max = (used - max_cache_mem) / BLOCK_SIZE;
   n = n > max ? max : n;
