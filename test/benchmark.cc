@@ -22,10 +22,13 @@
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
 
-#define STEPS 204800 //100M much larger than 10M L3 cache
+//TODO: shall be adjusted according to the no_thread and
+#define NUMOFBLOCKS (32768000ull) //100M much larger than 10M L3 cache
 #define DEBUG_LEVEL LOG_WARNING
 
-#define SYNC_KEY STEPS
+#define SYNC_KEY NUMOFBLOCKS
+
+uint64_t STEPS = 0;
 
 int node_id;
 
@@ -38,7 +41,10 @@ int port_worker = 12346;
 const char* result_file = "result.csv";
 
 //exp parameters
-long ITERATION = 2000000;
+// Cache can hold 4Million cache entries. Considering the random filling mechanism,
+// if we want to gurantee that the cache has been filled, we need to run 8Million iterations.
+long ITERATION_TOTAL = 8192000;
+long ITERATION = 0;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
 int no_node = 0;
@@ -229,7 +235,7 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
   stat_lock.unlock();
 #endif
   // Access is the address of future acesses.
-  for (int i = 1; i < ITERATION; i++) {
+  for (int i = 1; i < 2*ITERATION; i++) {
     //PopulateOneBlock(alloc, data, ldata, i, l_remote_ratio, l_space_locality, seedp);
     GAddr next;
     if (TrueOrFalse(space_locality, seedp)) {
@@ -501,7 +507,8 @@ void Benchmark(int id) {
 //	for(int i = 0; i < STEPS; i++) {
 //		ldata[i] = (GAddr*)malloc(BLOCK_SIZE);
 //	}
-  GAddr* access = (GAddr*) malloc(sizeof(GAddr) * ITERATION);
+    // gernerate 2*Iteration access target, half for warm up half for the real test
+  GAddr* access = (GAddr*) malloc(sizeof(GAddr) * 2*ITERATION);
 
   //bool shared[STEPS];
   bool* shared = (bool*) malloc(sizeof(bool) * STEPS);
@@ -567,7 +574,8 @@ void Benchmark(int id) {
   stat_lock.unlock();
 
   epicLog(LOG_WARNING, "start run the benchmark on thread %d", id);
-  Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
+  //Second half of access is for the real test.
+  Run(alloc, data, &access[ITERATION], addr_to_pos, shared, id, &seedp, warmup);
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
@@ -674,7 +682,8 @@ int main(int argc, char* argv[]) {
 //  conf.cache_size = cache_size;
     no_node = compute_num + memory_num;
   GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
-
+  STEPS = NUMOFBLOCKS/no_thread;
+  ITERATION = ITERATION_TOTAL/no_thread;
   sleep(1);
 
   //sync with all the other workers
