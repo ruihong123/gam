@@ -300,6 +300,7 @@ int Cache::ReadWrite(WorkRequest* wr) {
 #ifdef USE_LRU
   if (newcline) {
   //if (newcline && !(wr->flag & ASYNC)) {
+
     Evict(newcline);
   }
 #endif

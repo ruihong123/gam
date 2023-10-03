@@ -534,6 +534,8 @@ void Benchmark(int id) {
 
   bool warmup = true;
   Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
+    // print cache statistics
+    alloc->ReportCacheStatistics();
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
