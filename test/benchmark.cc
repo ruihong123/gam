@@ -536,22 +536,22 @@ void Benchmark(int id) {
   Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
     // print cache statistics
     alloc->ReportCacheStatistics();
-    alloc->ResetCacheStatistics();
+//    alloc->ResetCacheStatistics();
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
   alloc->WLock(data[0], BLOCK_SIZE);
   alloc->UnLock(data[0], BLOCK_SIZE);
 #endif
-  uint64_t SYNC_RUN_BASE = SYNC_KEY + compute_num * 2;
-  int sync_id = SYNC_RUN_BASE + compute_num * node_id + id;
+  uint64_t SYNC_RUN_BASE = SYNC_KEY + (compute_num +memory_num) * 2;
+  int sync_id = SYNC_RUN_BASE + no_thread * node_id + id;
   alloc->Put(sync_id, &sync_id, sizeof(int));
 
   for (int i = 1; i <= compute_num; i++) {
     for (int j = 0; j < no_thread; j++) {
       epicLog(LOG_WARNING, "waiting for node %d, thread %d", i, j);
-      alloc->Get(SYNC_RUN_BASE + compute_num * i + j, &sync_id);
-      epicAssert(sync_id == SYNC_RUN_BASE + compute_num * i + j);
+      alloc->Get(SYNC_RUN_BASE + no_thread * i + j, &sync_id);
+      epicAssert(sync_id == SYNC_RUN_BASE + no_thread * i + j);
       epicLog(LOG_WARNING, "get sync_id %d from node %d, thread %d", sync_id, i,
               j);
     }
