@@ -64,7 +64,7 @@ using namespace std;
 
 #define BLOCK_POWER 11 // 9 = 512, 10 = 1024, 11 = 2048, 12 = 4096
 #define BLOCK_SIZE (1 << BLOCK_POWER)
-#define BLOCK_MASK (BLOCK_SIZE - 1)
+#define BLOCK_MASK ~(BLOCK_SIZE - 1)
 
 #define RDMA_RESOURCE_EXCEPTION 1
 #define RDMA_CONTEXT_EXCEPTION 2
