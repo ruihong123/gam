@@ -683,6 +683,7 @@ void Cache::Evict() {
  */
 int Cache::Evict(int n) {
     //TODO: Where does the cache recycle the registered memory
+    assert(false);
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
   if (used < 0 || used <= max_cache_mem)// need some rooms for free page. otherwise, there will be no registered memory to be allocated
     return 0;
@@ -816,6 +817,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       cl->addr = block;
     }
     caches[block] = cl;
+    caches2[block] = cl;
   }
   return cl;
 }

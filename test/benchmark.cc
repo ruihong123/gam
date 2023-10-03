@@ -661,7 +661,7 @@ int main(int argc, char* argv[]) {
       result_file);
 
   //srand(1);
-
+    cache_th = 1;
   Conf conf;
   conf.loglevel = DEBUG_LEVEL;
   conf.is_master = is_master;
@@ -670,7 +670,7 @@ int main(int argc, char* argv[]) {
   conf.worker_ip = ip_worker;
   conf.worker_port = port_worker;
   conf.size = allocated_mem_size;
-  conf.cache_th = 1;
+  conf.cache_th = cache_th;
 //  conf.cache_size = cache_size;
     no_node = compute_num + memory_num;
   GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);

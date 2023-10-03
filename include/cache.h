@@ -64,6 +64,8 @@ class Cache {
 //unordered_map<GAddr, CacheLine> caches;
 #ifdef USE_SIMPLE_MAP
   Map<GAddr, CacheLine*> caches { "cache" };
+  std::map<GAddr, CacheLine*> caches2;
+  std::mutex caches_lock;
 #else
   HashTable<GAddr, CacheLine*> caches {"cache"};
 #endif
