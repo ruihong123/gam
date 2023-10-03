@@ -63,8 +63,8 @@ using namespace std;
 #define EXCLUSIVE_LOCK_TAG 255 //MAX(unsigned char)
 
 #define BLOCK_POWER 11 // 9 = 512, 10 = 1024, 11 = 2048, 12 = 4096
-#define BLOCK_MASK 0xFFFFFFFFFFFFFE00L
 #define BLOCK_SIZE (1 << BLOCK_POWER)
+#define BLOCK_MASK (BLOCK_SIZE - 1)
 
 #define RDMA_RESOURCE_EXCEPTION 1
 #define RDMA_CONTEXT_EXCEPTION 2
