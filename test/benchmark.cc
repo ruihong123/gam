@@ -536,6 +536,7 @@ void Benchmark(int id) {
   Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
     // print cache statistics
     alloc->ReportCacheStatistics();
+    alloc->ResetCacheStatistics();
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
