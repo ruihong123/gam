@@ -12,11 +12,12 @@
 #include "util.h"
 #include "gallocator.h"
 
-#define DEBUG_LEVEL LOG_WARNING
-#define STEPS 204800 //100M much larger than 10M L3 cache
+#define NUMOFBLOCKS (32768000ull) //100M much larger than 10M L3 cache
 #define DEBUG_LEVEL LOG_WARNING
 
-#define SYNC_KEY STEPS
+#define SYNC_KEY NUMOFBLOCKS
+
+uint64_t STEPS = 0;
 
 int node_id;
 
