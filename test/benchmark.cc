@@ -21,12 +21,16 @@
 //#define BENCHMARK_DEBUG
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
-
-//TODO: shall be adjusted according to the no_thread and
-#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node.
 #define DEBUG_LEVEL LOG_WARNING
 
-#define SYNC_KEY NUMOFBLOCKS
+//TODO: shall be adjusted according to the no_thread and
+//#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node. (25165824ull)
+//#define SYNC_KEY NUMOFBLOCKS
+
+//2516582ull =  48*1024*1024*1024/(2*1024)
+uint64_t NUMOFBLOCKS = 0;
+uint64_t SYNC_KEY = 0;
+uint64_t cache_size = 0;
 
 uint64_t STEPS = 0;
 
@@ -58,7 +62,6 @@ int compute_num = 100;
 int memory_num = 100;
 
 float cache_th = 0.15;  //0.15
-long cache_size = 0;
 uint64_t allocated_mem_size = 0;
 
 //runtime statistics
@@ -625,7 +628,10 @@ int main(int argc, char* argv[]) {
     } else if (strcmp(argv[i], "--item_size") == 0) {
       item_size = atoi(argv[++i]);
       items_per_block = BLOCK_SIZE / item_size;
-
+    } else if (strcmp(argv[i], "--cache_size") == 0) {
+        cache_size = atoi(argv[++i]);
+        cache_size = cache_size * 1024ull * 1024 * 1024;
+//        items_per_block = BLOCK_SIZE / item_size;
     } else if (strcmp(argv[i], "--allocated_mem_size") == 0) {
         allocated_mem_size = atoi(argv[++i]);
         allocated_mem_size = allocated_mem_size * 1024ull * 1024 * 1024;
@@ -677,13 +683,16 @@ int main(int argc, char* argv[]) {
   conf.master_port = port_master;
   conf.worker_ip = ip_worker;
   conf.worker_port = port_worker;
-  conf.size = allocated_mem_size;
+  conf.size = cache_size;
   conf.cache_th = cache_th;
 //  conf.cache_size = cache_size;
     no_node = compute_num + memory_num;
   GAlloc* alloc = GAllocFactory::CreateAllocator(&conf);
   // The formula below is to guranttee that the  Global allocated data is a constant even if
   // the thread number and share_ratio varied.
+  NUMOFBLOCKS = allocated_mem_size/(2*1024);
+    printf("number of blocks is %d\n", NUMOFBLOCKS);
+  SYNC_KEY = NUMOFBLOCKS;
   STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
   printf("number of steps is %d\n", STEPS);
   ITERATION = ITERATION_TOTAL/no_thread;
