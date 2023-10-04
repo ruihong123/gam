@@ -592,9 +592,9 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
       op, src, len, id, signaled, dest, imm, oldval, newval, src);
 
   int ret = len;
-//    if (len == 28){
-//        printf("break me\n");
-//    }
+    if (len == 52){
+        printf("break me\n");
+    }
 //    assert(len != 28);
   struct ibv_sge sge_list = { };
   struct ibv_send_wr wr = { };
