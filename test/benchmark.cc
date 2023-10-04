@@ -23,7 +23,7 @@
 //#define LOCAL_MEMORY
 
 //TODO: shall be adjusted according to the no_thread and
-#define NUMOFBLOCKS (25165824ull) //around 48GB totally, local cache is 8GB per node.
+#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node.
 #define DEBUG_LEVEL LOG_WARNING
 
 #define SYNC_KEY NUMOFBLOCKS
