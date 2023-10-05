@@ -593,7 +593,9 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
 
   int ret = len;
 
-//    assert(len != 28);
+    if (len == 28){
+        epicLog(LOG_WARNING, "size 28 RDMA operation is %d, source is %d, destination is %p, len is%d\n", op, src, dest, len);
+    }
   struct ibv_sge sge_list = { };
   struct ibv_send_wr wr = { };
 
