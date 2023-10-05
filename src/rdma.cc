@@ -592,9 +592,7 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
       op, src, len, id, signaled, dest, imm, oldval, newval, src);
 
   int ret = len;
-//    if (len == 52){
-//        printf("break me\n");
-//    }
+
 //    assert(len != 28);
   struct ibv_sge sge_list = { };
   struct ibv_send_wr wr = { };
@@ -637,6 +635,9 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
     }
     sge_list.lkey = send_buf->lkey;
   } else if (op == IBV_WR_RDMA_WRITE || op == IBV_WR_RDMA_WRITE_WITH_IMM) {
+      if (len == 28){
+          printf("source is %p, destination is %p\n", src, dest);
+      }
     sge_list.addr = (uintptr_t) src;
     sge_list.lkey = resource->bmr->lkey;
     wr.wr.rdma.remote_addr = (uintptr_t) dest;
