@@ -86,6 +86,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   *notify_buf = 1;  //not useful to set it to 1 if boost_queue is enabled
   epicAssert(*(int* )notify_buf == 1);
   wr->fd = recv_pipe[1];  //for legacy code
+  //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
   wr->notify_buf = this->notify_buf;
   epicLog(LOG_DEBUG,
       "workid = %d, wr->notify_buf = %d, wr->op = %d, wr->flag = %d, wr->status = %d, wr->addr = %lx, wr->size = %d, wr->fd = %d",

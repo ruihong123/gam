@@ -173,6 +173,10 @@ void Worker::StartService(Worker* w) {
 
   while (likely(!eventLoop->stop)) {
 #ifdef RDMA_POLL
+#ifndef NDEBUG
+      //for a better debugging.
+      memset(wc, 0, sizeof(ibv_wc)*MAX_CQ_EVENTS);
+#endif
     while (!(ne = ibv_poll_cq(cq, MAX_CQ_EVENTS, wc)))
       ;
     if (ne < 0) {
