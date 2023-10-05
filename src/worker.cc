@@ -526,6 +526,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     //epicLog(LOG_WARNING, "should not use for now");
     if (flag & ADD_TO_PENDING) {
       cli->WriteWithImm(dest, src, size, imm, wr->id, true);
+        assert(false);
     } else {
       cli->WriteWithImm(dest, src, size, imm);
     }
