@@ -590,6 +590,7 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
                           uint32_t imm, uint64_t oldval, uint64_t newval) {
   epicLog(LOG_DEBUG, "op = %d, src = %lx, len = %d, id = %d, signaled = %d, dest = %lx, imm = %u, oldval = %lu, newval = %lu\nsrc = %s",
       op, src, len, id, signaled, dest, imm, oldval, newval, src);
+    epicLog(LOG_WARNING,"RDMA write imme source is %p, destination is %p, len is%d\n", src, dest, len);
 
   int ret = len;
 
@@ -637,10 +638,6 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
     }
     sge_list.lkey = send_buf->lkey;
   } else if (op == IBV_WR_RDMA_WRITE || op == IBV_WR_RDMA_WRITE_WITH_IMM) {
-      if (op == IBV_WR_RDMA_WRITE_WITH_IMM){
-          epicLog(LOG_WARNING,"RDMA write imme source is %p, destination is %p, len is%d\n", src, dest, len);
-
-      }
     sge_list.addr = (uintptr_t) src;
     sge_list.lkey = resource->bmr->lkey;
     wr.wr.rdma.remote_addr = (uintptr_t) dest;
