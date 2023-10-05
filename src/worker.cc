@@ -521,7 +521,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
    * can remove it after development
    */
   wr->wid = GetWorkerId();
-
+    assert(wr->op != RLOCK && wr->op != WLOCK);
   if (!((wr->op & REPLY) || (flag & REQUEST_NO_ID)))
     wr->id = GetWorkPsn();
   if (flag & ADD_TO_PENDING)

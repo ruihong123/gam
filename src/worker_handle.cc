@@ -88,7 +88,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   wr->fd = recv_pipe[1];  //for legacy code
   //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
   wr->notify_buf = this->notify_buf;
-    if (wr->op == WRITE){
+    if (wr->op == WRITE && wr->op == READ){
         assert(false);
     }
   epicLog(LOG_DEBUG,

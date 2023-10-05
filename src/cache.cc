@@ -468,7 +468,7 @@ int Cache::Lock(WorkRequest* wr) {
     wr->is_cache_hit_ = false;
     WorkRequest* lwr = new WorkRequest(*wr);
     //we hide the fact that it is whether a lock op or read/write from the remote side
-    //as lock is completely maintained locally
+    //as lock is completely maintained locally. Why????
     lwr->op = wr->op == RLOCK ? READ : WRITE;
     lwr->counter = 0;
     lwr->flag |= CACHED;
