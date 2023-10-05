@@ -21,7 +21,7 @@
 //#define BENCHMARK_DEBUG
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
-#define DEBUG_LEVEL LOG_INFO
+#define DEBUG_LEVEL LOG_WARNING
 
 //TODO: shall be adjusted according to the no_thread and
 //#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node. (25165824ull)
