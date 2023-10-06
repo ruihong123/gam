@@ -344,6 +344,7 @@ void Worker::ProcessRequest(Client* client, WorkRequest* wr) {
 //Remote means request issued from the remote side.
 void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
     epicAssert(IsLocal(wr->addr));
+    epicLog(LOG_WARNING, "Process remote READ request from %d", client->GetWorkerId());
 #ifdef SELECTIVE_CACHING
     void* laddr = ToLocal(TOBLOCK(wr->addr));
 #else
@@ -623,7 +624,7 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
 }
 // process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
-    epicLog(LOG_INFO, "Process remote write request from %d", client->GetWorkerId());
+    epicLog(LOG_WARNING, "Process remote write request from %d", client->GetWorkerId());
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
     epicAssert(wr->size == BLOCK_SIZE);

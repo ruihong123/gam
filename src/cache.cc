@@ -290,7 +290,7 @@ int Cache::ReadWrite(WorkRequest* wr) {
         epicAssert(cline->state != CACHE_TO_DIRTY);
         ToToDirty(cline);
       }
-      epicLog(LOG_WARNING, "Cach miss, Remote operation %d, local buffer is %p, remote buffer is %p, size is %d\n", lwr->op, lwr->ptr, lwr->addr, lwr->size);
+      epicLog(LOG_WARNING, "Cach miss, Remote operation %d, local buffer is %p, remote buffer is %p, size is %d, target node is %d\n", lwr->op, lwr->ptr, lwr->addr, lwr->size, cli->GetWorkerId());
       worker->SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
     }
     unlock(i);
