@@ -520,8 +520,11 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
    * TODO: it is actually not necessary
    * can remove it after development
    */
+    if (wr->op == WRITE_BACK){
+        epicLog(LOG_WARNING, "BREAK HERER\n");
+    }
   wr->wid = GetWorkerId();
-    assert(wr->op != RLOCK && wr->op != WLOCK);
+    assert(wr->op != RLOCK && wr->op != WLOCK);// THE rlock and wlock is not implemented at all!
   if (!((wr->op & REPLY) || (flag & REQUEST_NO_ID)))
     wr->id = GetWorkPsn();
   if (flag & ADD_TO_PENDING)
@@ -549,12 +552,16 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     if (sbuf == nullptr) {
       busy = true;
       sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
-      epicLog(LOG_INFO,
+      epicLog(LOG_WARNING,
           "We don't have enough slot buf, we use local buf instead");
+        assert(false);
+      // need to RDMA regist it and free it in the end. We shall
     }
     int len;
     int ret = wr->Ser(sbuf, len);
     epicAssert(!ret);
+      epicLog(LOG_WARNING,
+              "RDMA send request local addr is %p", sbuf);
     if ((ret = cli->Send(sbuf, len)) != len) {
       epicAssert(ret == -1);
       epicLog(LOG_INFO, "sent failed: slots are busy");

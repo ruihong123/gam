@@ -341,7 +341,7 @@ void Worker::ProcessRequest(Client* client, WorkRequest* wr) {
       break;
   }
 }
-
+//Remote means request issued from the remote side.
 void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
     epicAssert(IsLocal(wr->addr));
 #ifdef SELECTIVE_CACHING
@@ -362,6 +362,8 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
     if (directory.GetState(entry) != DIR_DIRTY) {  //it is shared or exclusively owned (Case 2)
         //add the lock support
         if (directory.IsBlockWLocked(entry)) {
+            //According to my analysis, the code below is never invoked.
+            assert(false);
             if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
                 epicAssert(wr->flag & LOCKED);
                 wr->status = LOCK_FAILED;
@@ -383,6 +385,8 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
         //TODO: add the write completion check
         epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
         client->WriteWithImm(wr->ptr, ToLocal(wr->addr), wr->size, wr->id);
+        epicLog(LOG_WARNING, "Remote read write back, RDMA write with imm, local addr %p, remote addr %p", ToLocal(wr->addr),
+                wr->ptr);
 #ifdef SELECTIVE_CACHING
         if(!(wr->flag & NOT_CACHE)) {
 #endif
@@ -422,12 +426,13 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
 #else
         //intermediate state
         directory.ToToShared(entry);
-        SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
+        epicLog(LOG_WARNING, "Remote read forward, conducted thorugh RDMA send");
+                SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
 #endif
     }
     directory.unlock(laddr);
 }
-
+// Handle the read forward request, this node has to exclusively own the data.
 void Worker::ProcessRemoteReadCache(Client* client, WorkRequest* wr) {
     Work op_orin = wr->op;
     bool deadlock = false;
@@ -616,7 +621,7 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
     pwr = nullptr;
     wr = nullptr;
 }
-
+// process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
@@ -642,6 +647,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
     if (state != DIR_DIRTY) {
         //add the lock support
         if (directory.IsBlockLocked(entry)) {
+            epicAssert(false);
             epicAssert((directory.IsBlockWLocked(entry) && state == DIR_UNSHARED)
                        || !directory.IsBlockWLocked(entry));
             if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
@@ -691,7 +697,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
                     lwr->counter--;
                     continue;
                 }
-                epicLog(LOG_DEBUG, "invalidate forward (%d) cache from worker %d",
+                epicLog(LOG_WARNING, "invalidate forward (%d) cache from worker %d",
                         lwr->op, cli->GetWorkerId());
                 if (first) {
                     AddToPending(lwr->id, lwr);
@@ -730,9 +736,11 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
       } else {
 #endif
             if (WRITE == op_orin) {
-                epicLog(LOG_DEBUG, "write the data (size = %ld) to destination",
-                        wr->size);
+                epicLog(LOG_WARNING, "write the local data %p  (size = %ld) to destination %p",
+                        laddr, wr->size, wr->ptr);
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
+                // In this case, the compute node does  not have a copy of data, we need to first write the local data
+                // back to the request node.
                 client->Write(wr->ptr, laddr, wr->size);
             } else {  //WRITE_PERMISSION_ONLY
                 epicAssert(state == DIR_UNSHARED);
@@ -754,6 +762,8 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         wr->op = WRITE_REPLY;
         wr->status = SUCCESS;
         wr->counter = 0;
+        //Why not use write with imm? notify the remote node that the data is ready.
+        epicLog(LOG_WARNING, "Notify the request node for REMOTE write request on unshared data by RDMA send");
         SubmitRequest(client, wr);
 
 #ifdef SELECTIVE_CACHING
@@ -805,7 +815,9 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
 
         //intermediate state
         directory.ToToDirty(entry);
-        SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
+        epicLog(LOG_WARNING, "Write forward for dirty data page write, conducted through RDMA send");
+
+        SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);// what does ADD_TO_PENDING mean?
     }
     directory.unlock(laddr);
 }

@@ -18,7 +18,7 @@ enum DirState {
   DIR_TO_SHARED,
   DIR_TO_UNSHARED
 };
-
+//Somehow similar to cache entry.
 struct DirEntry {
   DirState state = DIR_UNSHARED;
   list<GAddr> shared;

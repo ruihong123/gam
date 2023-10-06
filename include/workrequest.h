@@ -140,6 +140,7 @@ struct WorkRequest {
   int status;
 
   Flag flag = 0;
+  //Local write back buffer for the cache line?
   void* ptr;
 
   int fd;
