@@ -23,7 +23,7 @@ uint64_t STEPS = 0;
 
 int node_id;
 
-int is_master = 1;
+int is_master = 0;
 string ip_master = get_local_ip("eth0");
 string ip_worker = get_local_ip("eth0");
 int port_master = 12345;
