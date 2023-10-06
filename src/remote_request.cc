@@ -623,6 +623,7 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
 }
 // process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
+    epicLog(LOG_INFO, "Process remote write request from %d", client->GetWorkerId());
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
     epicAssert(wr->size == BLOCK_SIZE);
@@ -736,8 +737,8 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
       } else {
 #endif
             if (WRITE == op_orin) {
-                epicLog(LOG_WARNING, "write the local data %p  (size = %ld) to destination %p",
-                        laddr, wr->size, wr->ptr);
+                epicLog(LOG_WARNING, "write the local data %p  ro node %d (size = %ld) to destination %p",
+                        laddr, client->GetWorkerId(),wr->size, wr->ptr);
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
                 // In this case, the compute node does  not have a copy of data, we need to first write the local data
                 // back to the request node.

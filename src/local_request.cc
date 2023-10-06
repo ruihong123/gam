@@ -356,7 +356,7 @@ int Worker::ProcessLocalRead(WorkRequest* wr) {
         fence->unlock();
     }
 
-    if (likely(IsLocal(wr->addr))) {
+    if (unlikely(IsLocal(wr->addr))) {
         GAddr start = wr->addr;
         GAddr start_blk = TOBLOCK(start);
         GAddr end = GADD(start, wr->size);
