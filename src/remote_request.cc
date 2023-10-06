@@ -385,7 +385,7 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
         //TODO: add the write completion check
         epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
         client->WriteWithImm(wr->ptr, ToLocal(wr->addr), wr->size, wr->id);
-        epicLog(LOG_WARNING, "Remote read write back, RDMA write with imm, local addr %p, remote addr %p", ToLocal(wr->addr),
+        epicLog(LOG_WARNING, "Remote read write back to node %d, RDMA write with imm, local addr %p, remote addr %p", client->GetWorkerId(), ToLocal(wr->addr),
                 wr->ptr);
 #ifdef SELECTIVE_CACHING
         if(!(wr->flag & NOT_CACHE)) {

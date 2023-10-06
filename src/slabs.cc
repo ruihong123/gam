@@ -289,6 +289,7 @@ void * SlabAllocator::do_slabs_alloc(const size_t size, unsigned int id) {
   /* fail unless we have space at the end of a recently allocated page,
    we have something on our freelist, or we could allocate a new page */
   if (!(p->sl_curr != 0 || do_slabs_newslab(id) != 0)) {
+      assert(false);
     /* We don't have more memory available */
     ret = NULL;
   } else if (p->sl_curr != 0) {
