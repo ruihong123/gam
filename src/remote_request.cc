@@ -344,7 +344,7 @@ void Worker::ProcessRequest(Client* client, WorkRequest* wr) {
 //Remote means request issued from the remote side.
 void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
     epicAssert(IsLocal(wr->addr));
-    epicLog(LOG_WARNING, "Process remote READ request from %d", client->GetWorkerId());
+    epicLog(LOG_INFO, "Process remote READ request from %d", client->GetWorkerId());
 #ifdef SELECTIVE_CACHING
     void* laddr = ToLocal(TOBLOCK(wr->addr));
 #else
@@ -386,7 +386,7 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
         //TODO: add the write completion check
         epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
         client->WriteWithImm(wr->ptr, ToLocal(wr->addr), wr->size, wr->id);
-        epicLog(LOG_WARNING, "Remote read write back to node %d, RDMA write with imm, local addr %p, remote addr %p", client->GetWorkerId(), ToLocal(wr->addr),
+        epicLog(LOG_INFO, "Remote read write back to node %d, RDMA write with imm, local addr %p, remote addr %p", client->GetWorkerId(), ToLocal(wr->addr),
                 wr->ptr);
 #ifdef SELECTIVE_CACHING
         if(!(wr->flag & NOT_CACHE)) {
@@ -427,7 +427,7 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
 #else
         //intermediate state
         directory.ToToShared(entry);
-        epicLog(LOG_WARNING, "Remote read forward, conducted thorugh RDMA send");
+        epicLog(LOG_INFO, "Remote read forward, conducted thorugh RDMA send");
                 SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
 #endif
     }
@@ -624,7 +624,7 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
 }
 // process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
-    epicLog(LOG_WARNING, "Process remote write request from %d", client->GetWorkerId());
+    epicLog(LOG_INFO, "Process remote write request from %d", client->GetWorkerId());
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
     epicAssert(wr->size == BLOCK_SIZE);
@@ -699,7 +699,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
                     lwr->counter--;
                     continue;
                 }
-                epicLog(LOG_WARNING, "invalidate forward (%d) cache from worker %d",
+                epicLog(LOG_INFO, "invalidate forward (%d) cache from worker %d",
                         lwr->op, cli->GetWorkerId());
                 if (first) {
                     AddToPending(lwr->id, lwr);
@@ -738,7 +738,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
       } else {
 #endif
             if (WRITE == op_orin) {
-                epicLog(LOG_WARNING, "write the local data %p  ro node %d (size = %ld) to destination %p",
+                epicLog(LOG_INFO, "write the local data %p  ro node %d (size = %ld) to destination %p",
                         laddr, client->GetWorkerId(),wr->size, wr->ptr);
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
                 // In this case, the compute node does  not have a copy of data, we need to first write the local data
@@ -765,7 +765,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         wr->status = SUCCESS;
         wr->counter = 0;
         //Why not use write with imm? notify the remote node that the data is ready.
-        epicLog(LOG_WARNING, "Notify the request node for REMOTE write request on unshared data by RDMA send");
+        epicLog(LOG_INFO, "Notify the request node for REMOTE write request on unshared data by RDMA send");
         SubmitRequest(client, wr);
 
 #ifdef SELECTIVE_CACHING
@@ -817,7 +817,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
 
         //intermediate state
         directory.ToToDirty(entry);
-        epicLog(LOG_WARNING, "Write forward for dirty data page write, conducted through RDMA send");
+        epicLog(LOG_INFO, "Write forward for dirty data page write, conducted through RDMA send");
 
         SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);// what does ADD_TO_PENDING mean?
     }

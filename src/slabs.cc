@@ -207,6 +207,7 @@ void* SlabAllocator::memory_allocate(size_t size) {
         }
 
         mem_current += size;
+        assert(mem_base - mem_current <= mem_limit);
         if (size < mem_avail) {
             mem_avail -= size;
         } else {
@@ -249,6 +250,7 @@ int SlabAllocator::do_slabs_newslab(const unsigned int id) {
         || ((ptr = (char *) memory_allocate((size_t) len)) == 0)) {
 
         epicLog(LOG_WARNING, "new slab class %d failed", id);
+        assert(false);
         return 0;
     }
 

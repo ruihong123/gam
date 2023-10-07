@@ -643,7 +643,7 @@ void Worker::ProcessPendingInvalidateForward(Client* cli, WorkRequest* wr) {
 }
 
 void Worker::ProcessPendingRequest(Client* cli, WorkRequest* wr) {
-  epicLog(LOG_DEBUG, "process pending request %d from worker %d", wr->op,
+  epicLog(LOG_WARNING, "process pending request %d from worker %d", wr->op,
           cli->GetWorkerId());
   switch (wr->op) {
     case READ:
