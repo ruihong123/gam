@@ -207,7 +207,7 @@ void* SlabAllocator::memory_allocate(size_t size) {
         }
 
         mem_current += size;
-        assert(mem_base - mem_current <= mem_limit);
+        assert(mem_current - mem_base <= mem_limit);
         if (size < mem_avail) {
             mem_avail -= size;
         } else {
