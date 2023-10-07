@@ -556,7 +556,7 @@ char* RdmaContext::GetFreeSlot_() {
   int avail = RMINUS(slot_tail, slot_head, max_pending_msg);  //slot_head <= slot_tail ? slot_tail-slot_head : slot_tail+max_pending_msg-slot_head;
   if (!avail && !full)
     avail = max_pending_msg;
-  epicLog(LOG_WARNING, "avail = %d, pending_msg = %d", avail, pending_msg.load());
+  epicLog(LOG_INFO, "avail = %d, pending_msg = %d", avail, pending_msg.load());
   if (avail <= 0 || pending_msg >= max_pending_msg) {
     epicLog(LOG_INFO, "all the slots are busy\n");
     return nullptr;
@@ -571,14 +571,16 @@ char* RdmaContext::GetFreeSlot_() {
 }
 
 char* RdmaContext::GetFreeSlot() {
-  lock();
+    lock();
     char* s = GetFreeSlot_();
 
     uint64_t i = 0;
     while ( !s){
         i++;
         s = GetFreeSlot_();
+        unlock();
         usleep(50);
+        lock();
         if ((i%1024) == 0){
             epicLog(LOG_WARNING,
                     "We don't have enough slot buf, we use local buf instead");
