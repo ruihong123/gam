@@ -573,7 +573,18 @@ char* RdmaContext::GetFreeSlot_() {
 
 char* RdmaContext::GetFreeSlot() {
   lock();
-  char* s = GetFreeSlot_();
+    char* s = GetFreeSlot_();
+
+    uint64_t i = 0;
+    while ( !s){
+        i++;
+        s = GetFreeSlot_();
+        usleep(50);
+        if ((i%1024) == 0){
+            epicLog(LOG_WARNING,
+                    "We don't have enough slot buf, we use local buf instead");
+        }
+    }
 #ifdef ASYNC_RDMA_SEND
   unlock();  //we delay the unlock to after-send
 #endif

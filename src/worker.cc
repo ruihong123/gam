@@ -548,18 +548,6 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     rdma_queue->push(data);
 #else
       char* sbuf = cli->GetFreeSlot();
-
-      uint64_t i = 0;
-      while ( !sbuf){
-          i++;
-          cli->unlock();
-          sbuf = cli->GetFreeSlot();
-          usleep(100);
-          if ((i%1024) == 0){
-              epicLog(LOG_WARNING,
-                      "We don't have enough slot buf, we use local buf instead");
-          }
-      }
 //    bool busy = false;
 //    if (sbuf == nullptr) {
 //      busy = true;
