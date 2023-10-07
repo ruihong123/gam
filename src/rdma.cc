@@ -183,7 +183,7 @@ int RdmaResource::PostRecvSlot(int slot) {
     epicLog(LOG_WARNING, "cannot post any recv, already full");
     return 0;
   }
-
+  epicLog(LOG_WARNING, "post recv request ");
   recv_posted += 1;
   ibv_recv_wr rr { };
   ibv_sge sge { };
