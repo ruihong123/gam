@@ -570,7 +570,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     int len;
     int ret = wr->Ser(sbuf, len);
     epicAssert(!ret);
-      epicLog(LOG_WARNING,
+      epicLog(LOG_INFO,
               "RDMA send request local addr is %p", sbuf);
     if ((ret = cli->Send(sbuf, len)) != len) {
       epicAssert(ret == -1);
