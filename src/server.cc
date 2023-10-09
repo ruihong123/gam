@@ -116,6 +116,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       //epicAssert(n == 1);
       break;
     }
+    //imm is used to wake up those pending work request, change TOTOXXX to XXX state
     case IBV_WC_RECV_RDMA_WITH_IMM: {
       epicLog(LOG_DEBUG, "Get recv with IMM completion event");
       char* data = cli->RecvComp(wc);
