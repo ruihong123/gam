@@ -536,7 +536,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
       cli->WriteWithImm(dest, src, size, imm, wr->id, true);
     } else {
       cli->WriteWithImm(dest, src, size, imm);
-        assert(false);
+//        assert(false);
 
     }
   } else if (flag & REQUEST_SEND) {
