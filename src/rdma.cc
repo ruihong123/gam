@@ -574,23 +574,23 @@ char* RdmaContext::GetFreeSlot() {
     lock();
     char* s = GetFreeSlot_();
 
-    uint64_t i = 0;
-    while ( !s){
-        i++;
-        s = GetFreeSlot_();
-        unlock();
-        usleep(50);
-        lock();
-        if ((i%1024) == 0){
-            epicLog(LOG_WARNING,
-                    "slot buffer is full, we wait for 50us and try again");
-        }
-        if (i >=  1024*32){
-            epicLog(LOG_FATAL,
-                    "the slot buffer is full, we wait for 50us and try again, but we have tried 1024*1024 times, we give up");
-            epicAssert(false);
-        }
-    }
+//    uint64_t i = 0;
+//    while ( !s){
+//        i++;
+//        s = GetFreeSlot_();
+//        unlock();
+//        usleep(50);
+//        lock();
+//        if ((i%1024) == 0){
+//            epicLog(LOG_WARNING,
+//                    "slot buffer is full, we wait for 50us and try again");
+//        }
+//        if (i >=  1024*32){
+//            epicLog(LOG_FATAL,
+//                    "the slot buffer is full, we wait for 50us and try again, but we have tried 1024*1024 times, we give up");
+//            epicAssert(false);
+//        }
+//    }
 #ifdef ASYNC_RDMA_SEND
   unlock();  //we delay the unlock to after-send
 #endif

@@ -549,15 +549,15 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     rdma_queue->push(data);
 #else
       char* sbuf = cli->GetFreeSlot();
-//    bool busy = false;
-//    if (sbuf == nullptr) {
-//      busy = true;
-//      sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
-//      epicLog(LOG_WARNING,
-//          "We don't have enough slot buf, we use local buf instead");
-//        assert(false);
-//      // need to RDMA regist it and free it in the end. We shall
-//    }
+    bool busy = false;
+    if (sbuf == nullptr) {
+      busy = true;
+      sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
+      epicLog(LOG_WARNING,
+          "We don't have enough slot buf, we use local buf instead");
+        assert(false);
+      // need to RDMA regist it and free it in the end. We shall
+    }
     int len;
     int ret = wr->Ser(sbuf, len);
     epicAssert(!ret);
