@@ -585,7 +585,7 @@ char* RdmaContext::GetFreeSlot() {
             epicLog(LOG_WARNING,
                     "slot buffer is full, we wait for 50us and try again");
         }
-        if (i >=  1024*1024){
+        if (i >=  1024*32){
             epicLog(LOG_FATAL,
                     "the slot buffer is full, we wait for 50us and try again, but we have tried 1024*1024 times, we give up");
             epicAssert(false);
