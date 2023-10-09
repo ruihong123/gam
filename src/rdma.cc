@@ -583,7 +583,12 @@ char* RdmaContext::GetFreeSlot() {
         lock();
         if ((i%1024) == 0){
             epicLog(LOG_WARNING,
-                    "We don't have enough slot buf, we use local buf instead");
+                    "slot buffer is full, we wait for 50us and try again");
+        }
+        if (i >=  1024*1024){
+            epicLog(LOG_FATAL,
+                    "the slot buffer is full, we wait for 50us and try again, but we have tried 1024*1024 times, we give up");
+            epicAssert(false);
         }
     }
 #ifdef ASYNC_RDMA_SEND
