@@ -555,7 +555,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
       sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
       epicLog(LOG_WARNING,
           "We don't have enough slot buf, we use local buf instead");
-        assert(false);
+//        assert(false);
       // need to RDMA regist it and free it in the end. We shall
     }
     int len;
