@@ -491,7 +491,7 @@ void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
   cache.lock(wr->addr);
   cache.ToInvalid(wr->addr);
   cache.unlock(wr->addr);
-    epicLog(LOG_WARNING, "Process pending cache eviction");
+//    epicLog(LOG_WARNING, "Process pending cache eviction");
   int ret = ErasePendingWork(wr->id);
   epicAssert(ret);
   ProcessToServeRequest(wr);
@@ -644,7 +644,7 @@ void Worker::ProcessPendingInvalidateForward(Client* cli, WorkRequest* wr) {
 }
 
 void Worker::ProcessPendingRequest(Client* cli, WorkRequest* wr) {
-  epicLog(LOG_WARNING, "process pending request %d from worker %d", wr->op,
+  epicLog(LOG_DEBUG, "process pending request %d from worker %d", wr->op,
           cli->GetWorkerId());
   switch (wr->op) {
     case READ:
@@ -691,7 +691,7 @@ void Worker::ProcessRequest(Client* cli, unsigned int work_id) {
   epicLog(LOG_WARNING, "shouldn't come here");
   return;
 #endif
-  epicLog(LOG_WARNING, "callback function work_id = %u, reply from %d", work_id,
+  epicLog(LOG_DEBUG, "callback function work_id = %u, reply from %d", work_id,
           cli->GetWorkerId());
   WorkRequest* wr = GetPendingWork(work_id);
   epicAssert(wr);
