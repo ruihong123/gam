@@ -303,6 +303,8 @@ void * SlabAllocator::do_slabs_alloc(const size_t size, unsigned int id) {
         //ret = (void *)it; //sep
         ret = it->data;  //sep
     }
+    assert(mem_free == p->sl_curr*p->size);
+
 #ifdef FINE_SLAB_LOCK
     p->unlock();
 #endif
@@ -351,6 +353,7 @@ void SlabAllocator::do_slabs_free(void *ptr, const size_t size,
     p->requested -= size;
     if (size)
         mem_free += p->size;
+    assert(mem_free == p->sl_curr*p->size);
     return;
 }
 

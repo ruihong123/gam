@@ -175,7 +175,7 @@ void Worker::ProcessRemoteGetReply(Client* client, WorkRequest* wr) {
   delete wr;
   wr = nullptr;
 }
-
+// Remote cache evict a shared page.
 void Worker::ProcessRemoteEvictShared(Client* client, WorkRequest* wr) {
   void* laddr = ToLocal(wr->addr);
   directory.lock(laddr);
@@ -823,7 +823,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
     }
     directory.unlock(laddr);
 }
-
+// Remote write to the cache in this worker
 void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
     epicAssert(wr->op != WRITE_PERMISSION_ONLY_FORWARD);  //this cannot happen
     Work op_orin = wr->op;
@@ -948,6 +948,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
         //TODO: add the write completion check
         //can add it to the pending work and check it upon done
         if (wr->op == FETCH_AND_INVALIDATE) {  //FETCH_AND_INVALIDATE
+            assert(false); //Not gonna happen in disaggregated setup.
             epicAssert(cache.IsDirty(cline) || cache.InTransitionState(cline));
             if (deadlock) {
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);

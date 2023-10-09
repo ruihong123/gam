@@ -26,7 +26,7 @@ typedef void* caddr;
 
 enum CacheState {
   CACHE_NOT_EXIST = -1,
-  CACHE_INVALID = 0,
+  CACHE_INVALID = 0, // Invalidated cache will not exist in the cache at all!
   CACHE_SHARED,
   CACHE_DIRTY,
   CACHE_TO_INVALID,
@@ -65,7 +65,7 @@ class Cache {
 //unordered_map<GAddr, CacheLine> caches;
 #ifdef USE_SIMPLE_MAP
   Map<GAddr, CacheLine*> caches { "cache" };
-  std::map<GAddr, CacheLine*> caches2;
+//  std::map<GAddr, CacheLine*> caches2;
   std::mutex caches_lock;
 #else
   HashTable<GAddr, CacheLine*> caches {"cache"};

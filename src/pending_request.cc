@@ -491,6 +491,7 @@ void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
   cache.lock(wr->addr);
   cache.ToInvalid(wr->addr);
   cache.unlock(wr->addr);
+    epicLog(LOG_WARNING, "Process pending cache eviction");
   int ret = ErasePendingWork(wr->id);
   epicAssert(ret);
   ProcessToServeRequest(wr);

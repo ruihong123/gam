@@ -774,7 +774,9 @@ void Cache::Evict(CacheLine* cline) {
     wr = nullptr;
   } else if (CACHE_DIRTY == state) {
     wr->op = WRITE_BACK;
-    cli->Write(cli->ToLocal(wr->addr), cline->line, BLOCK_SIZE);
+    //The write shall goto an TOTOInvalid state not invalid immediately,
+    // because the home node may still in transition state and the local copy is still in use.
+    cli->Write(cli->ToLocal(wr->addr), cline->line, BLOCK_SIZE); // Why not use write with imm. May be this will violate the transition state?
     ToToInvalid(cline);
 //  UnLinkLRU(cline, pos); //since we already got the lock in the parent function of Evict(CacheLine*)
     worker->SubmitRequest(worker->GetClient(wr->addr), wr,
@@ -818,7 +820,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       cl->addr = block;
     }
     caches[block] = cl;
-    caches2[block] = cl;
+//    caches2[block] = cl;
   }
   return cl;
 }

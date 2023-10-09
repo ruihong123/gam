@@ -21,14 +21,14 @@
 enum Work {
   MALLOC = 1,
   READ,
-  FETCH_AND_SHARED,
-  READ_FORWARD,
+  FETCH_AND_SHARED,// Read initialized on homenode, home node is invalidated. Home node -> shared node.
+  READ_FORWARD, // home node -> owner node. Owner node will return the latest copy.
   WRITE,
   WRITE_PERMISSION_ONLY,
-  FETCH_AND_INVALIDATE,
-  INVALIDATE,
-  INVALIDATE_FORWARD,
-  WRITE_FORWARD,
+  FETCH_AND_INVALIDATE,//  UPdate initialized on home node. homenode -> owner node.. HOme node is dirty update on home node,
+  INVALIDATE, //  UPdate initialized on home node. homenode-> other shared node. home node write, home node directly invalidate others
+  INVALIDATE_FORWARD, // homenode -> shared node Non-home node write, Home node is in shared state. home node directly return the most updated copy. home node forward the invalidate message all the cache copies
+  WRITE_FORWARD, // homenode -> owner node. Non-home node write, home node is in invalidate state. the home node forward the message to the owner node.
   WRITE_PERMISSION_ONLY_FORWARD,
   ATOMIC,
   UPDATE_MEM_STATS,
@@ -63,8 +63,8 @@ enum Work {
 #endif
   MALLOC_REPLY,
   FETCH_MEM_STATS_REPLY,
-  READ_REPLY,
-  WRITE_REPLY,
+  READ_REPLY,// HOme node is DIR_UNSHARED, the home node reply to a read request.
+  WRITE_REPLY,// HOme node is DIR_UNSHARED, the home node reply to a write request.
   LOCK_REPLY,
   FREE_REPLY,
 #ifdef DHT
