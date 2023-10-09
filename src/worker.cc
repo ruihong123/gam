@@ -527,9 +527,9 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     wr->id = GetWorkPsn();
   if (flag & ADD_TO_PENDING)// ADD TO pending list for future RDMA write with imm call back
     AddToPending(wr->id, wr);
-    if (wr->op == WRITE_BACK){
-        epicLog(LOG_WARNING, "WRITE BACK generated id is %d", wr->id);
-    }
+//    if (wr->op == WRITE_BACK){
+//        epicLog(LOG_WARNING, "WRITE BACK generated id is %d", wr->id);
+//    }
   if (flag & REQUEST_WRITE_IMM) {
     //epicLog(LOG_WARNING, "should not use for now");
     if (flag & ADD_TO_PENDING) {
