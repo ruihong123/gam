@@ -783,7 +783,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
   epicLog(LOG_DEBUG, "add pending work %d, wr->op = %d, wr addr = %lx", id,
       wr->op, wr);
   pending_works[id] = wr;
-  ending_works2[id] = wr;
+  pending_works2[id] = wr;
   //UNLOCK_MICRO(pending_works, id);
 }
 
