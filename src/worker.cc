@@ -527,7 +527,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     assert(wr->op != RLOCK && wr->op != WLOCK);// THE rlock and wlock is not implemented at all!
   if (!((wr->op & REPLY) || (flag & REQUEST_NO_ID)))
     wr->id = GetWorkPsn();
-  if (flag & ADD_TO_PENDING)
+  if (flag & ADD_TO_PENDING)// ADD TO pending list for future RDMA write with imm call back
     AddToPending(wr->id, wr);
   if (flag & REQUEST_WRITE_IMM) {
     //epicLog(LOG_WARNING, "should not use for now");
