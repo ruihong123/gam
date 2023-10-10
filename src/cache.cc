@@ -716,6 +716,7 @@ int Cache::Evict(int n) {
   }
   GAddr addr = Gnullptr;
   size_t evict_counter = 0;
+    CacheLine* to_evict;
   for (i = 0; i < n; i++) {
     int lru_no = GetRandom(0, LRU_NUM);
     if (lru_locks_[lru_no].try_lock()) {
@@ -724,7 +725,7 @@ int Cache::Evict(int n) {
         lru_locks_[lru_no].unlock();
         return 0;
       }
-      CacheLine* to_evict = tails[lru_no];
+        to_evict = tails[lru_no];
       tried = 0;
       while (to_evict) {  //only unlocked cache line can be evicted
         addr = to_evict->addr;
