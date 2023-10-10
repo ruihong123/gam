@@ -741,7 +741,7 @@ int Cache::Evict(int n) {
       }
       lru_locks_[lru_no].unlock();
       if (!to_evict) {
-        epicLog(LOG_INFO, "all the cache lines are searched");
+        epicLog(LOG_WARNING, "all the cache lines are searched");
         continue;
       }
       epicAssert(!InTransitionState(to_evict));
