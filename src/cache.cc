@@ -708,7 +708,7 @@ int Cache::Evict(int n) {
   }
 #else
   int i = 0;
-  int tries = 1, tried = 0;
+  int tries = 1024, tried = 0;
   int max_evict = 16;
   if (n > max_evict){
       epicLog(LOG_WARNING, "trying to evict %d, but max is %d", n, max_evict);
@@ -729,17 +729,18 @@ int Cache::Evict(int n) {
         addr = to_evict->addr;
         if (try_lock(addr)) {
           if (unlikely(to_evict->locks.size() || InTransitionState(to_evict))) {
-            epicLog(LOG_INFO, "cache line (%lx) is locked", to_evict->addr);
+            epicLog(LOG_WARNING, "cache line (%lx) is locked", to_evict->addr);
             unlock(addr);
           } else {
             break;
           }
         }
-        tried++;
-        if (tried == tries) {
-          to_evict = nullptr;
-          break;
-        }
+//        tried++;
+//        if (tried == tries) {
+//          to_evict = nullptr;
+//          break;
+//        }
+        //Shall keep trying at eviction.
         to_evict = to_evict->prev;
       }
 
@@ -791,7 +792,7 @@ void Cache::Evict(CacheLine* cline) {
                           ADD_TO_PENDING | REQUEST_SEND);
   } else {  //invalid
     epicAssert(CACHE_INVALID == state);
-    epicLog(LOG_INFO, "unexpected cache state when evicting");
+    epicLog(LOG_WARNING, "unexpected cache state when evicting");
   }
 }
 #endif
