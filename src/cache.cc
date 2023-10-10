@@ -799,7 +799,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
     cl = caches.at(block);
     if (line) {
       worker->sb.sb_free((byte*) cl->line - CACHE_LINE_PREFIX);
-      used_bytes -= (BLOCK_SIZE + CACHE_LINE_PREFIX);
+      used_bytes.fetch_sub(BLOCK_SIZE + CACHE_LINE_PREFIX);
       cl->line = line;
       cl->addr = block;
       epicLog(LOG_WARNING, "should not use for now");
@@ -814,7 +814,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
                                                BLOCK_SIZE + CACHE_LINE_PREFIX);
 //        epicLog(LOG_WARNING, "ALLOCATE used byte in cache is %ld, allocator used byte is %ld ", used_bytes.load(), worker->sb.get_allocated());
 //        assert(used_bytes.load() == worker->sb.get_allocated());
-      used_bytes += (BLOCK_SIZE + CACHE_LINE_PREFIX);
+      used_bytes.fetch_add(BLOCK_SIZE + CACHE_LINE_PREFIX);
       //*(byte*) ptr = CACHE_INVALID;
       ptr = (byte*) ptr + CACHE_LINE_PREFIX;
       cl->line = ptr;
@@ -871,7 +871,7 @@ void Cache::ToInvalid(CacheLine* cline) {
 #endif
   void* line = cline->line;
   worker->sb.sb_free((char*) line - CACHE_LINE_PREFIX);
-  used_bytes -= (BLOCK_SIZE + CACHE_LINE_PREFIX);
+  used_bytes.fetch_sub(BLOCK_SIZE + CACHE_LINE_PREFIX);
 
   epicAssert(!IsBlockLocked(cline));
 
