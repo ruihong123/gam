@@ -743,7 +743,7 @@ int Cache::Evict(int n) {
         //Shall keep trying at eviction.
         to_evict = to_evict->prev;
       }
-
+      assert(to_evict);
       if (to_evict) {
         UnLinkLRU(to_evict, to_evict->pos);  //since we already got the lock in the parent function of Evict(CacheLine*)
       }
