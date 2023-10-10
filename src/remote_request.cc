@@ -96,7 +96,7 @@ void Worker::ProcessRemoteMemStat(Client* client, WorkRequest* wr) {
     cli->lock();
     if (cli) {
       cli->SetMemStat(mtotal, mfree);
-        epicLog(LOG_WARNING, "worker %d 's memstats get updated, total mem is %d, free mem is %d", wid, mtotal, mfree);
+        epicLog(LOG_INFO, "worker %d 's memstats get updated, total mem is %llu, free mem is %llu", wid, mtotal, mfree);
     } else {
       epicLog(LOG_WARNING, "worker %d not registered yet", wid);
     }

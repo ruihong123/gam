@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
     conf.master_port = port_master;
     conf.worker_ip = ip_worker;
     conf.worker_port = port_worker;
-    conf.size = allocated_mem_size;
+    conf.size = allocated_mem_size + 1024ULL*1024*1024;// Reserver 1 more GB in case the memory is outof bound.
     long size = ((long) BLOCK_SIZE) * STEPS * no_thread * 4;
     conf.size = size < conf.size ? conf.size : size;
 //    conf.cache_size = cache_size;
