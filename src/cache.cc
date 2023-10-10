@@ -818,6 +818,10 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       cl->line = line;
       epicLog(LOG_WARNING, "should not use for now");
     } else {
+        //In case that the pending to evict cache is too much causing cache memory explosion.
+        while (to_evicted > 512){
+            usleep(100);
+        }
       caddr ptr = worker->sb.sb_aligned_calloc(1,
                                                BLOCK_SIZE + CACHE_LINE_PREFIX);
 //        epicLog(LOG_WARNING, "ALLOCATE used byte in cache is %ld, allocator used byte is %ld ", used_bytes.load(), worker->sb.get_allocated());
