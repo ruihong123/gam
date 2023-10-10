@@ -556,7 +556,7 @@ char* RdmaContext::GetFreeSlot_() {
   int avail = RMINUS(slot_tail, slot_head, max_pending_msg);  //slot_head <= slot_tail ? slot_tail-slot_head : slot_tail+max_pending_msg-slot_head;
   if (!avail && !full)
     avail = max_pending_msg;
-  epicLog(LOG_WARNING, "avail = %d, pending_msg = %d", avail, pending_msg.load());
+  epicLog(LOG_DEBUG, "avail = %d, pending_msg = %d", avail, pending_msg.load());
   if (avail <= 0 || pending_msg >= max_pending_msg) {
     epicLog(LOG_INFO, "all the slots are busy\n");
     return nullptr;
