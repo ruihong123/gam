@@ -487,7 +487,7 @@ void Worker::ProcessPendingWriteForward(Client* cli, WorkRequest* wr) {
 }
 
 void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
-  cache.to_evicted--;
+  cache.to_evicted.fetch_sub(1);
   cache.lock(wr->addr);
   cache.ToInvalid(wr->addr);
   cache.unlock(wr->addr);
