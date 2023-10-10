@@ -554,7 +554,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
       busy = true;
       sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
       epicLog(LOG_WARNING,
-          "We don't have enough slot buf, we use local buf instead");
+          "We don't have enough slot buf, we add this work to pending list");
 //        assert(false);
       // need to RDMA regist it and free it in the end. We shall
     }
