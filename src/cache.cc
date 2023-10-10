@@ -704,8 +704,8 @@ int Cache::Evict(int n) {
   int tries = 1, tried = 0;
   int max_evict = 16;
   if (n > max_evict){
-      n = max_evict;
       epicLog(LOG_WARNING, "trying to evict %d, but max is %d", n, max_evict);
+      n = max_evict;
   }
   GAddr addr = Gnullptr;
   for (i = 0; i < n; i++) {
