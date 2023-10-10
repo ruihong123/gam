@@ -715,6 +715,7 @@ int Cache::Evict(int n) {
       n = max_evict;
   }
   GAddr addr = Gnullptr;
+  size_t evict_counter = 0;
   for (i = 0; i < n; i++) {
     int lru_no = GetRandom(0, LRU_NUM);
     if (lru_locks_[lru_no].try_lock()) {
@@ -754,9 +755,11 @@ int Cache::Evict(int n) {
       }
       epicAssert(!InTransitionState(to_evict));
       Evict(to_evict);
+        evict_counter++;
       unlock(addr);
     }
   }
+    assert(evict_counter == n);
   if (i < n)
     epicLog(LOG_WARNING, "trying to evict %d, but only evicted %d", n, i);
   return i;
