@@ -716,10 +716,11 @@ int Cache::Evict(int n) {
   }
   GAddr addr = Gnullptr;
   size_t evict_counter = 0;
-    CacheLine* to_evict;
+  CacheLine* to_evict = nullptr;
   for (i = 0; i < n; i++) {
     int lru_no = GetRandom(0, LRU_NUM);
-    if (lru_locks_[lru_no].try_lock()) {
+      lru_locks_[lru_no].lock();
+//    if (lru_locks_[lru_no].try_lock()) {
       if (!tails[lru_no]) {
         epicLog(LOG_INFO, "No cache exists");
         lru_locks_[lru_no].unlock();
@@ -756,9 +757,9 @@ int Cache::Evict(int n) {
       }
       epicAssert(!InTransitionState(to_evict));
       Evict(to_evict);
-        evict_counter++;
+      evict_counter++;
       unlock(addr);
-    }
+//    }
   }
     assert(evict_counter == n);
   if (i < n)
