@@ -682,18 +682,18 @@ void Cache::Evict() {
  * return: true if we allow n more new cache lines
  * 		   false if we don't have enough free space for n more cache lines
  */
-bool cache_full = false;
+//bool cache_full = false;
 int Cache::Evict(int n) {
     //TODO: Where does the cache recycle the registered memory
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
     // need some rooms for free page. otherwise, there will be no registered memory to be allocated
   if (used < 0 || used <= max_cache_mem){
-      if (cache_full){
-          printf("cache should be full, but still skip the eviction\n");
-      }
+//      if (cache_full){
+//          printf("cache should be full, but still skip the eviction\n");
+//      }
       return 0;
   }
-  cache_full = true;
+//  cache_full = true;
 //assert(false);
 
   int max = (used - max_cache_mem) / BLOCK_SIZE;
