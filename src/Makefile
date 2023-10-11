@@ -1,4 +1,4 @@
-CPP = g++ -std=c++11 -O0
+CPP = g++ -std=c++11 -O3 -DNDEBUG
 #-O3 -DNDEBUG
 INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src
 #INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src -I/users/zhongle/local/include
