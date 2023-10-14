@@ -783,7 +783,7 @@ void Cache::Evict(CacheLine* cline) {
   if (CACHE_SHARED == state) {
     wr->op = ACTIVE_INVALIDATE;
     ToInvalid(cline);
-    worker->SubmitRequest(cli, wr);
+    worker->SubmitRequest(cli, wr); // Send message to change the sharing list in the home node directory.
     delete wr;
     wr = nullptr;
   } else if (CACHE_DIRTY == state) {
