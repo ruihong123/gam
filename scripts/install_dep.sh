@@ -75,12 +75,15 @@ function run_bench() {
 #  done
 #Set up memory nodes
 for node in ${memory_shard[@]}
+do
   echo "Rsync the $node"
   rsync -a ~/gam node:~/gam
+done
 for node in ${compute_shard[@]}
+do
   echo "Rsync the $node"
   rsync -a ~/gam node:~/gam
-
+done
 #  while [ $n -lt $nshard ]
 #    do
 #      echo "Rsync the ${compute_shard[n]}"
