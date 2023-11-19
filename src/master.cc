@@ -147,7 +147,7 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
         busy = true;
         send_buf = (char *) zmalloc(MAX_REQUEST_SIZE);
         epicLog(LOG_INFO,
-                "We don't have enough slot buf, we use local buf instead");
+                "zmalloc a send buff");
       }
 
       int n = 0, i = 0;
@@ -207,7 +207,7 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
           busy = true;
           send_buf = (char *) zmalloc(MAX_REQUEST_SIZE);
           epicLog(LOG_INFO,
-                  "We don't have enough slot buf, we use local buf instead");
+                  "zmalloc a send buff");
         }
 
         int len = 0, ret;
@@ -240,8 +240,8 @@ void Master::Broadcast(const char* buf, size_t len) {
     if (send_buf == nullptr) {
       busy = true;
       send_buf = (char *) zmalloc(MAX_REQUEST_SIZE);
-      epicLog(LOG_INFO,
-              "We don't have enough slot buf, we use local buf instead");
+      epicLog(LOG_WARNING,
+              "zmalloc a send buff");
     }
     memcpy(send_buf, buf, len);
 

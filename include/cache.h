@@ -214,7 +214,7 @@ class Cache {
   inline void ToToInvalid(CacheLine* cline) {
     epicAssert(cline->state == CACHE_SHARED || cline->state == CACHE_DIRTY);
     cline->state = CACHE_TO_INVALID;
-    to_evicted++;
+    to_evicted.fetch_add(1);
   }
 
   void ToToShared(GAddr addr);

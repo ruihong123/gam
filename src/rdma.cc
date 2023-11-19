@@ -556,7 +556,7 @@ char* RdmaContext::GetFreeSlot_() {
   int avail = RMINUS(slot_tail, slot_head, max_pending_msg);  //slot_head <= slot_tail ? slot_tail-slot_head : slot_tail+max_pending_msg-slot_head;
   if (!avail && !full)
     avail = max_pending_msg;
-  epicLog(LOG_INFO, "avail = %d, pending_msg = %d", avail, pending_msg.load());
+  epicLog(LOG_DEBUG, "avail = %d, pending_msg = %d", avail, pending_msg.load());
   if (avail <= 0 || pending_msg >= max_pending_msg) {
     epicLog(LOG_INFO, "all the slots are busy\n");
     return nullptr;
@@ -574,18 +574,23 @@ char* RdmaContext::GetFreeSlot() {
     lock();
     char* s = GetFreeSlot_();
 
-    uint64_t i = 0;
-    while ( !s){
-        i++;
-        s = GetFreeSlot_();
-        unlock();
-        usleep(50);
-        lock();
-        if ((i%1024) == 0){
-            epicLog(LOG_WARNING,
-                    "We don't have enough slot buf, we use local buf instead");
-        }
-    }
+//    uint64_t i = 0;
+//    while ( !s){
+//        i++;
+//        s = GetFreeSlot_();
+//        unlock();
+//        usleep(50);
+//        lock();
+//        if ((i%1024) == 0){
+//            epicLog(LOG_WARNING,
+//                    "slot buffer is full, we wait for 50us and try again");
+//        }
+//        if (i >=  1024*32){
+//            epicLog(LOG_FATAL,
+//                    "the slot buffer is full, we wait for 50us and try again, but we have tried 1024*1024 times, we give up");
+//            epicAssert(false);
+//        }
+//    }
 #ifdef ASYNC_RDMA_SEND
   unlock();  //we delay the unlock to after-send
 #endif
@@ -610,8 +615,9 @@ ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
   struct ibv_send_wr wr = { };
 
   if (pending_msg >= max_pending_msg) {
+      assert(!IsRegistered(src));
     //add the send request to the waiting queue
-    epicLog(LOG_WARNING, "Rdma device is busy; will try later");
+    epicLog(LOG_WARNING, "Rdma device is busy; will try later, pending request queue size is %d",pending_requests.size());
     pending_requests.push(RdmaRequest { op, src, len, id, signaled, dest, imm, oldval, newval });
     epicAssert(
                pending_requests.back().op == op && pending_requests.back().src == src

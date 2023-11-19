@@ -96,6 +96,7 @@ void Worker::ProcessRemoteMemStat(Client* client, WorkRequest* wr) {
     cli->lock();
     if (cli) {
       cli->SetMemStat(mtotal, mfree);
+        epicLog(LOG_INFO, "worker %d 's memstats get updated, total mem is %llu, free mem is %llu", wid, mtotal, mfree);
     } else {
       epicLog(LOG_WARNING, "worker %d not registered yet", wid);
     }
@@ -207,7 +208,7 @@ void Worker::ProcessRemoteEvictDirty(Client* client, WorkRequest* wr) {
   }
   directory.Clear(entry, client->ToGlobal(wr->ptr));
   directory.unlock(laddr);
-    epicLog(LOG_WARNING, "cache write back\n",
+    epicLog(LOG_INFO, "cache write back\n",
             directory.GetState(entry));
   client->WriteWithImm(nullptr, nullptr, 0, wr->id);
   delete wr;

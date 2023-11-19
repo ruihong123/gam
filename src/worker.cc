@@ -527,16 +527,16 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     wr->id = GetWorkPsn();
   if (flag & ADD_TO_PENDING)// ADD TO pending list for future RDMA write with imm call back
     AddToPending(wr->id, wr);
-    if (wr->op == WRITE_BACK){
-        epicLog(LOG_WARNING, "WRITE BACK generated id is %d", wr->id);
-    }
+//    if (wr->op == WRITE_BACK){
+//        epicLog(LOG_WARNING, "WRITE BACK generated id is %d", wr->id);
+//    }
   if (flag & REQUEST_WRITE_IMM) {
     //epicLog(LOG_WARNING, "should not use for now");
     if (flag & ADD_TO_PENDING) {
       cli->WriteWithImm(dest, src, size, imm, wr->id, true);
     } else {
       cli->WriteWithImm(dest, src, size, imm);
-        assert(false);
+//        assert(false);
 
     }
   } else if (flag & REQUEST_SEND) {
@@ -549,15 +549,15 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     rdma_queue->push(data);
 #else
       char* sbuf = cli->GetFreeSlot();
-//    bool busy = false;
-//    if (sbuf == nullptr) {
-//      busy = true;
-//      sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
-//      epicLog(LOG_WARNING,
-//          "We don't have enough slot buf, we use local buf instead");
+    bool busy = false;
+    if (sbuf == nullptr) {
+      busy = true;
+      sbuf = (char *) zmalloc(MAX_REQUEST_SIZE);
+      epicLog(LOG_WARNING,
+          "We don't have enough slot buf, we add this work to pending list");
 //        assert(false);
-//      // need to RDMA regist it and free it in the end. We shall
-//    }
+      // need to RDMA regist it and free it in the end. We shall
+    }
     int len;
     int ret = wr->Ser(sbuf, len);
     epicAssert(!ret);

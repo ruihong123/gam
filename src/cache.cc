@@ -682,11 +682,18 @@ void Cache::Evict() {
  * return: true if we allow n more new cache lines
  * 		   false if we don't have enough free space for n more cache lines
  */
+//bool cache_full = false;
 int Cache::Evict(int n) {
     //TODO: Where does the cache recycle the registered memory
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
-  if (used < 0 || used <= max_cache_mem)// need some rooms for free page. otherwise, there will be no registered memory to be allocated
-    return 0;
+    // need some rooms for free page. otherwise, there will be no registered memory to be allocated
+  if (used < 0 || used <= max_cache_mem){
+//      if (cache_full){
+//          printf("cache should be full, but still skip the eviction\n");
+//      }
+      return 0;
+  }
+//  cache_full = true;
 //assert(false);
 
   int max = (used - max_cache_mem) / BLOCK_SIZE;
@@ -701,53 +708,60 @@ int Cache::Evict(int n) {
   }
 #else
   int i = 0;
-  int tries = 1, tried = 0;
+  int tries = 1024, tried = 0;
   int max_evict = 16;
-  epicLog(LOG_INFO, "trying to evict %d, but max is %d", n, max_evict);
-  if (n > max_evict)
-    n = max_evict;
+  if (n > max_evict){
+      epicLog(LOG_WARNING, "trying to evict %d, but max is %d", n, max_evict);
+      n = max_evict;
+  }
   GAddr addr = Gnullptr;
+  size_t evict_counter = 0;
+  CacheLine* to_evict = nullptr;
   for (i = 0; i < n; i++) {
     int lru_no = GetRandom(0, LRU_NUM);
-    if (lru_locks_[lru_no].try_lock()) {
+      lru_locks_[lru_no].lock();
+//    if (lru_locks_[lru_no].try_lock()) {
       if (!tails[lru_no]) {
         epicLog(LOG_INFO, "No cache exists");
         lru_locks_[lru_no].unlock();
         return 0;
       }
-      CacheLine* to_evict = tails[lru_no];
+        to_evict = tails[lru_no];
       tried = 0;
       while (to_evict) {  //only unlocked cache line can be evicted
         addr = to_evict->addr;
         if (try_lock(addr)) {
           if (unlikely(to_evict->locks.size() || InTransitionState(to_evict))) {
-            epicLog(LOG_INFO, "cache line (%lx) is locked", to_evict->addr);
+            epicLog(LOG_WARNING, "cache line (%lx) is locked", to_evict->addr);
             unlock(addr);
           } else {
             break;
           }
         }
-        tried++;
-        if (tried == tries) {
-          to_evict = nullptr;
-          break;
-        }
+//        tried++;
+//        if (tried == tries) {
+//          to_evict = nullptr;
+//          break;
+//        }
+        //Shall keep trying at eviction.
         to_evict = to_evict->prev;
       }
-
+      assert(to_evict);
       if (to_evict) {
         UnLinkLRU(to_evict, to_evict->pos);  //since we already got the lock in the parent function of Evict(CacheLine*)
       }
       lru_locks_[lru_no].unlock();
       if (!to_evict) {
-        epicLog(LOG_INFO, "all the cache lines are searched");
+        epicLog(LOG_WARNING, "all the cache lines are searched");
         continue;
       }
       epicAssert(!InTransitionState(to_evict));
       Evict(to_evict);
+      evict_counter++;
       unlock(addr);
-    }
+//    }
   }
+    assert(evict_counter == n);
   if (i < n)
     epicLog(LOG_WARNING, "trying to evict %d, but only evicted %d", n, i);
   return i;
@@ -769,7 +783,7 @@ void Cache::Evict(CacheLine* cline) {
   if (CACHE_SHARED == state) {
     wr->op = ACTIVE_INVALIDATE;
     ToInvalid(cline);
-    worker->SubmitRequest(cli, wr);
+    worker->SubmitRequest(cli, wr); // Send message to change the sharing list in the home node directory.
     delete wr;
     wr = nullptr;
   } else if (CACHE_DIRTY == state) {
@@ -783,7 +797,7 @@ void Cache::Evict(CacheLine* cline) {
                           ADD_TO_PENDING | REQUEST_SEND);
   } else {  //invalid
     epicAssert(CACHE_INVALID == state);
-    epicLog(LOG_INFO, "unexpected cache state when evicting");
+    epicLog(LOG_WARNING, "unexpected cache state when evicting");
   }
 }
 #endif
@@ -798,7 +812,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
     cl = caches.at(block);
     if (line) {
       worker->sb.sb_free((byte*) cl->line - CACHE_LINE_PREFIX);
-      used_bytes -= (BLOCK_SIZE + CACHE_LINE_PREFIX);
+      used_bytes.fetch_sub(BLOCK_SIZE + CACHE_LINE_PREFIX);
       cl->line = line;
       cl->addr = block;
       epicLog(LOG_WARNING, "should not use for now");
@@ -809,11 +823,15 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       cl->line = line;
       epicLog(LOG_WARNING, "should not use for now");
     } else {
+        //In case that the pending to evict cache is too much causing cache memory explosion.
+        while (to_evicted > 512){
+            usleep(100);
+        }
       caddr ptr = worker->sb.sb_aligned_calloc(1,
                                                BLOCK_SIZE + CACHE_LINE_PREFIX);
 //        epicLog(LOG_WARNING, "ALLOCATE used byte in cache is %ld, allocator used byte is %ld ", used_bytes.load(), worker->sb.get_allocated());
 //        assert(used_bytes.load() == worker->sb.get_allocated());
-      used_bytes += (BLOCK_SIZE + CACHE_LINE_PREFIX);
+      used_bytes.fetch_add(BLOCK_SIZE + CACHE_LINE_PREFIX);
       //*(byte*) ptr = CACHE_INVALID;
       ptr = (byte*) ptr + CACHE_LINE_PREFIX;
       cl->line = ptr;
@@ -870,7 +888,7 @@ void Cache::ToInvalid(CacheLine* cline) {
 #endif
   void* line = cline->line;
   worker->sb.sb_free((char*) line - CACHE_LINE_PREFIX);
-  used_bytes -= (BLOCK_SIZE + CACHE_LINE_PREFIX);
+  used_bytes.fetch_sub(BLOCK_SIZE + CACHE_LINE_PREFIX);
 
   epicAssert(!IsBlockLocked(cline));
 

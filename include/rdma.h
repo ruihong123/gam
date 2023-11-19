@@ -198,7 +198,8 @@ class RdmaContext {
   unsigned int SendComp(ibv_wc& wc);
   unsigned int WriteComp(ibv_wc& wc);
   char* RecvComp(ibv_wc& wc);
-  char* GetFreeSlot();bool IsRegistered(const void* addr);
+  char* GetFreeSlot();
+  bool IsRegistered(const void* addr);
 
   ssize_t Send(const void* ptr, size_t len, unsigned int id = 0, bool signaled =
                    false);
