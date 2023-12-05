@@ -2,6 +2,9 @@
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 SRC_HOME=$bin/../src
+home_dir="/users/Ruihong/gam/"
+compute_nodes_all=$bin/compute_nodes_cloudlab
+memory_nodes_all=$bin/memory_nodes_cloudlab
 compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
@@ -13,24 +16,97 @@ master_port=12311
 #memory_num = 0
 run() {
     echo "run for result_file=$result_file,
-    thread=$thread,
-    remote_ratio=$remote_ratio, shared_ratio=$shared_ratio,
-    read_ratio=$read_ratio, op_type=$op_type,
-    space_locality=$space_locality, time_locality=$time_locality"
+        thread=$thread, zipfian_alpha=$zipfian_alpha, workload=$workload,
+        remote_ratio=$remote_ratio, shared_ratio=$shared_ratio,
+        read_ratio=$read_ratio, op_type=$op_type,
+        space_locality=$space_locality, time_locality=$time_locality"
+
 
     old_IFS=$IFS
-    IFS=$'\n'
+    IFS=' '
     i=0
-#    compute_nodes_arr=`cat "$compute_nodes"`
-#    memory_nodes_arr=`cat "$memory_nodes"`
-#    echo $compute_nodes_arr
-#    echo $memory_nodes_arr
-#    compute_num=${#$compute_nodes_arr[@]}
-#    memory_num=${#$memory_nodes_arr[@]}
+    awk -v pos="$node" -F' ' '{
+            if (NR <= pos) {
+              for (i=1; i<=NF; i++) {
+                printf("%s", $i)
+                if (i < pos) printf(" ")
+              }
+            }
+
+        }' "$compute_nodes_all" > "$compute_nodes"
+
+    awk -v pos="$node" -F' ' '{
+            if (NR <= pos) {
+              for (i=1; i<=NF; i++) {
+                printf("%s", $i)
+                if (i < pos) printf(" ")
+              }
+            }
+
+        }' "$memory_nodes_all" > "$memory_nodes"
+    old_IFS=$IFS
+    IFS=$'\n'
+
     compute_num=$(wc -l < $compute_nodes)
     memory_num=$(wc -l < $memory_nodes)
     compute_num=$((compute_num+1))
     memory_num=$((memory_num+1))
+    echo "memory nodes:"
+    i=0
+    for memory in `cat "$memory_nodes"`
+    do
+       echo $memory
+       i=$((i+1))
+    done
+    i=0
+    echo "compute nodes:"
+    for compute in `cat "$compute_nodes"`
+    do
+       echo $compute
+       i=$((i+1))
+    done
+
+    j=0
+    for compute in `cat "$compute_nodes"`
+    do
+      ip=`echo $compute | cut -d ' ' -f1`
+      ssh -o StrictHostKeyChecking=no $ip "killall micro_bench > /dev/null 2>&1 && cd $BIN_HOME"
+      j=$((j+1))
+  #		if [ $j = $node ]; then
+  #			break;
+  #		fi
+    done
+
+    j=0
+      for memory in `cat "$compute_nodes"`
+      do
+        ip=`echo $memory | cut -d ' ' -f1`
+        ssh -o StrictHostKeyChecking=no $ip "killall memory_server_term > /dev/null 2>&1 && cd $BIN_HOME"
+        j=$((j+1))
+  #  		if [ $j = $node ]; then
+  #  			break;
+  #  		fi
+      done
+
+    i=0
+    while [ $i -lt $memory_num ]
+    do
+      target_ip=`sed -n '${i}p' $memory_nodes | cut -d ' ' -f1`
+      echo "Rsync the connection.conf to $target_ip"
+      rsync -vz $compute_nodes $target_ip:$compute_nodes
+      rsync -vz $memory_nodes $target_ip:$memory_nodes
+      i=$((i+1))
+    done
+    i=0
+    while [ $i -lt $compute_num ]
+    do
+      target_ip=`sed -n '${i}p' $compute_nodes| cut -d ' ' -f1`
+      echo "Rsync the connection.conf to $target_ip"
+      rsync -vz $compute_nodes $target_ip:$compute_nodes
+      rsync -vz $memory_nodes $target_ip:$memory_nodes
+      i=$((i+1))
+    done
+    i=0
 #    echo `cat $slaves`
     echo $compute_num
     echo $memory_num
@@ -49,7 +125,7 @@ run() {
     	fi
     	echo ""
     	echo "compute = $compute, ip = $ip, port = $port"
-    	echo "$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num" | tee -a "$log_file".$ip
+    	echo "$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a $log_file.$ip"
     	ssh -i ~/.ssh/id_rsa $ip	"$SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
@@ -72,7 +148,7 @@ run() {
         	fi
         	echo ""
         	echo "memory = $memory, ip = $ip, port = $port"
-        	echo "$SRC_HOME/memory_server --op_type $op_type  --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num" | tee -a "$log_file".$ip
+        	echo "$SRC_HOME/memory_server --op_type $op_type  --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a $log_file.$ip"
         	ssh -i ~/.ssh/id_rsa $ip	"numactl --physcpubind=31 $SRC_HOME/memory_server --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
         	sleep 1
         	i=$((i+1))
@@ -424,8 +500,8 @@ run_node_test() {
 # node test
 echo "**************************run node test****************************"
 result_file=$bin/results/node
-#node_range=$(wc -l < $compute_nodes)
-thread_range="1 4 8 12 16"
+node_range="1 2 4 8"
+thread_range="16"
 remote_range="0" #"20 40 60 80 100"
 shared_range="0 50 100"
 read_range="50"
@@ -433,7 +509,10 @@ space_range="0"
 time_range="0"
 op_range="0"
 #cache_th=0.5
-
+for workload in $workload_range
+do
+for zipfian_alpha in $zipfian_alpha_range
+do
 for remote_ratio in $remote_range
 do
 for shared_ratio in $shared_range
@@ -446,8 +525,8 @@ for space_locality in $space_range
 do
 for time_locality in $time_range
 do
-#for node in $node_range
-#do
+for node in $node_range
+do
   echo $node
 for thread in $thread_range
 do
@@ -465,7 +544,9 @@ done
 done
 done
 done
-#done
+done
+done
+done
 done
 done
 }

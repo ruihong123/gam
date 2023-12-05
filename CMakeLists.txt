@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(GAM)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include_directories(
@@ -31,14 +31,10 @@ file(GLOB TPCC_DEPENDENCY
         "${PROJECT_SOURCE_DIR}/database/tpcc/*.cpp"
         "${PROJECT_SOURCE_DIR}/database/util/*.cpp"
         "${PROJECT_SOURCE_DIR}/database/util/*.h"
+        "${PROJECT_SOURCE_DIR}/database/txn/*.cpp"
 )
-
-add_library(GAM_Base ${src_folder} )
-target_link_libraries(GAM_Base pthread)
-add_executable(TPCC_CMAKE ${TPCC_DEPENDENCY} )
-target_link_libraries(TPCC_CMAKE GAM_Base)
-add_executable(Benchmark ${PROJECT_SOURCE_DIR}/test/benchmark.cc )
-target_link_libraries(Benchmark GAM_Base)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pthread -ggdb -DLOCK -DBACKOFF") #-fsanitize=address -fsanitize=leak
+#find_package(ibverbs REQUIRED)
 add_custom_target(
         GAM
         COMMAND make -C ${PROJECT_SOURCE_DIR}/src
@@ -51,6 +47,17 @@ add_custom_target(
         COMMAND make tpcc
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/database/tpcc
 )
+
+add_library(GAM_Base ${src_folder} )
+add_executable(TPCC_CMAKE ${TPCC_DEPENDENCY} )
+add_executable(Benchmark ${PROJECT_SOURCE_DIR}/test/benchmark.cc )
+target_link_libraries(Benchmark GAM_Base)
+
+target_link_libraries(GAM_Base pthread)
+target_link_libraries(GAM_Base -libverbs -lboost_filesystem -lboost_system -lboost_date_time -pthread -lboost_thread -lcityhash)
+target_link_libraries(TPCC_CMAKE GAM_Base)
+
+
 
 add_executable(executable main.cpp)
 target_link_libraries(executable ./src/libgalloc.a)

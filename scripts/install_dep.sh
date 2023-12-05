@@ -1,13 +1,13 @@
 #!/bin/bash
-home_dir="/users/Ruihong/MemoryEngine"
+home_dir="/users/Ruihong/gam/"
 nmemory="10"
 ncompute="10"
 nmachines="20"
 nshard="10"
 numa_node=("0" "1")
 port=$((10000+RANDOM%1000))
-github_repo="https://github.com/ruihong123/MemoryEngine"
-gitbranch="reserved_branch1"
+github_repo="https://github.com/ruihong123/gam"
+gitbranch="master"
 function run_bench() {
   communication_port=()
 #	memory_port=()
@@ -77,12 +77,12 @@ function run_bench() {
 for node in ${memory_shard[@]}
 do
   echo "Rsync the $node"
-  rsync -a ~/gam node:~/gam
+  rsync -a $home_dir node:$home_dir
 done
 for node in ${compute_shard[@]}
 do
   echo "Rsync the $node"
-  rsync -a ~/gam node:~/gam
+  rsync -a $home_dir node:$home_dir
 done
 #  while [ $n -lt $nshard ]
 #    do

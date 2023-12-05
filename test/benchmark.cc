@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cstring>
 #include <mutex>
+#include <random>
 
 #include "../include/lockwrapper.h"
 #include "zmalloc.h"
@@ -60,7 +61,8 @@ int read_ratio = 10;  //0..100
 int op_type = 0;  //0: read/write; 1: rlock/wlock; 2: rlock+read/wlock+write
 int compute_num = 100;
 int memory_num = 100;
-
+int workload = 0;  //0: random; 1: zipfian
+double zipfian_alpha = 1;
 float cache_th = 0.15;  //0.15
 uint64_t allocated_mem_size = 0;
 
@@ -85,6 +87,37 @@ int addr_size = sizeof(GAddr);
 //int addr_size = BLOCK_SIZE;
 int item_size = addr_size;
 int items_per_block = BLOCK_SIZE / item_size;
+class ZipfianDistributionGenerator {
+private:
+    uint64_t array_size;
+    double skewness;
+    std::vector<double> probabilities;
+//    std::vector<int> zipfian_values;
+    std::default_random_engine generator;
+    std::discrete_distribution<int>* distribution;
+
+public:
+    ZipfianDistributionGenerator(uint64_t size, double s, unsigned int seed) : array_size(size), skewness(s), probabilities(size), generator(seed) {
+        for(int i = 0; i < array_size; ++i) {
+            probabilities[i] = 1.0 / (pow(i+1, skewness));
+//            zipfian_values[i] = i;
+        }
+        double smallest_probability = 1.0 / (pow(array_size, skewness));
+// Convert smallest_probability to a string
+        char buffer[50];
+        snprintf(buffer, sizeof(buffer), "%.15f", smallest_probability);
+
+        // Print the smallest_probability
+        printf("Smallest Probability: %s\n", buffer);
+        distribution = new std::discrete_distribution<int>(probabilities.begin(), probabilities.end());
+//        std::shuffle(zipfian_values.begin(), zipfian_values.end(), generator);
+    }
+
+    int getZipfianValue() {
+//        return zipfian_values[distribution(generator)];
+        return (*distribution)(generator);
+    }
+};
 
 bool TrueOrFalse(double probability, unsigned int* seedp) {
   return (rand_r(seedp) % 100) < probability;
@@ -230,8 +263,13 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
       }
     }
   }
+
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
+    ZipfianDistributionGenerator* zipf_gen;
+    if (workload == 1){
+        zipf_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp);
+    }
 #ifdef STATS_COLLECTION
   stat_lock.lock();
   gen_accesses.insert(TOBLOCK(access[0]));
@@ -247,11 +285,22 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
         next = TOBLOCK(access[i - 1]);
       }
     } else {
-      GAddr n = data[GetRandom(0, STEPS, seedp)];
-      while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
-        n = data[GetRandom(0, STEPS, seedp)];
-      }
-      next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
+        if (workload == 0){
+            GAddr n = data[GetRandom(0, STEPS, seedp)];
+            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
+                n = data[GetRandom(0, STEPS, seedp)];
+            }
+            next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
+        }else{
+            int64_t pos = zipf_gen->getZipfianValue();
+            GAddr n = data[pos];
+            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
+                pos = zipf_gen->getZipfianValue();
+                n = data[pos];
+            }
+            next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
+        }
+
     }
     access[i] = next;
 #ifdef STATS_COLLECTION
@@ -621,6 +670,10 @@ int main(int argc, char* argv[]) {
       time_locality = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--op_type") == 0) {
       op_type = atoi(argv[++i]);  //0..100
+    } else if (strcmp(argv[i], "--workload") == 0) {
+        workload = atoi(argv[++i]);
+    } else if (strcmp(argv[i], "--zipfian_alpha") == 0) {
+        zipfian_alpha = atof(argv[++i]);
 //    } else if (strcmp(argv[i], "--compute_num") == 0) {
 //      compute_num = atoi(argv[++i]);  //0..100
     } else if (strcmp(argv[i], "--result_file") == 0) {

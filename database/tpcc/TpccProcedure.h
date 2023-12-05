@@ -135,6 +135,7 @@ class NewOrderProcedure : public StoredProcedure {
     epicLog(LOG_DEBUG, "thread_id=%u,start new order", thread_id_);
     NewOrderParam *new_order_param = static_cast<NewOrderParam*>(param);
     double total = 0;
+    //new_order_param->ol_cnt_ : number of item to be checked out.
     for (size_t i = 0; i < new_order_param->ol_cnt_; ++i) {
       int item_id = new_order_param->i_ids_[i];
       // "getItemInfo": "SELECT I_PRICE, I_NAME, I_DATA FROM ITEM WHERE I_ID = ?"
@@ -159,7 +160,7 @@ class NewOrderProcedure : public StoredProcedure {
       ol_amounts[i] = ol_amount;
       total += ol_amount;
     }
-
+    // Stock saves the quantity of each item in different warehouse.
     for (size_t i = 0; i < new_order_param->ol_cnt_; ++i) {
       int ol_i_id = new_order_param->i_ids_[i];
       int ol_supply_w_id = new_order_param->i_w_ids_[i];
