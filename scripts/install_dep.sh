@@ -7,7 +7,7 @@ nshard="10"
 numa_node=("0" "1")
 port=$((10000+RANDOM%1000))
 github_repo="https://github.com/ruihong123/gam"
-gitbranch="master"
+gitbranch="disaggregation"
 function run_bench() {
   communication_port=()
 #	memory_port=()

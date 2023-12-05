@@ -70,13 +70,16 @@ run() {
     for compute in `cat "$compute_nodes"`
     do
       ip=`echo $compute | cut -d ' ' -f1`
+      if [ j==0 ]; then
+          master_ip=$ip
+      fi
       ssh -o StrictHostKeyChecking=no $ip "killall micro_bench > /dev/null 2>&1 && cd $BIN_HOME"
       j=$((j+1))
   #		if [ $j = $node ]; then
   #			break;
   #		fi
     done
-
+    echo "Master ip is $master_ip"
     j=0
       for memory in `cat "$compute_nodes"`
       do
