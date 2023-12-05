@@ -30,6 +30,7 @@ run() {
               for (i=1; i<=NF; i++) {
                 printf("%s", $i)
                 if (i < 2) printf(" ")
+                if (i == 2) printf("\n")
               }
             }
 
@@ -40,6 +41,7 @@ run() {
               for (i=1; i<=NF; i++) {
                 printf("%s", $i)
                 if (i < 2) printf(" ")
+                if (i == 2) printf("\n")
               }
             }
 
