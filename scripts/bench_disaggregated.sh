@@ -25,21 +25,21 @@ run() {
     old_IFS=$IFS
     IFS=' '
     i=0
-    awk -v pos="$node" -F' ' '{
-            if (NR <= pos) {
+    awk -v line_num="$node" -F' ' '{
+            if (NR <= line_num) {
               for (i=1; i<=NF; i++) {
                 printf("%s", $i)
-                if (i < pos) printf(" ")
+                if (i < 2) printf(" ")
               }
             }
 
         }' "$compute_nodes_all" > "$compute_nodes"
 
-    awk -v pos="$node" -F' ' '{
-            if (NR <= pos) {
+    awk -v line_num="$node" -F' ' '{
+            if (NR <= line_num) {
               for (i=1; i<=NF; i++) {
                 printf("%s", $i)
-                if (i < pos) printf(" ")
+                if (i < 2) printf(" ")
               }
             }
 
@@ -75,23 +75,19 @@ run() {
     echo "Master ip is $master_ip"
 
 
-    i=0
-    while [ $i -lt $memory_num ]
+    for memory in `cat "$memory_nodes"`
     do
-      target_ip=`sed -n '${i}p' $memory_nodes | cut -d ' ' -f1`
+      target_ip=`echo $memory | cut -d ' ' -f1`
       echo "Rsync the connection.conf to $target_ip"
       rsync -vz $compute_nodes $target_ip:$compute_nodes
       rsync -vz $memory_nodes $target_ip:$memory_nodes
-      i=$((i+1))
     done
-    i=0
-    while [ $i -lt $compute_num ]
+    for compute in `cat "$compute_nodes"`
     do
-      target_ip=`sed -n '${i}p' $compute_nodes| cut -d ' ' -f1`
+      target_ip=`echo $compute | cut -d ' ' -f1`
       echo "Rsync the connection.conf to $target_ip"
       rsync -vz $compute_nodes $target_ip:$compute_nodes
       rsync -vz $memory_nodes $target_ip:$memory_nodes
-      i=$((i+1))
     done
     i=0
 #    echo `cat $slaves`
