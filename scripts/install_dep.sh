@@ -77,12 +77,12 @@ function run_bench() {
 for node in ${memory_shard[@]}
 do
   echo "Rsync the $node"
-  rsync -a $home_dir node:$home_dir
+  rsync -a $home_dir $node:$home_dir
 done
 for node in ${compute_shard[@]}
 do
   echo "Rsync the $node"
-  rsync -a $home_dir node:$home_dir
+  rsync -a $home_dir $node:$home_dir
 done
 #  while [ $n -lt $nshard ]
 #    do
