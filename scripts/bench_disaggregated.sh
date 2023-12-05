@@ -67,29 +67,13 @@ run() {
     done
 
     j=0
-    for compute in `cat "$compute_nodes"`
-    do
-      ip=`echo $compute | cut -d ' ' -f1`
-      if [ j==0 ]; then
-          master_ip=$ip
-      fi
-      ssh -o StrictHostKeyChecking=no $ip "killall micro_bench > /dev/null 2>&1 && cd $BIN_HOME"
-      j=$((j+1))
-  #		if [ $j = $node ]; then
-  #			break;
-  #		fi
-    done
+    ip=`echo $compute | cut -d ' ' -f1`
+    if [ j==0 ]; then
+        master_ip=$ip
+    fi
+
     echo "Master ip is $master_ip"
-    j=0
-      for memory in `cat "$compute_nodes"`
-      do
-        ip=`echo $memory | cut -d ' ' -f1`
-        ssh -o StrictHostKeyChecking=no $ip "killall memory_server_term > /dev/null 2>&1 && cd $BIN_HOME"
-        j=$((j+1))
-  #  		if [ $j = $node ]; then
-  #  			break;
-  #  		fi
-      done
+
 
     i=0
     while [ $i -lt $memory_num ]
