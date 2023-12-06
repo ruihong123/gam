@@ -51,8 +51,8 @@ run() {
 
     compute_num=$(wc -l < $compute_nodes)
     memory_num=$(wc -l < $memory_nodes)
-    compute_num=$((compute_num+1))
-    memory_num=$((memory_num+1))
+    #compute_num=$((compute_num+1))
+    #memory_num=$((memory_num+1))
     echo "memory nodes:"
     i=0
     for memory in `cat "$memory_nodes"`
