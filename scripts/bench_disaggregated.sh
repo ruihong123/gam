@@ -12,6 +12,7 @@ cache_mem_size=8 # 8 gb Local memory size
 remote_mem_size=48 # 48 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
+port=$((10000+RANDOM%1000))
 #compute_num = 0
 #memory_num = 0
 run() {
@@ -98,7 +99,7 @@ run() {
     for compute in `cat "$compute_nodes"`
     do
     	ip=`echo $compute | cut -d ' ' -f1`
-    	port=`echo $compute | cut -d ' ' -f2`
+#    	port=`echo $compute | cut -d ' ' -f2`
     	if [ $i = 0 ]; then
     		is_master=1
             master_ip=$ip
@@ -121,7 +122,7 @@ run() {
     for memory in `cat "$memory_nodes"`
         do
         	ip=`echo $memory | cut -d ' ' -f1`
-        	port=`echo $memory | cut -d ' ' -f2`
+#        	port=`echo $memory | cut -d ' ' -f2`
         	if [ $i = 0 ]; then
         		is_master=1
                 master_ip=$ip
