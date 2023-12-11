@@ -489,7 +489,7 @@ Client* Worker::GetClient(GAddr addr) {
       epicLog(LOG_DEBUG, "select the server with most free memory to allocate");
       Size max = 0;
       for (auto& entry : widCliMapWorker) {
-        epicLog(LOG_WARNING, "worker %d, have %ld free out of %ld",
+        epicLog(LOG_DEBUG, "worker %d, have %ld free out of %ld",
             entry.second->GetWorkerId(), entry.second->GetFreeMem(),
             entry.second->GetTotalMem());
         if (entry.first == GetWorkerId())
