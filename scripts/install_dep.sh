@@ -77,12 +77,12 @@ function run_bench() {
 for node in ${memory_shard[@]}
 do
   echo "kill the zombie process on $node"
-  ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark memory_server > /dev/null 2>&1 && cd $BIN_HOME"
+  ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark  && pkill -f memory_server && cd $BIN_HOME" #> /dev/null 2>&1
 done
 for node in ${compute_shard[@]}
 do
   echo "kill the zombie process on $node"
-  ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark memory_server > /dev/null 2>&1 && cd $BIN_HOME"
+  ssh -o StrictHostKeyChecking=no $node "pkill -f memory_server && pkill -f benchmark && cd $BIN_HOME"
 done
 for node in ${memory_shard[@]}
 do
