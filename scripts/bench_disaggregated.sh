@@ -147,7 +147,7 @@ run() {
 	for compute in `cat $compute_nodes`
 	do
 		ip=`echo $compute | cut -d ' ' -f1`
-		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
+		ssh -i ~/.ssh/id_rsa $ip pkill -f benchmark > /dev/null 2>&1
 		j=$((j+1))
 #		if [ $j = $node ]; then
 #			break;
@@ -158,7 +158,7 @@ run() {
   	for memory in `cat $memory_nodes`
   	do
   		ip=`echo $memory | cut -d ' ' -f1`
-  		ssh -i ~/.ssh/id_rsa $ip killall benchmark > /dev/null 2>&1
+  		ssh -i ~/.ssh/id_rsa $ip pkill -f memory_server > /dev/null 2>&1
   		j=$((j+1))
 #  		if [ $j = $node ]; then
 #  			break;
