@@ -65,17 +65,24 @@ run() {
     echo "compute nodes:"
     for compute in `cat "$compute_nodes"`
     do
+        if [ $i = 0 ]; then
+                is_master=1
+                master_ip=$ip
+                echo "Master ip is $master_ip"
+              else
+                is_master=0
+        fi
        echo $compute
        i=$((i+1))
     done
 
-    j=0
-    ip=`echo $compute | cut -d ' ' -f1`
-    if [ j==0 ]; then
-        master_ip=$ip
-    fi
+#    j=0
+#    ip=`echo $compute | cut -d ' ' -f1`
+#    if [ j==0 ]; then
+#        master_ip=$ip
+#    fi
 
-    echo "Master ip is $master_ip"
+
 
 
     for memory in `cat "$memory_nodes"`
@@ -100,9 +107,9 @@ run() {
     do
     	ip=`echo $compute | cut -d ' ' -f1`
 #    	port=`echo $compute | cut -d ' ' -f2`
-    	if [ $i = 0 ]; then
+    	if [ $i == 0 ]; then
     		is_master=1
-            master_ip=$ip
+        master_ip=$ip
     	else
     		is_master=0
     	fi
@@ -123,12 +130,7 @@ run() {
         do
         	ip=`echo $memory | cut -d ' ' -f1`
 #        	port=`echo $memory | cut -d ' ' -f2`
-        	if [ $i = 0 ]; then
-        		is_master=1
-                master_ip=$ip
-        	else
-        		is_master=0
-        	fi
+
         	if [ $port == $ip ]; then
         		port=12345
         	fi
@@ -175,7 +177,7 @@ echo "*********************run thread test**********************"
 result_file=$bin/results/thread
 node_range="8"
 thread_range="1 2 3 4 5 6 7 8"
-remote_range="0 50 100"
+remote_range="100"
 shared_range="0" #"0 10 20 30 40 50 60 70 80 90 100"
 read_range="0 50 100"
 space_range="0" #"0 10 20 30 40 50 60 70 80 90 100"
@@ -488,9 +490,9 @@ echo "**************************run node test****************************"
 result_file=$bin/results/node
 node_range="1 2 4 8"
 thread_range="16"
-remote_range="0" #"20 40 60 80 100"
+remote_range="100" #"20 40 60 80 100"
 shared_range="0"
-read_range="100"
+read_range="0 100"
 space_range="0"
 time_range="0"
 op_range="0"
@@ -524,10 +526,7 @@ do
 #    if [[ $node = 1 ]]; then
 #        continue;
 #    fi
-	if [[ $remote_ratio -gt 0 && $node = 1 ]]; then
-		continue;
-	fi
-    run
+  run
 done
 done
 done
