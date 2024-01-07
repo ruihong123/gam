@@ -431,6 +431,7 @@ void Worker::ProcessToServeRequest(WorkRequest* wr) {
 void Worker::SyncMaster(Work op, WorkRequest* parent) {
   WorkRequest* wr = new WorkRequest();
   wr->parent = parent;
+  static int counter = 0;
   int ret;
 
   char buf[MAX_REQUEST_SIZE];
@@ -445,7 +446,9 @@ void Worker::SyncMaster(Work op, WorkRequest* parent) {
     size_t cache_size = conf->size * conf->cache_th;
     wr->size = conf->size - cache_size;
     wr->free = sb.get_avail() - (cache_size - cache.GetUsedBytes());
-    epicLog(LOG_WARNING, "this node (%d)'s free memory is %ld", GetWorkerId(), wr->free);
+      if (counter++%100 == 0){
+          epicLog(LOG_WARNING, "this node (%d)'s free memory is %ld", GetWorkerId(), wr->free);
+      }
     SubmitRequest(master, wr);
 
     //TODO: whether needs to do it in a callback func?
