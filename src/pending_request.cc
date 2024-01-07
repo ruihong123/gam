@@ -485,7 +485,7 @@ void Worker::ProcessPendingWriteForward(Client* cli, WorkRequest* wr) {
   wr = nullptr;
   parent = nullptr;
 }
-
+//This happens at the eviction initializer.
 void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
   cache.to_evicted.fetch_sub(1);
   cache.lock(wr->addr);
@@ -494,6 +494,7 @@ void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
 //    epicLog(LOG_WARNING, "Process pending cache eviction");
   int ret = ErasePendingWork(wr->id);
   epicAssert(ret);
+  epicLog(LOG_INFO, "Cache entry eviction reply for %d has been processed", wr->addr);
   ProcessToServeRequest(wr);
   delete wr;
   wr = nullptr;

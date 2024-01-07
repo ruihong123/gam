@@ -48,7 +48,7 @@ int Worker::ProcessLocalHTable(WorkRequest* pwr) {
     } else return SUCCESS;
 }
 #endif // DHT
-//using namespace std;
+//using namespace std; Local means operation received from local not from RDMA message.
 int Worker::ProcessLocalMalloc(WorkRequest* wr) {
   epicAssert(!(wr->flag & ASYNC));
   if ((wr->flag & REMOTE) || (wr->addr && !IsLocal(wr->addr))) {  //remote alloc

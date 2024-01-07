@@ -105,7 +105,7 @@ class Worker : public Server {
   atomic<unsigned int> wr_psn;  //we assume the pending works will not exceed INT_MAX
 
   /*
-   * pending_works: the work requests that are waiting for replies
+   * pending_works: the work requests that are waiting for replies. (Async)
    */
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };

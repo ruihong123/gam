@@ -130,6 +130,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
     }
     default:
       epicLog(LOG_WARNING, "unknown opcode received %d\n", wc.opcode);
+      epicAssert(false);
       break;
   }
 }
