@@ -825,7 +825,7 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
       epicLog(LOG_WARNING, "should not use for now");
     } else {
         //In case that the pending to evict cache is too much causing cache memory explosion.
-        while (to_evicted > 512){
+        while (to_evicted > 32){
             //TODO: shall release the cache bucket lock when waiting for the space. Other wise, the RDMA REPLY
             // message handling thread can be blocked.
             unlock(addr);
