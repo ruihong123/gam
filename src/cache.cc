@@ -825,7 +825,11 @@ CacheLine* Cache::SetCLine(GAddr addr, void* line) {
     } else {
         //In case that the pending to evict cache is too much causing cache memory explosion.
         while (to_evicted > 512){
+            //TODO: shall release the cache bucket lock when waiting for the space. Other wise, the RDMA REPLY
+            // message handling thread can be blocked.
+            unlock(addr);
             usleep(100);
+            lock(addr);
         }
       caddr ptr = worker->sb.sb_aligned_calloc(1,
                                                BLOCK_SIZE + CACHE_LINE_PREFIX);
