@@ -494,7 +494,7 @@ void Worker::ProcessPendingEvictDirty(Client* cil, WorkRequest* wr) {
 //    epicLog(LOG_WARNING, "Process pending cache eviction");
   int ret = ErasePendingWork(wr->id);
   epicAssert(ret);
-  epicLog(LOG_INFO, "Cache entry eviction reply for %d has been processed", wr->addr);
+  epicLog(LOG_WARNING, "Cache entry eviction reply for %d has been processed", wr->addr);
   ProcessToServeRequest(wr);
   delete wr;
   wr = nullptr;
