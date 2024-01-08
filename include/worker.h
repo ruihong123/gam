@@ -187,7 +187,10 @@ class Worker : public Server {
   void logOwner(int id, GAddr addr) {
     //log->logOwner(id, addr);
   }
-  
+  long GetCacheToevict() {
+        return cache.to_evicted.load();
+  }
+
 
   SlabAllocator sb;
   /*

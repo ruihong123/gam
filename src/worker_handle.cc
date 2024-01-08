@@ -95,6 +95,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       "workid = %d, wr->notify_buf = %d, wr->op = %d, wr->flag = %d, wr->status = %d, wr->addr = %lx, wr->size = %d, wr->fd = %d",
       worker->GetWorkerId(), *wr->notify_buf, wr->op, wr->flag, wr->status,
       wr->addr, wr->size, wr->fd);
+    //In case that the pending to evict cache is too much causing cache memory explosion.
+    while (worker->GetCacheToevict() > 512){
+        usleep(100);
+    }
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
