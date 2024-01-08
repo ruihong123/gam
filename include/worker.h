@@ -178,7 +178,7 @@ class Worker : public Server {
   atomic<Size> no_remote_writes_;
   atomic<Size> no_remote_writes_hit_;
   atomic<Size> no_remote_writes_direct_hit_;
-
+  std::mutex Psn_mtx;
   // logging
   void logWrite(GAddr addr, Size sz, const void* content) {
     //log->logWrite(addr, sz, content);
@@ -229,9 +229,13 @@ class Worker : public Server {
     return wqueue;
   }
   inline unsigned int GetWorkPsn() {
+      //TODO: under multi-threaded environment, this code shall be thread-safe
     volatile unsigned int ret = ++wr_psn;
+
+    Psn_mtx.lock();
     if (ret == 0)
       ret = ++wr_psn;
+    Psn_mtx.unlock();
     return ret;
   }
 
