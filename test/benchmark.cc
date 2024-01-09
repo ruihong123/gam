@@ -828,12 +828,17 @@ int main(int argc, char* argv[]) {
   a_thr /= no_thread;
   long a_lat = avg_latency;
   a_lat /= no_thread;
+#ifdef GETANALYSIS
   uint64_t avg_read_lat = readcounter==0? 0: readTotal/readcounter;
     uint64_t avg_write_lat = writecounter==0? 0: writeTotal/writecounter;
-    epicLog(LOG_WARNING,
+        epicLog(LOG_WARNING,
       "results for node_id %d: total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld, avg read lat: %lu, avg write lat: %lu",
       node_id, t_thr, a_thr, a_lat, avg_read_lat, avg_write_lat);
-
+#else
+    epicLog(LOG_WARNING,
+            "results for node_id %d: total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld",
+            node_id, t_thr, a_thr, a_lat);
+#endif
   //sync with all the other workers
   //check all the benchmark are completed
   long res[3];
