@@ -500,10 +500,10 @@ Client* Worker::GetClient(GAddr addr) {
         if (max < entry.second->GetFreeMem()) {
           max = entry.second->GetFreeMem();
           wid = entry.first;
-            if(wid % 2 == 0){
-                epicLog(LOG_DEBUG, "wid is %d and shall not allocate data from the compute node", wid);
-                epicAssert(false);
-            };// assert the block is not allocated in the compute node
+//            if(wid % 2 == 0){
+//                epicLog(LOG_DEBUG, "wid is %d and shall not allocate data from the compute node", wid);
+//                epicAssert(false);
+//            };// assert the block is not allocated in the compute node
           cli = entry.second;
         }
       }
