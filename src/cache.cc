@@ -795,7 +795,7 @@ void Cache::Evict(CacheLine* cline) {
 //  UnLinkLRU(cline, pos); //since we already got the lock in the parent function of Evict(CacheLine*)
     worker->SubmitRequest(worker->GetClient(wr->addr), wr,
                           ADD_TO_PENDING | REQUEST_SEND);
-    epicLog(LOG_WARNING, "Cache entry for %llu is being evicted", wr->addr);
+    epicLog(LOG_INFO, "Cache entry for %llu is being evicted", wr->addr);
   } else {  //invalid
     epicAssert(CACHE_INVALID == state);
     epicLog(LOG_WARNING, "unexpected cache state when evicting");

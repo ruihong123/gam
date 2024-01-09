@@ -211,7 +211,7 @@ void Worker::ProcessRemoteEvictDirty(Client* client, WorkRequest* wr) {
     epicLog(LOG_INFO, "cache write back\n",
             directory.GetState(entry));
   client->WriteWithImm(nullptr, nullptr, 0, wr->id);
-  epicLog(LOG_WARNING, "Cache entry eviction message for %llu is processed on the home node", wr->addr);
+  epicLog(LOG_INFO, "Cache entry eviction message for %llu is processed on the home node", wr->addr);
   delete wr;
   wr = nullptr;
 }
