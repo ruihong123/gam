@@ -96,6 +96,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       worker->GetWorkerId(), *wr->notify_buf, wr->op, wr->flag, wr->status,
       wr->addr, wr->size, wr->fd);
     //In case that the pending to evict cache is too much causing cache memory explosion.
+    //May be the code below will also block those operations which will not result in cache eviction. As a result, the design
+    // is not good.
     while (worker->GetCacheToevict() > 512){
         usleep(10);
     }

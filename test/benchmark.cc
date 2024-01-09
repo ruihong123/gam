@@ -23,6 +23,21 @@
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
 #define DEBUG_LEVEL LOG_WARNING
+//#define GETANALYSIS
+#ifdef GETANALYSIS
+std::atomic<uint64_t> readTotal = 0;
+std::atomic<uint64_t> readcounter = 0;
+std::atomic<uint64_t> writeTotal = 0;
+std::atomic<uint64_t> writecounter = 0;
+//extern std::atomic<uint64_t> PostreadTotal;
+//extern std::atomic<uint64_t> Postreadcounter;
+//extern std::atomic<uint64_t> MemcopyTotal;
+//extern std::atomic<uint64_t> Memcopycounter;
+//extern std::atomic<uint64_t> NextStepTotal;
+//extern std::atomic<uint64_t> NextStepcounter;
+//extern std::atomic<uint64_t> WholeopTotal;
+//extern std::atomic<uint64_t> Wholeopcounter;
+#endif
 
 //TODO: shall be adjusted according to the no_thread and
 //#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node. (25165824ull)
@@ -371,7 +386,16 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
           memcpy(buf, (void*)to_access, item_size);
           ret = item_size;
 #else
+#ifdef GETANALYSIS
+            auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
           ret = alloc->Read(to_access, buf, item_size);
+#ifdef GETANALYSIS
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+            readTotal.fetch_add(duration.count());
+            readcounter.fetch_add(1);
+#endif
 #endif
 #ifdef STATS_COLLECTION
           read_access++;
@@ -384,7 +408,16 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
           memcpy((void *)to_access, buf, item_size);
           ret = item_size;
 #else
+#ifdef GETANALYSIS
+            auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
           ret = alloc->Write(to_access, buf, item_size);
+#ifdef GETANALYSIS
+            auto stop = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+            writeTotal.fetch_add(duration.count());
+            writecounter.fetch_add(1);
+#endif
           //if (!warmup)
           //    alloc->MFence();
 #ifdef BENCHMARK_DEBUG
@@ -795,10 +828,11 @@ int main(int argc, char* argv[]) {
   a_thr /= no_thread;
   long a_lat = avg_latency;
   a_lat /= no_thread;
-  epicLog(
-      LOG_WARNING,
-      "results for node_id %d: total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld",
-      node_id, t_thr, a_thr, a_lat);
+  uint64_t avg_read_lat = readcounter==0? 0: readTotal/readcounter;
+    uint64_t avg_write_lat = writecounter==0? 0: writeTotal/writecounter;
+    epicLog(LOG_WARNING,
+      "results for node_id %d: total_throughput: %ld, avg_throuhgput:%ld, avg_latency:%ld, avg read lat: %lu, avg write lat: %lu",
+      node_id, t_thr, a_thr, a_lat, avg_read_lat, avg_write_lat);
 
   //sync with all the other workers
   //check all the benchmark are completed
