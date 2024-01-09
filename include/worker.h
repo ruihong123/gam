@@ -109,8 +109,8 @@ class Worker : public Server {
    */
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };
-    std::map<unsigned int, WorkRequest*> pending_works2;
-    std::mutex pending_works2_mutex;
+//    std::map<unsigned int, WorkRequest*> pending_works2;
+//    std::mutex pending_works2_mutex;
   /*
    * the pending work requests from remote nodes
    * because some states are in intermediate state

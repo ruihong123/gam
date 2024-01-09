@@ -97,7 +97,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       wr->addr, wr->size, wr->fd);
     //In case that the pending to evict cache is too much causing cache memory explosion.
     while (worker->GetCacheToevict() > 512){
-        usleep(100);
+        usleep(10);
     }
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
   if (ret) {  //not complete due to remote or previously-sent similar requests
