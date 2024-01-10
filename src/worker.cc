@@ -789,6 +789,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
   //epicAssert(!(wr->flag & ASYNC) || wr->IsACopy());
   epicLog(LOG_DEBUG, "add pending work %d, wr->op = %d, wr addr = %lx", id,
       wr->op, wr);
+  //TODO: how to syncrhonize the access to pending_works?
   pending_works[id] = wr;
 //    pending_works2_mutex.lock();
 //  pending_works2.insert({id, wr});

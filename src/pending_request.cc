@@ -119,6 +119,7 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
 
   if (--parent->counter == 0) {  //read all the data
     parent->unlock();
+    //notify the read buffer.
     Notify(parent);
   } else {
     parent->unlock();

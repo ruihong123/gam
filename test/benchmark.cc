@@ -430,17 +430,20 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
         }
         epicAssert(item_size == ret);
         break;
-      case 1:  //rlock/wlock
+      case 1:  //r/w TSO (with write fence)
       {
         if (TrueOrFalse(read_ratio, seedp)) {
-          alloc->RLock(to_access, item_size);
+            memset(buf, 0, item_size);
+            ret = alloc->Read(to_access, buf, item_size);
 #ifdef STATS_COLLECTION
           read_access++;
 #endif
         } else {
-          alloc->WLock(to_access, item_size);
+            memset(buf, i, item_size);
+            ret = alloc->Write(to_access, buf, item_size);
+            alloc->MFence();
         }
-        alloc->UnLock(to_access, item_size);
+        epicAssert(item_size == ret);
         break;
       }
       case 2:  //rlock+read/wlock+write Is this GAM PSO

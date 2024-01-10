@@ -476,7 +476,7 @@ int Worker::ProcessLocalWrite(WorkRequest* wr) {
         epicLog(LOG_DEBUG, "Local: one more pending write");
     }
     //TODO change likely to unlikely
-    if (likely(IsLocal(wr->addr))) {
+    if (unlikely(IsLocal(wr->addr))) {
         //THis code path shall be impossible for compute node.
         GAddr start = wr->addr;
         GAddr start_blk = TOBLOCK(start);

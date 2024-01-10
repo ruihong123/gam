@@ -7,19 +7,23 @@
 #include "../include/lockwrapper.h"
 #include "zmalloc.h"
 #include "util.h"
+#include "kernel.h"
 
 LockWrapper WorkerHandle::lock;
-
+thread_local int WorkerHandle::thread_id = -1;
 WorkerHandle::WorkerHandle(Worker* w)
     : worker(w),
-      wqueue(w->GetWorkQ()) {
+      wqueue(w->GetWorkQ()),
+      registered_thread_num(0){
 //#if !defined(USE_PIPE_W_TO_H) || (!defined(USE_BOOST_QUEUE) && !defined(USE_PIPE_H_TO_W))
 #if !(defined(USE_PIPE_W_TO_H) && defined(USE_PIPE_H_TO_W))
   int notify_buf_size = sizeof(WorkRequest) + sizeof(int);
   int ret = posix_memalign((void**) &notify_buf, HARDWARE_CACHE_LINE,
-                           notify_buf_size);
+                           HARDWARE_CACHE_LINE*32);
   epicAssert((uint64_t)notify_buf % HARDWARE_CACHE_LINE == 0 && !ret);
-  *notify_buf = 2;
+    for (int i = 0; i < 32; ++i) {
+        *(int*)(&notify_buf[i]) = 2;
+    }
 #endif
 #ifdef USE_PTHREAD_COND
   pthread_mutex_init(&cond_lock, NULL);
@@ -81,13 +85,16 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
+    if (unlikely(thread_id == -1)) {
+        thread_id = registered_thread_num.fetch_add(1);
+    }
   wr->flag |= LOCAL_REQUEST;
 #ifdef MULTITHREAD
-  *notify_buf = 1;  //not useful to set it to 1 if boost_queue is enabled
-  epicAssert(*(int* )notify_buf == 1);
+  *(int*)(&notify_buf[thread_id]) = 1;  //not useful to set it to 1 if boost_queue is enabled
+//  epicAssert(*(int* )notify_buf == 1);
   wr->fd = recv_pipe[1];  //for legacy code
   //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
-  wr->notify_buf = this->notify_buf;
+  wr->notify_buf = (int*)&this->notify_buf[thread_id];
 //    if (wr->op == WRITE && wr->op == READ){
 //        assert(false);
 //    }
@@ -120,7 +127,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       int ret = pthread_cond_wait(&cond, &cond_lock);
       epicAssert(!ret);
 #else
-      while (*notify_buf != 2);
+      while (*(int*)&notify_buf[thread_id] != 2);
       epicLog(LOG_DEBUG, "get notified via buf");
 #endif
       return wr->status;
