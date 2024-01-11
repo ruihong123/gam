@@ -59,12 +59,13 @@ int Worker::ProcessLocalMalloc(WorkRequest* wr) {
               "there is no remote worker, we allocate locally instead");
     } else {
       cli->SetMemStat(cli->GetTotalMem(), cli->GetFreeMem() - wr->size);
-        epicLog(LOG_WARNING,
-                "Remote Malloc request sent to worker %d, free mem = %d", cli->GetWorkerId(), cli->GetFreeMem());
+//        epicLog(LOG_WARNING,
+//                "Remote Malloc request sent to worker %d, free mem = %d", cli->GetWorkerId(), cli->GetFreeMem());
       SubmitRequest(cli, wr, ADD_TO_PENDING | REQUEST_SEND);
       return REMOTE_REQUEST;
     }
   } else if (wr->flag & RANDOM) {
+
     size_t size = GetWorkersSize();
     static unsigned int seed = GetWorkerId();
     int i;
