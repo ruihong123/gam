@@ -127,7 +127,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       int ret = pthread_cond_wait(&cond, &cond_lock);
       epicAssert(!ret);
 #else
-      while (*(int*)&notify_buf[thread_id] != 2);
+      volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
+      while (*local_notify_buf != 2);
       epicLog(LOG_DEBUG, "get notified via buf");
 #endif
       return wr->status;
