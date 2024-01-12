@@ -177,6 +177,7 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
     case PUT: {
       void* ptr = zmalloc(wr->size);
       memcpy(ptr, wr->ptr, wr->size);
+      //No need for synchronization as the master message handling is single-threaded
       kvs[wr->key] = pair<void*, Size>(ptr, wr->size);
       if (to_serve_kv_request.count(wr->key)) {
         int size = to_serve_kv_request[wr->key].size();

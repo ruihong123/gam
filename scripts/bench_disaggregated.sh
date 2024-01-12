@@ -443,7 +443,7 @@ run_time_test() {
 # time locality test
 echo "**************************run time locality test****************************"
 result_file=$bin/results/time_locality
-node_range="8"
+node_range="2 8"
 thread_range="1"
 remote_range="100"
 shared_range="0"
