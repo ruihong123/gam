@@ -9,7 +9,7 @@ compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
 cache_mem_size=8 # 8 gb Local memory size
-remote_mem_size=4 # 48 gb Remote memory size
+remote_mem_size=48 # 48 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
 port=$((10000+RANDOM%1000))
@@ -488,8 +488,8 @@ run_node_test() {
 # node test
 echo "**************************run node test****************************"
 result_file=$bin/results/node
-node_range="8"
-thread_range="16"
+node_range="2 8"
+thread_range="1"
 remote_range="100" #"20 40 60 80 100"
 shared_range="100"
 read_range="50 95"
