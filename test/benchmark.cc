@@ -23,14 +23,14 @@
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
 #define DEBUG_LEVEL LOG_WARNING
-//#define GETANALYSIS
+#define GETANALYSIS
 #ifdef GETANALYSIS
 std::atomic<uint64_t> readTotal = 0;
 std::atomic<uint64_t> readcounter = 0;
 std::atomic<uint64_t> writeTotal = 0;
 std::atomic<uint64_t> writecounter = 0;
-//extern std::atomic<uint64_t> PostreadTotal;
-//extern std::atomic<uint64_t> Postreadcounter;
+extern std::atomic<uint64_t> AllocTotal;
+extern std::atomic<uint64_t> Alloccounter;
 //extern std::atomic<uint64_t> MemcopyTotal;
 //extern std::atomic<uint64_t> Memcopycounter;
 //extern std::atomic<uint64_t> NextStepTotal;
@@ -228,12 +228,19 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
       epicAssert(!ret);
       epicAssert(data[i] % BLOCK_SIZE == 0);
 #else
-//      if (TrueOrFalse(remote_ratio, seedp)) {
+
+#ifdef GETANALYSIS
+              auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
               data[i] = alloc->AlignedMalloc(BLOCK_SIZE, REMOTE);
               shared_data[i] = data[i];
-//      } else {
-//        data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
-//      }
+#ifdef GETANALYSIS
+              auto stop = std::chrono::high_resolution_clock::now();
+              auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+              AllocTotal.fetch_add(duration.count());
+              Alloccounter.fetch_add(1);
+#endif
+
 #endif
               if (shared_ratio != 0)
                   //Register the allocation for master into a key value store.
@@ -300,7 +307,9 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
       }
     }
   }
-
+#ifdef GETANALYSIS
+    printf("Notice here!! Average remote allocation time elapse is %lu", AllocTotal.load()/Alloccounter.load());
+#endif
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
     ZipfianDistributionGenerator* zipf_gen;
