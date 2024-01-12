@@ -308,7 +308,7 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
     }
   }
 #ifdef GETANALYSIS
-    printf("Notice here!! Average remote allocation time elapse is %lu", AllocTotal.load()/Alloccounter.load());
+    printf("Notice here!! Average remote allocation time elapse is %lu\n", AllocTotal.load()/Alloccounter.load());
 #endif
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
