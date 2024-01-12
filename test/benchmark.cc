@@ -38,6 +38,7 @@ std::atomic<uint64_t> writecounter = 0;
 //extern std::atomic<uint64_t> WholeopTotal;
 //extern std::atomic<uint64_t> Wholeopcounter;
 #endif
+#define MEMSET_GRANULARITY (64*1024)
 
 //TODO: shall be adjusted according to the no_thread and
 //#define NUMOFBLOCKS (2516582ull) //around 48GB totally, local cache is 8GB per node. (25165824ull)
@@ -104,7 +105,6 @@ int item_size = addr_size;
 int items_per_block = BLOCK_SIZE / item_size;
 
 GAddr *shared_data;
-std::atomic<bool> shared_data_is_init(false);
 class ZipfianDistributionGenerator {
 private:
     uint64_t array_size;
@@ -215,7 +215,8 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 
   //the main thread (id == 0) in the master node (is_master == true)
   // is responsible for reference data access pattern
-  if (is_master && id == 0) {
+  if (id == 0) {
+      if (is_master){
           for (int i = 0; i < STEPS; i++) {
               //There is no meanings to do the if clause below.
               if (TrueOrFalse(l_shared_ratio, seedp)) {
@@ -230,7 +231,6 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 #else
 //      if (TrueOrFalse(remote_ratio, seedp)) {
               data[i] = alloc->AlignedMalloc(BLOCK_SIZE, REMOTE);
-              shared_data[i] = data[i];
 //      } else {
 //        data[i] = alloc->AlignedMalloc(BLOCK_SIZE);
 //      }
@@ -247,33 +247,20 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
       }
 #endif
           }
-          shared_data_is_init.store(true);
+      }
+
+
 
   } else {
-      if (id == 0){
-          for (int i = 0; i < STEPS; i++) {
-              GAddr addr;
-              int ret = alloc->Get(i, &addr);
-              epicAssert(ret == addr_size);
-              shared_data[i] = addr;
-          }
-          shared_data_is_init.store(true);
-      }
     for (int i = 0; i < STEPS; i++) {
-        while(!shared_data_is_init.load()){
-            usleep(100);
-        }
       //we prioritize the shared ratio over other parameters
       if (TrueOrFalse(l_shared_ratio, seedp)) {
         GAddr addr;
         //If this block is shared, then acqurie the shared block the same as master.
-        //todo: this is not a good way to do this. We should use a shared memory to store the shared block.
-//        int ret = alloc->Get(i, &addr);
-//        epicAssert(ret == addr_size);
-//          data[i] = addr;
-
-          data[i] = shared_data[i];
-
+        //todo: this is not a good way to do this. We should use bulk load for data[]
+        int ret = alloc->Get(i, &addr);
+        epicAssert(ret == addr_size);
+        data[i] = addr;
         //revise the l_remote_ratio accordingly if we get the shared addr violate the remote probability
 //        if (TrueOrFalse(l_remote_ratio, seedp)) {  //should be remote
 //          if (alloc->GetID() == WID(addr)) {  //false negative
