@@ -216,8 +216,6 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
   //the main thread (id == 0) in the master node (is_master == true)
   // is responsible for reference data access pattern
   if (is_master && id == 0) {
-      //TODO: logically not correct.
-
           for (int i = 0; i < STEPS; i++) {
               //There is no meanings to do the if clause below.
               if (TrueOrFalse(l_shared_ratio, seedp)) {
@@ -250,9 +248,6 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 #endif
           }
           shared_data_is_init.store(true);
-
-
-
 
   } else {
       if (id == 0){
