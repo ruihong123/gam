@@ -25,12 +25,12 @@
 #define DEBUG_LEVEL LOG_WARNING
 #define GETANALYSIS
 #ifdef GETANALYSIS
-std::atomic<uint64_t> readTotal = 0;
-std::atomic<uint64_t> readcounter = 0;
-std::atomic<uint64_t> writeTotal = 0;
-std::atomic<uint64_t> writecounter = 0;
-std::atomic<uint64_t> AllocTotal = 0;
-std::atomic<uint64_t> Alloccounter = 0;
+std::atomic<uint64_t> readTotal = {0};
+std::atomic<uint64_t> readcounter = {0};
+std::atomic<uint64_t> writeTotal = {0};
+std::atomic<uint64_t> writecounter = {0};
+std::atomic<uint64_t> AllocTotal = {0};
+std::atomic<uint64_t> Alloccounter = {0};
 //extern std::atomic<uint64_t> MemcopyTotal;
 //extern std::atomic<uint64_t> Memcopycounter;
 //extern std::atomic<uint64_t> NextStepTotal;
