@@ -15,6 +15,7 @@
 #include "zmalloc.h"
 #include "util.h"
 #include "gallocator.h"
+#include "kernel.h"
 
 //#define PERF_GET
 //#define PERF_MALLOC
@@ -247,18 +248,22 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 
               if (i%MEMSET_GRANULARITY == MEMSET_GRANULARITY - 1) {
                   memset_buffer[i%MEMSET_GRANULARITY] = data[i];
-                  assert(data[i].offset <= 64ull*1024ull*1024*1024);
+//                  assert(data[i].offset <= 64ull*1024ull*1024*1024);
                   printf("Memset a key %d\n", i);
-                  ddsm->memSet((const char*)&i, sizeof(i), (const char*)memset_buffer, sizeof(GlobalAddress) * MEMSET_GRANULARITY);
+                  alloc->memSet((const char*)&i, sizeof(i), (const char*)memset_buffer, sizeof(GAddr) * MEMSET_GRANULARITY);
 //                    assert(i%MEMSET_GRANULARITY == MEMSET_GRANULARITY-1);
               }else{
                   memset_buffer[i%MEMSET_GRANULARITY] = data[i];
-                  assert(data[i].offset <= 64ull*1024ull*1024*1024);
+//                  assert(data[i].offset <= 64ull*1024ull*1024*1024);
 
               }
-              if (shared_ratio != 0)
-                  //Register the allocation for master into a key value store.
-                  alloc->Put(i, &data[i], addr_size);
+              if (i == STEPS - 1) {
+                  printf("Memset a key %d\n", i);
+                  alloc->memSet((const char*)&i, sizeof(i), (const char*)memset_buffer, sizeof(GAddr) * MEMSET_GRANULARITY);
+              }
+//              if (shared_ratio != 0)
+//                  //Register the allocation for master into a key value store.
+//                  alloc->Put(i, &data[i], addr_size);
 #ifdef BENCHMARK_DEBUG
               if (shared_ratio != 0) {
         GAddr readback;
@@ -272,10 +277,28 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 
   } else {
       if (id == 0){
+
           for (int i = 0; i < STEPS; i++) {
-              GAddr addr;
-              int ret = alloc->Get(i, &addr);
-              epicAssert(ret == addr_size);
+              if(unlikely(shared_ratio > 0 && i == (STEPS/MEMSET_GRANULARITY)*MEMSET_GRANULARITY)){
+                  if (memget_buffer){
+                      delete memget_buffer;
+                  }
+                  size_t v_size;
+                  int key =  STEPS - 1;
+                  memget_buffer = (GAddr*)alloc->memGet((const char*)&key, sizeof(key),  &v_size);
+                  assert(v_size == sizeof(GAddr) * MEMSET_GRANULARITY);
+              }else if (unlikely(shared_ratio > 0 && i%MEMSET_GRANULARITY == 0 )) {
+                  if (memget_buffer){
+                      delete memget_buffer;
+                  }
+                  size_t v_size;
+                  int key =  i + MEMSET_GRANULARITY - 1;
+                  memget_buffer = (GAddr*)alloc->memGet((const char*)&key, sizeof(key),  &v_size);
+                  assert(v_size == sizeof(GAddr) * MEMSET_GRANULARITY);
+              }
+              GAddr addr = memget_buffer[i%MEMSET_GRANULARITY];;
+//              int ret = alloc->Get(i, &addr);
+//              epicAssert(ret == addr_size);
               shared_data[i] = addr;
           }
           shared_data_is_init.store(true);
