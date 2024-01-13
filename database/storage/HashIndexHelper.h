@@ -92,6 +92,7 @@ class BucketHeader : public GAMObject{
     GAddr prev_node_addr = Gnullptr;
     BucketNode cur_node;
     while (cur_node_addr != Gnullptr) {
+        //The code below may circles a long time.
       gallocator->Read(cur_node_addr, &cur_node, sizeof(BucketNode));
       if (cur_node.key_ == key) {
         break;

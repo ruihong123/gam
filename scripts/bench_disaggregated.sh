@@ -9,7 +9,7 @@ compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
 cache_mem_size=8 # 8 gb Local memory size
-remote_mem_size=8 # 48 gb Remote memory size
+remote_mem_size=48 # 48 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12311
 port=$((10000+RANDOM%1000))
@@ -103,6 +103,9 @@ run() {
 #    echo `cat $slaves`
     echo $compute_num
     echo $memory_num
+    read -r -a memcached_node <<< $(head -n 1 $home_dir/memcached_ip.conf)
+    echo "restart memcached on ${memcached_node[0]}"
+    ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
     for compute in `cat "$compute_nodes"`
     do
     	ip=`echo $compute | cut -d ' ' -f1`

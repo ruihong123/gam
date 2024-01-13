@@ -16,9 +16,22 @@ LockWrapper GAllocFactory::lock;
 GFunc* GAllocFactory::gfuncs[] = { Incr, IncrDouble, GatherPagerank,
     ApplyPagerank, ScatterPagerank };
 #endif
-
+std::string trim(const std::string &s) {
+    std::string res = s;
+    if (!res.empty()) {
+        res.erase(0, res.find_first_not_of(" "));
+        res.erase(res.find_last_not_of(" ") + 1);
+    }
+    return res;
+}
 GAlloc::GAlloc(Worker* worker)
     : wh(new WorkerHandle(worker)) {
+    if (!connectMemcached()) {
+        printf("Failed to connect to memcached\n");
+        return;
+    }
+    char temp[100] = "Try me ahahahahaha! kkk";
+    memSet(reinterpret_cast<const char *>(&temp), 100, reinterpret_cast<const char *>(&temp), 100);
 }
 
 GAddr GAlloc::Malloc(const Size size, Flag flag) {
@@ -326,3 +339,89 @@ int GAlloc::HTable(void* addr) {
 GAlloc::~GAlloc() {
   delete wh;
 }
+
+bool GAlloc::connectMemcached() {
+    memcached_server_st *servers = NULL;
+    memcached_return rc;
+
+    std::ifstream conf("../memcached_ip.conf");
+
+    if (!conf) {
+        fprintf(stderr, "can't open memcached_ip.conf\n");
+        return false;
+    }
+
+    std::string addr, port;
+    std::getline(conf, addr);
+    std::getline(conf, port);
+
+    memc = memcached_create(NULL);
+    servers = memcached_server_list_append(servers, trim(addr).c_str(),
+                                           std::stoi(trim(port)), &rc);
+    rc = memcached_server_push(memc, servers);
+
+    if (rc != MEMCACHED_SUCCESS) {
+        fprintf(stderr, "Counld't add server:%s\n", memcached_strerror(memc, rc));
+        sleep(1);
+        return false;
+    }
+
+    memcached_behavior_set(memc, MEMCACHED_BEHAVIOR_BINARY_PROTOCOL, 1);
+    return true;
+}
+
+bool GAlloc::disconnectMemcached() {
+    if (memc) {
+        memcached_quit(memc);
+        memcached_free(memc);
+        memc = NULL;
+    }
+    return true;
+}
+void GAlloc::memSet(const char *key, uint32_t klen, const char *val,
+                  uint32_t vlen) {
+
+    memcached_return rc;
+    while (true) {
+        memc_mutex.lock();
+
+        rc = memcached_set(memc, key, klen, val, vlen, (time_t)0, (uint32_t)0);
+        if (rc == MEMCACHED_SUCCESS) {
+            memc_mutex.unlock();
+            break;
+        }else{
+            memc_mutex.unlock();
+
+        }
+
+        usleep(400);
+    }
+}
+
+char *GAlloc::memGet(const char *key, uint32_t klen, size_t *v_size) {
+
+    size_t l;
+    char *res;
+    uint32_t flags;
+    memcached_return rc;
+
+    while (true) {
+        memc_mutex.lock();
+        res = memcached_get(memc, key, klen, &l, &flags, &rc);
+        if (rc == MEMCACHED_SUCCESS) {
+            memc_mutex.unlock();
+            break;
+        }else{
+            memc_mutex.unlock();
+
+        }
+        usleep(200 * wh->GetWorkerId());
+    }
+
+    if (v_size != nullptr) {
+        *v_size = l;
+    }
+
+    return res;
+}
+

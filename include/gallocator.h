@@ -13,15 +13,22 @@
 #include "master.h"
 #ifdef GFUNC_SUPPORT
 #include "gfunc.h"
+#include <libmemcached/memcached.h>
 #endif
 enum NodeType  {ComputeNode, MemoryNode};
 class GAlloc {
   WorkerHandle* wh;  //handle to communicate with local worker
     NodeType nodeType;
+    memcached_st *memc;
+    std::mutex memc_mutex;
   int Lock(Work op, const GAddr addr, const Size count, Flag flag = 0);
  public:
   GAlloc(Worker* worker);
-
+    bool connectMemcached();
+    bool disconnectMemcached();
+    void memSet(const char *key, uint32_t klen, const char *val, uint32_t vlen);
+    //blocking function.
+    char *memGet(const char *key, uint32_t klen, size_t *v_size = nullptr);
   /**
    * malloc in the global address
    * @param size: the size of memory to be malloced

@@ -96,6 +96,9 @@ do
   echo "Rsync the $node"
   rsync -a $home_dir $node:$home_dir
 done
+read -r -a memcached_node <<< $(head -n 1 $home_dir/memcached_ip.conf)
+echo "restart memcached on ${memcached_node[0]}"
+ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
 #  while [ $n -lt $nshard ]
 #    do
 #      echo "Rsync the ${compute_shard[n]}"

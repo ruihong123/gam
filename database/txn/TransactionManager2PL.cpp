@@ -9,6 +9,7 @@ namespace Database {
     PROFILE_TIME_START(thread_id_, CC_INSERT);
     RecordSchema *schema_ptr = storage_manager_->tables_[table_id]->GetSchema();
     bool lock_success = TryWLockRecord(data_addr, schema_ptr->GetSchemaSize());
+    //What does this mean? Why insert Record is commented.
     assert(lock_success == true); // since record is thread local
     record->SetVisible(true);
     Access* access = access_list_.NewAccess();
