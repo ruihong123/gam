@@ -24,7 +24,6 @@
 //#define STATS_COLLECTION
 //#define LOCAL_MEMORY
 #define DEBUG_LEVEL LOG_WARNING
-#define GETANALYSIS
 #ifdef GETANALYSIS
 std::atomic<uint64_t> readTotal = {0};
 std::atomic<uint64_t> readcounter = {0};

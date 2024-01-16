@@ -102,4 +102,6 @@ using namespace std;
 
 #define MAX_MEM_STATS_SIZE  64 //10+10+20+20+4 in decimal
 
+#define GETANALYSIS
+
 #endif /* INCLUDE_SETTINGS_H_ */
