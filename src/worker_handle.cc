@@ -115,7 +115,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef GETANALYSIS
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-    printf("ProcessLocalRequest  duration is %ld ns\n", duration.count());
+    epicLog(LOG_WARNING,"ProcessLocalRequest  duration is %ld ns", duration.count());
 #endif
 
 
@@ -146,7 +146,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef GETANALYSIS
         stop = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-        printf("Reply message polling  duration is %ld ns\n", duration.count());
+        epicLog(LOG_WARNING,"Reply message polling  duration is %ld ns\n", duration.count());
 #endif
 #endif
       return wr->status;
