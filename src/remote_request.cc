@@ -110,9 +110,7 @@ void Worker::ProcessRemoteMemStat(Client* client, WorkRequest* wr) {
 }
 
 void Worker::ProcessRemoteMalloc(Client* client, WorkRequest* wr) {
-#ifdef GETANALYSIS
-    auto statistic_start = std::chrono::high_resolution_clock::now();
-#endif
+
   void* addr = nullptr;
   if (wr->flag & ALIGNED) {
     addr = sb.sb_aligned_malloc(wr->size);
@@ -138,11 +136,7 @@ void Worker::ProcessRemoteMalloc(Client* client, WorkRequest* wr) {
   SubmitRequest(client, wr);
   delete wr;
   wr = nullptr;
-#ifdef GETANALYSIS
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-    printf("Alloc message handle duration is %ld ns\n", duration.count());
-#endif
+
 }
 
 void Worker::ProcessRemoteMallocReply(Client* client, WorkRequest* wr) {

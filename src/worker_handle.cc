@@ -108,7 +108,15 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
     while (worker->GetCacheToevict() > 512){
         usleep(10);
     }
+#ifdef GETANALYSIS
+    auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
+#ifdef GETANALYSIS
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+    printf("ProcessLocalRequest  duration is %ld ns\n", duration.count());
+#endif
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
       return SUCCESS;
