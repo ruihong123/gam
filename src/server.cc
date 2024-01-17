@@ -157,15 +157,9 @@ void Server::ProcessRdmaRequest() {
       }
 
       for (int i = 0; i < ne; ++i) {
-#ifdef GETANALYSIS
-          auto statistic_start = std::chrono::high_resolution_clock::now();
-#endif
+
         ProcessRdmaRequest(wc[i]);
-#ifdef GETANALYSIS
-          auto stop = std::chrono::high_resolution_clock::now();
-          auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-          epicLog(LOG_WARNING," RDMA request processing from Node: %d to Node %d duration is %ld ns", qpCliMap[wc[i].qp_num], GetWorkerId(),  duration.count());
-#endif
+
       }
     } while (ne == MAX_CQ_EVENTS);
   }

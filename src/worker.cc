@@ -187,8 +187,15 @@ void Worker::StartService(Worker* w) {
 #ifdef MULTITHREAD_RECV
       w->ioService.post(boost::bind(RdmaHandler, w, wc[i]));
 #else
-
+#ifdef GETANALYSIS
+        auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
       w->ProcessRdmaRequest(wc[i]);
+#ifdef GETANALYSIS
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+        epicLog(LOG_WARNING," RDMA request processing from Node: %d to Node %d duration is %ld ns", qpCliMap[wc[i].qp_num], GetWorkerId(),  duration.count());
+#endif
 #endif
     }
 #else
