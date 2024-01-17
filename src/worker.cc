@@ -570,7 +570,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
 #ifdef GETANALYSIS
       auto stop = std::chrono::high_resolution_clock::now();
       auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-      epicLog(LOG_WARNING,"SubmitRequest part 1  duration is %ld ns", duration.count());
+      epicLog(LOG_WARNING,"Node: %d SubmitRequest to Node %d part 1  duration is %ld ns", GetWorkerId(), cli->GetWorkerId(), duration.count());
 #endif
 #ifdef GETANALYSIS
       statistic_start = std::chrono::high_resolution_clock::now();
