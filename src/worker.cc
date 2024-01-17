@@ -572,16 +572,16 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
       auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
       epicLog(LOG_WARNING,"Node: %d SubmitRequest to Node %d part 1  duration is %ld ns", GetWorkerId(), cli->GetWorkerId(), duration.count());
 #endif
-#ifdef GETANALYSIS
-      statistic_start = std::chrono::high_resolution_clock::now();
-#endif
+//#ifdef GETANALYSIS
+//      statistic_start = std::chrono::high_resolution_clock::now();
+//#endif
     int len;
     int ret = wr->Ser(sbuf, len);
-#ifdef GETANALYSIS
-      stop = std::chrono::high_resolution_clock::now();
-      duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-      epicLog(LOG_WARNING,"Node: %d SubmitRequest to Node %d part 2 duration is %ld ns", GetWorkerId(), cli->GetWorkerId(), duration.count());
-#endif
+//#ifdef GETANALYSIS
+//      stop = std::chrono::high_resolution_clock::now();
+//      duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+//      epicLog(LOG_WARNING,"Node: %d SubmitRequest to Node %d part 2 duration is %ld ns", GetWorkerId(), cli->GetWorkerId(), duration.count());
+//#endif
 #ifdef GETANALYSIS
       statistic_start = std::chrono::high_resolution_clock::now();
 #endif

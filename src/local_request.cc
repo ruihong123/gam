@@ -58,7 +58,7 @@ int Worker::ProcessLocalMalloc(WorkRequest* wr) {
       epicLog(LOG_WARNING,
               "there is no remote worker, we allocate locally instead");
     } else {
-      cli->SetMemStat(cli->GetTotalMem(), cli->GetFreeMem() - wr->size);
+//      cli->SetMemStat(cli->GetTotalMem(), cli->GetFreeMem() - wr->size);
         epicLog(LOG_WARNING, "Remote Malloc request sent to worker %d, free mem = %d", cli->GetWorkerId(), cli->GetFreeMem());
       SubmitRequest(cli, wr, ADD_TO_PENDING | REQUEST_SEND);
       return REMOTE_REQUEST;

@@ -111,6 +111,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef GETANALYSIS
     auto statistic_start = std::chrono::high_resolution_clock::now();
 #endif
+    volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
+    assert(*local_notify_buf == 1);
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
 #ifdef GETANALYSIS
     auto stop = std::chrono::high_resolution_clock::now();
@@ -140,7 +142,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef GETANALYSIS
         statistic_start = std::chrono::high_resolution_clock::now();
 #endif
-      volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
+//      volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
       while (*local_notify_buf != 2);
       epicLog(LOG_DEBUG, "get notified via buf");
 #ifdef GETANALYSIS

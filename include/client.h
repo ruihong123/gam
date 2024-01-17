@@ -70,7 +70,7 @@ class Client {
     inline uint32_t GetQP() {
       return ctx->GetQP();
     }
-
+    //Unsignaled by default
     inline ssize_t Send(const void* buf, size_t len, unsigned int id = 0,
         bool signaled = false) {
       return ctx->Send(buf, len, id, signaled);
