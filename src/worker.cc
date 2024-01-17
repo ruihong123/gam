@@ -554,6 +554,9 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
     RDMASendData* data = new RDMASendData(cli, sbuf, len);
     rdma_queue->push(data);
 #else
+#ifdef GETANALYSIS
+      auto statistic_start = std::chrono::high_resolution_clock::now();
+#endif
       char* sbuf = cli->GetFreeSlot();
     bool busy = false;
     if (sbuf == nullptr) {
@@ -564,8 +567,24 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
 //        assert(false);
       // need to RDMA regist it and free it in the end. We shall
     }
+#ifdef GETANALYSIS
+      auto stop = std::chrono::high_resolution_clock::now();
+      auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+      epicLog(LOG_WARNING,"SubmitRequest part 1  duration is %ld ns", duration.count());
+#endif
+#ifdef GETANALYSIS
+      statistic_start = std::chrono::high_resolution_clock::now();
+#endif
     int len;
     int ret = wr->Ser(sbuf, len);
+#ifdef GETANALYSIS
+      stop = std::chrono::high_resolution_clock::now();
+      duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+      epicLog(LOG_WARNING,"SubmitRequest part 2  duration is %ld ns", duration.count());
+#endif
+#ifdef GETANALYSIS
+      statistic_start = std::chrono::high_resolution_clock::now();
+#endif
     epicAssert(!ret);
       epicLog(LOG_INFO,
               "RDMA send request local addr is %p", sbuf);
@@ -573,6 +592,11 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
       epicAssert(ret == -1);
       epicLog(LOG_INFO, "sent failed: slots are busy");
     }
+#ifdef GETANALYSIS
+      stop = std::chrono::high_resolution_clock::now();
+      duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
+      epicLog(LOG_WARNING,"SubmitRequest part 3  duration is %ld ns", duration.count());
+#endif
 #endif
   } else {
     epicLog(LOG_WARNING, "unrecognized request type");
