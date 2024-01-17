@@ -111,7 +111,7 @@ void Master::ProcessRequest(Client* client, WorkRequest* wr) {
         lwr.op = BROADCAST_MEM_STATS;
         char buf[conf->unsynced_th * MAX_MEM_STATS_SIZE + 1];  //op + list + \0
         char send_buf[MAX_REQUEST_SIZE];
-
+        epicLog(LOG_WARNING, "UPDATE_MEM_STATS op from node %d\n", client->GetWorkerId());
         int n = 0;
         while (!unsynced_workers.empty()) {
           Client* lc = unsynced_workers.front();
