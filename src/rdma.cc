@@ -46,7 +46,7 @@ RdmaResource::RdmaResource(ibv_device *dev, bool master)
     epicLog(LOG_FATAL, "Unable to allocate pd\n");
     goto clean_channel;
   }
-
+    //TODO: THE rx_depth is too big causing cache miss in RDMA device.
   rx_depth =
       (isForMaster) ? MASTER_RDMA_SRQ_RX_DEPTH : WORKER_RDMA_SRQ_RX_DEPTH;
   rx_depth = rx_depth > HW_MAX_PENDING ? HW_MAX_PENDING : rx_depth;
