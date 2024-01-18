@@ -194,7 +194,7 @@ void Worker::StartService(Worker* w) {
 #ifdef GETANALYSIS
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-        epicLog(LOG_WARNING," RDMA request processing from Node: %d to Node %d duration is %ld ns", qpCliMap[wc[i].qp_num], GetWorkerId(),  duration.count());
+        epicLog(LOG_WARNING," RDMA request processing from Node: %d to Node %d duration is %ld ns", w->qpCliMap[wc[i].qp_num], w->GetWorkerId(),  duration.count());
 #endif
 #endif
     }
