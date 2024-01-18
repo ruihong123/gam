@@ -87,6 +87,9 @@ class Client {
     inline int PostRecv(int n) {
       return ctx->PostRecv(n);
     }
+    inline int PostRecvSlot(int n) {
+        return ctx->PostRecvSlot(n);
+    }
 
     inline char* GetFreeSlot() {
       return ctx->GetFreeSlot();

@@ -24,13 +24,12 @@ RdmaResource::RdmaResource(ibv_device *dev, bool master)
       base(nullptr),
       bmr(nullptr),
       size(0),
-      rdma_context_counter(0),
-      slot_inuse(0),
-      slot_head(0),
-      recv_posted(0) {
+      rdma_context_counter(0){
 
   epicLog(LOG_DEBUG, "new rdma resource\n");
-
+    int rx_depth =
+            (isForMaster) ? MASTER_RDMA_SRQ_RX_DEPTH : WORKER_RDMA_SRQ_RX_DEPTH;
+    rx_depth = rx_depth > 16351 ? 16351 : rx_depth;
   if (!(context = ibv_open_device(dev))) {
     epicLog(LOG_FATAL, "unable to get context for %s\n",
             ibv_get_device_name(dev));
@@ -46,30 +45,27 @@ RdmaResource::RdmaResource(ibv_device *dev, bool master)
     epicLog(LOG_FATAL, "Unable to allocate pd\n");
     goto clean_channel;
   }
-    //TODO: THE rx_depth is too big causing cache miss in RDMA device.
-  rx_depth =
-      (isForMaster) ? MASTER_RDMA_SRQ_RX_DEPTH : WORKER_RDMA_SRQ_RX_DEPTH;
-  rx_depth = rx_depth > HW_MAX_PENDING ? HW_MAX_PENDING : rx_depth;
+
   if (!(cq = ibv_create_cq(this->context, (rx_depth << 1) + 1, NULL,
                            this->channel, 0))) {
     epicLog(LOG_FATAL, "Unable to create cq\n");
     goto clean_pd;
   }
 
-  {
-    ibv_srq_init_attr attr = { };
-    attr.attr.max_wr = rx_depth;
-    attr.attr.max_sge = 1;
-
-    if (!(srq = ibv_create_srq(this->pd, &attr))) {
-      epicLog(LOG_FATAL, "Unable to create srq\n");
-      goto clean_cq;
-    }
-  }
+//  {
+//    ibv_srq_init_attr attr = { };
+//    attr.attr.max_wr = rx_depth;
+//    attr.attr.max_sge = 1;
+//
+//    if (!(srq = ibv_create_srq(this->pd, &attr))) {
+//      epicLog(LOG_FATAL, "Unable to create srq\n");
+//      goto clean_cq;
+//    }
+//  }
 
   if (ibv_query_port(context, ibport, &portAttribute)) {
     epicLog(LOG_FATAL, "Unable to query port %d\n", ibport);
-    goto clean_srq;
+//    goto clean_srq;
   }
 
   devName = ibv_get_device_name(this->device);
@@ -90,7 +86,7 @@ RdmaResource::RdmaResource(ibv_device *dev, bool master)
 
   return;
 
-  clean_srq: ibv_destroy_srq(this->srq);
+//  clean_srq: ibv_destroy_srq(this->srq);
   clean_cq: ibv_destroy_cq(this->cq);
   clean_pd: ibv_dealloc_pd(this->pd);
   clean_channel: ibv_destroy_comp_channel(this->channel);
@@ -100,15 +96,15 @@ RdmaResource::RdmaResource(ibv_device *dev, bool master)
 }
 
 RdmaResource::~RdmaResource() {
-  ibv_destroy_srq(this->srq);
+//  ibv_destroy_srq(this->srq);
   ibv_destroy_cq(this->cq);
   ibv_dealloc_pd(this->pd);
   ibv_destroy_comp_channel(this->channel);
   ibv_close_device(this->context);
-  for (ibv_mr* mr : comm_buf) {
-    ibv_dereg_mr(mr);
-    zfree(mr->addr);
-  }
+//  for (ibv_mr* mr : comm_buf) {
+//    ibv_dereg_mr(mr);
+//    zfree(mr->addr);
+//  }
 }
 
 int RdmaResource::RegLocalMemory(void *base, size_t sz) {
@@ -133,144 +129,144 @@ int RdmaResource::RegLocalMemory(void *base, size_t sz) {
   return 0;
 }
 
-int RdmaResource::RegCommSlot(int slot) {
-  epicLog(LOG_DEBUG, "trying to register %d slots", slot);
+//int RdmaResource::RegCommSlot(int slot) {
+//  epicLog(LOG_DEBUG, "trying to register %d slots", slot);
+//
+//  if (slots.size() - slot_inuse >= slot) {
+//    epicLog(LOG_DEBUG, "no need to register: inuse = %d, current slots = %d\n",
+//            slot_inuse, slots.size());
+//    slot_inuse += slot;
+//    return 0;
+//  } else {
+//    slot_inuse += slot;
+//    int i = slots.size();
+//    for (; i < slot_inuse; i += RECV_SLOT_STEP) {
+//      int sz = roundup(RECV_SLOT_STEP*MAX_REQUEST_SIZE, page_size);
+//      void* buf = zmalloc(sz);
+//      struct ibv_mr *mr = ibv_reg_mr(
+//          this->pd,
+//          buf,
+//          sz,
+//          IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+//              | IBV_ACCESS_REMOTE_READ);
+//      if (!mr) {
+//        epicLog(LOG_FATAL, "Unable to register mr for communication slots");
+//        return -1;
+//      }
+//      comm_buf.push_back(mr);
+//      epicAssert(mr->addr == buf && mr->length == sz);
+//    }
+//    slots.reserve(i);
+//    for (int j = slots.size(); j < i; j++) {
+//      slots.push_back(false);
+//    }
+//
+//    epicLog(LOG_DEBUG, "registered %d, enlarge to %d with inuse = %d\n", slot,
+//            slots.size(), slot_inuse);
+//    epicAssert(slots.size() % RECV_SLOT_STEP == 0);
+//    return 0;
+//  }
+//}
+//
+//char* RdmaResource::GetSlot(int slot) {
+//  epicAssert(slots.at(slot) == true && slot < slot_inuse);
+//  //TODO: check slot == tail
+//  return (char*) ((uintptr_t) comm_buf[BPOS(slot)]->addr + BOFF(slot));
+//}
 
-  if (slots.size() - slot_inuse >= slot) {
-    epicLog(LOG_DEBUG, "no need to register: inuse = %d, current slots = %d\n",
-            slot_inuse, slots.size());
-    slot_inuse += slot;
-    return 0;
-  } else {
-    slot_inuse += slot;
-    int i = slots.size();
-    for (; i < slot_inuse; i += RECV_SLOT_STEP) {
-      int sz = roundup(RECV_SLOT_STEP*MAX_REQUEST_SIZE, page_size);
-      void* buf = zmalloc(sz);
-      struct ibv_mr *mr = ibv_reg_mr(
-          this->pd,
-          buf,
-          sz,
-          IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
-              | IBV_ACCESS_REMOTE_READ);
-      if (!mr) {
-        epicLog(LOG_FATAL, "Unable to register mr for communication slots");
-        return -1;
-      }
-      comm_buf.push_back(mr);
-      epicAssert(mr->addr == buf && mr->length == sz);
-    }
-    slots.reserve(i);
-    for (int j = slots.size(); j < i; j++) {
-      slots.push_back(false);
-    }
-
-    epicLog(LOG_DEBUG, "registered %d, enlarge to %d with inuse = %d\n", slot,
-            slots.size(), slot_inuse);
-    epicAssert(slots.size() % RECV_SLOT_STEP == 0);
-    return 0;
-  }
-}
-
-char* RdmaResource::GetSlot(int slot) {
-  epicAssert(slots.at(slot) == true && slot < slot_inuse);
-  //TODO: check slot == tail
-  return (char*) ((uintptr_t) comm_buf[BPOS(slot)]->addr + BOFF(slot));
-}
-
-int RdmaResource::PostRecvSlot(int slot) {
-  if (rx_depth == recv_posted) {
-    epicLog(LOG_WARNING, "cannot post any recv, already full");
-    return 0;
-  }
-  recv_posted += 1;
-  ibv_recv_wr rr { };
-  ibv_sge sge { };
-  int bpos = BPOS(slot);
-  int boff = BOFF(slot);
-
-  sge.length = MAX_REQUEST_SIZE;
-  sge.lkey = comm_buf[bpos]->lkey;
-  sge.addr = (uintptr_t) comm_buf[bpos]->addr + boff;
-
-  rr.wr_id = slot;
-  rr.num_sge = 1;
-  rr.sg_list = &sge;
-  rr.next = nullptr;
-
-  ibv_recv_wr* bad_rr;
-  if (ibv_post_srq_recv(srq, &rr, &bad_rr)) {
-    epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
-            strerror(errno));
-    slots.at(slot) = false;
-    return 0;
-  }
-  return 1;
-}
-
-int RdmaResource::PostRecv(int n) {
-  if (n > rx_depth - recv_posted) {
-    n = rx_depth - recv_posted;
-  }
-  epicAssert(n >= 0);
-  if (n == 0)
-    return 0;
-
-  ibv_recv_wr rr[n];
-  memset(rr, 0, sizeof(ibv_recv_wr) * n);
-  ibv_sge sge[n];
-  int i, ret;
-  int head_init = slot_head;
-  for (i = 0; i < n;) {
-    if (slots.at(slot_head) == true) {
-      if (++slot_head == slot_inuse)
-        slot_head = 0;
-      if (slot_head == head_init) {
-        epicLog(LOG_FATAL, "cannot find free recv slot (%d)", n);
-        break;
-      }
-      continue;
-    }
-    int bpos = BPOS(slot_head);
-    int boff = BOFF(slot_head);
-
-    sge[i].length = MAX_REQUEST_SIZE;
-    sge[i].lkey = comm_buf[bpos]->lkey;
-    sge[i].addr = (uintptr_t) comm_buf[bpos]->addr + boff;
-
-    rr[i].wr_id = slot_head;
-    rr[i].num_sge = 1;
-    rr[i].sg_list = &sge[i];
-    if (i + 1 < n)
-      rr[i].next = &rr[i + 1];
-
-    //advance the slot_head by 1
-    slots.at(slot_head) = true;
-    if (++slot_head == slot_inuse)
-      slot_head = 0;
-    i++;
-  }
-  ret = i;
-
-  if (i > 0) {
-    rr[i - 1].next = nullptr;
-    ibv_recv_wr* bad_rr;
-    if (ibv_post_srq_recv(srq, rr, &bad_rr)) {
-      epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
-              strerror(errno));
-      int s = bad_rr->wr_id;
-      ret -= RMINUS(slot_head, s, slot_inuse);
-      while (s != slot_head) {
-        slots.at(s) = false;
-        if (++s == slot_inuse)
-          s = 0;
-      }
-      slot_head = s;
-    }
-  }
-  recv_posted += n;
-  return ret;
-}
+//int RdmaResource::PostRecvSlot(int slot) {
+//  if (rx_depth == recv_posted) {
+//    epicLog(LOG_WARNING, "cannot post any recv, already full");
+//    return 0;
+//  }
+//  recv_posted += 1;
+//  ibv_recv_wr rr { };
+//  ibv_sge sge { };
+//  int bpos = BPOS(slot);
+//  int boff = BOFF(slot);
+//
+//  sge.length = MAX_REQUEST_SIZE;
+//  sge.lkey = comm_buf[bpos]->lkey;
+//  sge.addr = (uintptr_t) comm_buf[bpos]->addr + boff;
+//
+//  rr.wr_id = slot;
+//  rr.num_sge = 1;
+//  rr.sg_list = &sge;
+//  rr.next = nullptr;
+//
+//  ibv_recv_wr* bad_rr;
+//  if (ibv_post_srq_recv(srq, &rr, &bad_rr)) {
+//    epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
+//            strerror(errno));
+//    slots.at(slot) = false;
+//    return 0;
+//  }
+//  return 1;
+//}
+//
+//int RdmaResource::PostRecv(int n) {
+//  if (n > rx_depth - recv_posted) {
+//    n = rx_depth - recv_posted;
+//  }
+//  epicAssert(n >= 0);
+//  if (n == 0)
+//    return 0;
+//
+//  ibv_recv_wr rr[n];
+//  memset(rr, 0, sizeof(ibv_recv_wr) * n);
+//  ibv_sge sge[n];
+//  int i, ret;
+//  int head_init = slot_head;
+//  for (i = 0; i < n;) {
+//    if (slots.at(slot_head) == true) {
+//      if (++slot_head == slot_inuse)
+//        slot_head = 0;
+//      if (slot_head == head_init) {
+//        epicLog(LOG_FATAL, "cannot find free recv slot (%d)", n);
+//        break;
+//      }
+//      continue;
+//    }
+//    int bpos = BPOS(slot_head);
+//    int boff = BOFF(slot_head);
+//
+//    sge[i].length = MAX_REQUEST_SIZE;
+//    sge[i].lkey = comm_buf[bpos]->lkey;
+//    sge[i].addr = (uintptr_t) comm_buf[bpos]->addr + boff;
+//
+//    rr[i].wr_id = slot_head;
+//    rr[i].num_sge = 1;
+//    rr[i].sg_list = &sge[i];
+//    if (i + 1 < n)
+//      rr[i].next = &rr[i + 1];
+//
+//    //advance the slot_head by 1
+//    slots.at(slot_head) = true;
+//    if (++slot_head == slot_inuse)
+//      slot_head = 0;
+//    i++;
+//  }
+//  ret = i;
+//
+//  if (i > 0) {
+//    rr[i - 1].next = nullptr;
+//    ibv_recv_wr* bad_rr;
+//    if (ibv_post_srq_recv(srq, rr, &bad_rr)) {
+//      epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
+//              strerror(errno));
+//      int s = bad_rr->wr_id;
+//      ret -= RMINUS(slot_head, s, slot_inuse);
+//      while (s != slot_head) {
+//        slots.at(s) = false;
+//        if (++s == slot_inuse)
+//          s = 0;
+//      }
+//      slot_head = s;
+//    }
+//  }
+//  recv_posted += n;
+//  return ret;
+//}
 
 const char *RdmaResourceFactory::defaultDevname = NULL;
 std::vector<RdmaResource *> RdmaResourceFactory::resources;
@@ -339,10 +335,10 @@ RdmaContext* RdmaResource::NewRdmaContext(bool isForMaster) {
 
   int s = isForMaster ? MAX_MASTER_PENDING_MSG : MAX_WORKER_PENDING_MSG;
   s = s > HW_MAX_PENDING ? HW_MAX_PENDING : s;
-  if (RegCommSlot(s)) {
-    epicLog(LOG_WARNING, "unable to register more communication slots\n");
-    return nullptr;
-  }
+//  if (RegCommSlot(s)) {
+//    epicLog(LOG_WARNING, "unable to register more communication slots\n");
+//    return nullptr;
+//  }
   epicLog(LOG_DEBUG, "new RdmaContext: %d\n", rdma_context_counter);
   return new RdmaContext(this, isForMaster);
 }
@@ -362,13 +358,19 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
       pending_send_msg(0) {
   //check either master == true, or both isMaster() in RdmaContext and RdmaResouce are false
   epicAssert(IsMaster() || IsMaster() == res->IsMaster());
-
+    rx_depth =
+            (isForMaster) ? MASTER_RDMA_SRQ_RX_DEPTH : WORKER_RDMA_SRQ_RX_DEPTH;
+    rx_depth = rx_depth > HW_MAX_PENDING ? HW_MAX_PENDING : rx_depth;
   max_pending_msg =
       IsMaster() ? MAX_MASTER_PENDING_MSG : MAX_WORKER_PENDING_MSG;
   max_pending_msg =
       max_pending_msg > HW_MAX_PENDING ? HW_MAX_PENDING : max_pending_msg;
   int max_buf_size = IsMaster() ? MASTER_BUFFER_SIZE : WORKER_BUFFER_SIZE;
-
+    int s = isForMaster ? MAX_MASTER_PENDING_MSG : MAX_WORKER_PENDING_MSG;
+    s = s > HW_MAX_PENDING ? HW_MAX_PENDING : s;
+    if (RegCommSlot(s)) {
+        epicLog(LOG_WARNING, "unable to register more communication slots\n");
+    }
   void* buf = zmalloc(roundup(max_buf_size, page_size));
   if (unlikely(!buf)) {
     epicLog(LOG_WARNING, "Unable to allocate memeory\n");
@@ -402,8 +404,8 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
     attr.cap.max_send_wr = max_pending_msg;
     attr.cap.max_send_sge = 1;
     attr.sq_sig_all = 0;
-//		attr.cap.max_recv_wr = 1;
-//		attr.cap.max_recv_sge = 1;
+		attr.cap.max_recv_wr = rx_depth;
+		attr.cap.max_recv_sge = 1;
     attr.cap.max_inline_data = MAX_RDMA_INLINE_SIZE;
 
     qp = ibv_create_qp(res->pd, &attr);
@@ -453,6 +455,144 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
   clean_mr: ibv_dereg_mr(send_buf);
   send_mr_err: zfree(buf);
   send_buf_err: throw RDMA_CONTEXT_EXCEPTION;
+}
+
+int RdmaContext::RegCommSlot(int slot) {
+    epicLog(LOG_DEBUG, "trying to register %d slots", slot);
+
+    if (slots.size() - slot_inuse >= slot) {
+        epicLog(LOG_DEBUG, "no need to register: inuse = %d, current slots = %d\n",
+                slot_inuse, slots.size());
+        slot_inuse += slot;
+        return 0;
+    } else {
+        slot_inuse += slot;
+        int i = slots.size();
+        for (; i < slot_inuse; i += RECV_SLOT_STEP) {
+            int sz = roundup(RECV_SLOT_STEP*MAX_REQUEST_SIZE, page_size);
+            void* buf = zmalloc(sz);
+            struct ibv_mr *mr = ibv_reg_mr(
+                    this->resource->pd,
+                    buf,
+                    sz,
+                    IBV_ACCESS_LOCAL_WRITE | IBV_ACCESS_REMOTE_WRITE
+                    | IBV_ACCESS_REMOTE_READ);
+            if (!mr) {
+                epicLog(LOG_FATAL, "Unable to register mr for communication slots");
+                return -1;
+            }
+            comm_buf.push_back(mr);
+            epicAssert(mr->addr == buf && mr->length == sz);
+        }
+        slots.reserve(i);
+        for (int j = slots.size(); j < i; j++) {
+            slots.push_back(false);
+        }
+
+        epicLog(LOG_DEBUG, "registered %d, enlarge to %d with inuse = %d\n", slot,
+                slots.size(), slot_inuse);
+        epicAssert(slots.size() % RECV_SLOT_STEP == 0);
+        return 0;
+    }
+}
+inline int RdmaContext::PostRecv(int n) {
+    if (n > rx_depth - recv_posted) {
+        n = rx_depth - recv_posted;
+    }
+    epicAssert(n >= 0);
+    if (n == 0)
+        return 0;
+
+    ibv_recv_wr rr[n];
+    memset(rr, 0, sizeof(ibv_recv_wr) * n);
+    ibv_sge sge[n];
+    int i, ret;
+    int head_init = receive_slot_head;
+    for (i = 0; i < n;) {
+        if (slots.at(receive_slot_head)) {
+            if (++receive_slot_head == slot_inuse)
+                receive_slot_head = 0;
+            if (receive_slot_head == head_init) {
+                epicLog(LOG_FATAL, "cannot find free recv slot (%d)", n);
+                break;
+            }
+            continue;
+        }
+        int bpos = BPOS(receive_slot_head);
+        int boff = BOFF(receive_slot_head);
+
+        sge[i].length = MAX_REQUEST_SIZE;
+        sge[i].lkey = comm_buf[bpos]->lkey;
+        sge[i].addr = (uintptr_t) comm_buf[bpos]->addr + boff;
+
+        rr[i].wr_id = receive_slot_head;
+        rr[i].num_sge = 1;
+        rr[i].sg_list = &sge[i];
+        if (i + 1 < n)
+            rr[i].next = &rr[i + 1];
+
+        //advance the slot_head by 1
+        slots.at(receive_slot_head) = true;
+        if (++receive_slot_head == slot_inuse)
+            receive_slot_head = 0;
+        i++;
+    }
+    ret = i;
+
+    if (i > 0) {
+        rr[i - 1].next = nullptr;
+        ibv_recv_wr* bad_rr;
+        if (ibv_post_recv(qp, rr, &bad_rr)) {
+            epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
+                    strerror(errno));
+            int s = bad_rr->wr_id;
+            ret -= RMINUS(receive_slot_head, s, slot_inuse);
+            while (s != receive_slot_head) {
+                slots.at(s) = false;
+                if (++s == slot_inuse)
+                    s = 0;
+            }
+            receive_slot_head = s;
+        }
+    }
+    recv_posted += n;
+    return ret;
+}
+int RdmaContext::PostRecvSlot(int slot) {
+    if (rx_depth == recv_posted) {
+        epicLog(LOG_WARNING, "cannot post any recv, already full");
+        return 0;
+    }
+    recv_posted += 1;
+    ibv_recv_wr rr { };
+    ibv_sge sge { };
+    int bpos = BPOS(slot);
+    int boff = BOFF(slot);
+
+    sge.length = MAX_REQUEST_SIZE;
+    sge.lkey = comm_buf[bpos]->lkey;
+    sge.addr = (uintptr_t) comm_buf[bpos]->addr + boff;
+
+    rr.wr_id = slot;
+    rr.num_sge = 1;
+    rr.sg_list = &sge;
+    rr.next = nullptr;
+
+    ibv_recv_wr* bad_rr;
+    if (ibv_post_recv(qp, &rr, &bad_rr)) {
+        epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
+                strerror(errno));
+        slots.at(slot) = false;
+        return 0;
+    }
+    return 1;
+}
+
+
+char* RdmaContext::GetSlot(int slot) {
+    epicAssert(slots.at(slot) == true && slot < slot_inuse);
+    //TODO: check slot == tail
+    return (char*) ((uintptr_t) comm_buf[BPOS(slot)]->addr + BOFF(slot));
 }
 
 int RdmaContext::SetRemoteConnParam(const char *conn) {
@@ -505,7 +645,7 @@ int RdmaContext::SetRemoteConnParam(const char *conn) {
     attr.retry_cnt = 7;
     attr.rnr_retry = 7;
     attr.sq_psn = this->resource->psn;
-    attr.max_rd_atomic = 1;
+    attr.max_rd_atomic = 1; // It was 1 in the origin gam code
     ret = ibv_modify_qp(
         this->qp,
         &attr,
@@ -518,7 +658,7 @@ int RdmaContext::SetRemoteConnParam(const char *conn) {
     }
   }
 
-  resource->PostRecv(max_pending_msg);
+  this->PostRecv(max_pending_msg);
   return 0;
 }
 
@@ -996,9 +1136,9 @@ unsigned int RdmaContext::WriteComp(ibv_wc& wc) {
 char* RdmaContext::RecvComp(ibv_wc& wc) {
   //FIXME: thread-safe
   //what if others grab this slot before the current thread finish its job
-  char* ret = resource->GetSlot(wc.wr_id);
+  char* ret = this->GetSlot(wc.wr_id);
   //resource->ClearSlot(wc.wr_id);
-  resource->recv_posted -= 1;
+  this->recv_posted -= 1;
   return ret;
 }
 

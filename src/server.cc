@@ -112,7 +112,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       }
 #endif
       //resource->ClearSlot(wc.wr_id);
-      int n = resource->PostRecvSlot(wc.wr_id);
+      int n = cli->PostRecvSlot(wc.wr_id);
       //epicAssert(n == 1);
       break;
     }
@@ -124,7 +124,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       epicAssert(wc.wc_flags & IBV_WC_WITH_IMM);
       ProcessRequest(cli, ntohl(wc.imm_data));
       //resource->ClearSlot(wc.wr_id);
-      int n = resource->PostRecvSlot(wc.wr_id);
+      int n = cli->PostRecvSlot(wc.wr_id);
       //epicAssert(n == 1);
       break;
     }

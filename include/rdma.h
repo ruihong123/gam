@@ -52,7 +52,7 @@ class RdmaResource {
   ibv_comp_channel *channel;
   ibv_pd *pd;
   ibv_cq *cq; /* global comp queue */
-  ibv_srq *srq; /* share receive queue */
+//  ibv_srq *srq; /* share receive queue */
   const char *devName = NULL;
   ibv_port_attr portAttribute;
   int ibport = 1; /* TODO: dual-port support */
@@ -63,21 +63,21 @@ class RdmaResource {
   void* base;  //the base addr for the local memory
   size_t size;
   struct ibv_mr *bmr;
-
-  //node-wide communication buf used for receive request
-  std::vector<struct ibv_mr*> comm_buf;
-  //size_t buf_size; buf_size = slots.size() * MAX_REQUEST_SIZE
-  int slot_head;  //current slot head
-  int slot_inuse;  //number of slots in use
-  /*
-   * TODO: check whether head + tail is enough
-   */
-  std::vector<bool> slots;  //the states of all the allocated slots (true: occupied, false: free)
   //current created RdmaContext
   int rdma_context_counter;
+//  //node-wide communication buf used for receive request
+//  std::vector<struct ibv_mr*> comm_buf;
+//  //size_t buf_size; buf_size = slots.size() * MAX_REQUEST_SIZE
+//  int slot_head;  //current slot head
+//  int slot_inuse;  //number of slots in use
+//  /*
+//   * TODO: check whether head + tail is enough
+//   */
+//  std::vector<bool> slots;  //the states of all the allocated slots (true: occupied, false: free)
 
-  std::atomic<int> recv_posted;
-  int rx_depth = 0;
+//
+//  std::atomic<int> recv_posted;
+//  int rx_depth = 0;
 
  public:
   /*
@@ -103,13 +103,13 @@ class RdmaResource {
   bool GetCompEvent() const;
   int RegLocalMemory(void *base, size_t sz);
 
-  int RegCommSlot(int);
-  char* GetSlot(int s);  //get the starting addr of the slot
-  int PostRecv(int n = 1);  //post n RR to the srq
-  int PostRecvSlot(int slot);
-  inline void ClearSlot(int s) {
-    slots.at(s) = false;
-  }
+//  int RegCommSlot(int);
+//  char* GetSlot(int s);  //get the starting addr of the slot
+//  int PostRecv(int n = 1);  //post n RR to the srq
+//  int PostRecvSlot(int slot);
+//  inline void ClearSlot(int s) {
+//    slots.at(s) = false;
+//  }
 
   RdmaContext* NewRdmaContext(bool isForMaster);
   void DeleteRdmaContext(RdmaContext* ctx);
@@ -140,7 +140,9 @@ class RdmaContext {
   uint64_t vaddr = 0; /* for remote rdma read/write */
   uint32_t rkey = 0;
 
-  RdmaResource *resource;bool isForMaster;
+  RdmaResource *resource;
+
+  bool isForMaster;
   int max_pending_msg;
   int max_unsignaled_msg;
   atomic<int> pending_msg;  //including both RDMA send and write/read that don't use the send buf
@@ -151,6 +153,19 @@ class RdmaContext {
 
   char *msg;
 
+    //node-wide communication buf used for receive request
+    std::vector<struct ibv_mr*> comm_buf;
+    int receive_slot_head;  //current slot head
+    int slot_inuse;  //number of slots in use
+    /*
+     * TODO: check whether head + tail is enough
+     */
+    std::vector<bool> slots;  //the states of all the allocated slots (true: occupied, false: free)
+    //current created RdmaContext
+    int rdma_context_counter;
+
+    std::atomic<int> recv_posted;
+    int rx_depth = 0;
   ssize_t Rdma(ibv_wr_opcode op, const void* src, size_t len, unsigned int id =
                    0,
                bool signaled =
@@ -194,8 +209,16 @@ class RdmaContext {
   inline void* GetBase() {
     return (void*) vaddr;
   }
+    int RegCommSlot(int);
+    char* GetSlot(int s);  //get the starting addr of the slot
+    int PostRecv(int n = 1);  //post n RR to the srq
+    int PostRecvSlot(int slot);
+    inline void ClearSlot(int s) {
+        slots.at(s) = false;
+    }
 
-  unsigned int SendComp(ibv_wc& wc);
+
+    unsigned int SendComp(ibv_wc& wc);
   unsigned int WriteComp(ibv_wc& wc);
   char* RecvComp(ibv_wc& wc);
   char* GetFreeSlot();
@@ -203,9 +226,11 @@ class RdmaContext {
 
   ssize_t Send(const void* ptr, size_t len, unsigned int id = 0, bool signaled =
                    false);
-  inline int PostRecv(int n) {
-    return resource->PostRecv(n);
-  }
+
+//    inline int PostRecv(int n) {
+//    return resource->PostRecv(n);
+//  }
+
   int Recv();
 
   void ProcessPendingRequests(int n);
