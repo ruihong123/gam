@@ -359,7 +359,7 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
   //check either master == true, or both isMaster() in RdmaContext and RdmaResouce are false
   epicAssert(IsMaster() || IsMaster() == res->IsMaster());
     rx_depth =
-            (isForMaster) ? MASTER_RDMA_SRQ_RX_DEPTH : WORKER_RDMA_SRQ_RX_DEPTH;
+            (isForMaster) ? MAX_MASTER_PENDING_MSG : MAX_WORKER_PENDING_MSG;
     rx_depth = rx_depth > HW_MAX_PENDING ? HW_MAX_PENDING : rx_depth;
   max_pending_msg =
       IsMaster() ? MAX_MASTER_PENDING_MSG : MAX_WORKER_PENDING_MSG;
