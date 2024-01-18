@@ -11,7 +11,7 @@ log_file=$bin/log
 cache_mem_size=8 # 8 gb Local memory size
 remote_mem_size=48 # 48 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
-master_port=12311
+master_port=12312
 port=$((10000+RANDOM%1000))
 #compute_num = 0
 #memory_num = 0
