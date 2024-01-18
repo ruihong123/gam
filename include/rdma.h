@@ -211,7 +211,7 @@ class RdmaContext {
   }
     int RegCommSlot(int);
     char* GetSlot(int s);  //get the starting addr of the slot
-    int PostRecv(int n = 1);  //post n RR to the srq
+    int PostRecv(int n = 1);  //post n RR to the qp
     int PostRecvSlot(int slot);
     inline void ClearSlot(int s) {
         slots.at(s) = false;
