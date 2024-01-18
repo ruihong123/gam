@@ -746,7 +746,7 @@ bool RdmaContext::IsRegistered(const void* addr) {
 ssize_t RdmaContext::Rdma(ibv_wr_opcode op, const void* src, size_t len,
                           unsigned int id, bool signaled, void* dest,
                           uint32_t imm, uint64_t oldval, uint64_t newval) {
-  epicLog(LOG_DEBUG, "op = %d, src = %lx, len = %d, id = %d, signaled = %d, dest = %lx, imm = %u, oldval = %lu, newval = %lu\nsrc = %s",
+  epicLog(LOG_WARNING, "op = %d, src = %lx, len = %d, id = %d, signaled = %d, dest = %lx, imm = %u, oldval = %lu, newval = %lu\nsrc = %s",
       op, src, len, id, signaled, dest, imm, oldval, newval, src);
 //    epicLog(LOG_WARNING,"RDMA opcode is %d source is %p, destination is %p, len is%d\n", op, src, dest, len);
 

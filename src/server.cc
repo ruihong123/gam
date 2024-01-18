@@ -70,7 +70,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
       break;
     case IBV_WC_RECV: {
 
-      epicLog(LOG_DEBUG, "Get recv completion event");
+      epicLog(LOG_WARNING, "Get recv completion event");
       char* data = cli->RecvComp(wc);
       data[wc.byte_len] = '\0';
 
