@@ -355,7 +355,11 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
       isForMaster(master),
       msg(),
       pending_msg(0),
-      pending_send_msg(0) {
+      pending_send_msg(0),
+      slot_inuse(0),
+      slot_head(0),
+      slot_tail(0),
+      recv_posted(0){
   //check either master == true, or both isMaster() in RdmaContext and RdmaResouce are false
   epicAssert(IsMaster() || IsMaster() == res->IsMaster());
     rx_depth =
@@ -503,9 +507,9 @@ inline int RdmaContext::PostRecv(int n) {
     if (n == 0)
         return 0;
 
-    ibv_recv_wr rr[n];
+    ibv_recv_wr* rr = new ibv_recv_wr[n];
     memset(rr, 0, sizeof(ibv_recv_wr) * n);
-    ibv_sge sge[n];
+    ibv_sge* sge = new ibv_sge[n];
     int i, ret;
     int head_init = receive_slot_head;
     for (i = 0; i < n;) {
@@ -556,6 +560,8 @@ inline int RdmaContext::PostRecv(int n) {
         }
     }
     recv_posted += n;
+    delete[] rr;
+    delete[] sge;
     return ret;
 }
 int RdmaContext::PostRecvSlot(int slot) {
