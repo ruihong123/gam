@@ -1,4 +1,4 @@
-CPP = g++ -std=c++11 -O3
+CPP = g++ -std=c++11 -O3 -fsanitize=address
 INCLUDE = -I../include -I../lib/libcuckoo/src -I../lib/libcuckoo/cityhash-1.1.1/src
 LIBS = ../src/libgalloc.a -libverbs -lpthread -lcityhash -lboost_thread -lboost_system
 CFLAGS += -g -rdynamic
