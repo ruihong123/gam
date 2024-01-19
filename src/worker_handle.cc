@@ -108,13 +108,13 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
     while (worker->GetCacheToevict() > 512){
         usleep(10);
     }
-#ifdef GETANALYSIS
+#ifdef TIMEPRINT
     auto statistic_start = std::chrono::high_resolution_clock::now();
 #endif
     volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
     assert(*local_notify_buf == 1);
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
-#ifdef GETANALYSIS
+#ifdef TIMEPRINT
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
     epicLog(LOG_WARNING,"ProcessLocalRequest  duration is %ld ns", duration.count());
