@@ -14,14 +14,14 @@ endif
 SRC = gfunc.cc ae.cc client.cc server.cc worker.cc gallocator.cc master.cc tcp.cc worker_handle.cc anet.cc rdma.cc util.cc zmalloc.cc log.cc slabs.cc workrequest.cc cache.cc directory.cc local_request.cc remote_request.cc pending_request.cc MurmurHash.cc logging.cc
 OBJ = gfunc.o ae.o client.o server.o worker.o gallocator.o master.o tcp.o worker_handle.o anet.o rdma.o util.o zmalloc.o log.o slabs.o workrequest.o cache.o directory.o remote_request.o local_request.o pending_request.o MurmurHash.o logging.o
 
+$(OBJ): %.o : %.cc
+	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
+
 libgalloc.a: $(OBJ)
 	ar rcs $@ $^
 
 libgalloc.so: $(SRC)
 	$(CPP) $(CFLAGS) $(INCLUDE) -fPIC -shared -o $@ $^ $(LIBS)
-
-$(OBJ): %.o : %.cc
-	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
 
 benchmark: ../test/benchmark.cc
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
