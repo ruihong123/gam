@@ -356,9 +356,11 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
       msg(),
       pending_msg(0),
       pending_send_msg(0),
-      slot_inuse(0),
+
       slot_head(0),
       slot_tail(0),
+      receive_slot_head(0),
+      receive_slot_inuse(0),
       recv_posted(0){
   //check either master == true, or both isMaster() in RdmaContext and RdmaResouce are false
   epicAssert(IsMaster() || IsMaster() == res->IsMaster());
@@ -464,15 +466,15 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
 int RdmaContext::RegCommSlot(int slot) {
     epicLog(LOG_DEBUG, "trying to register %d slots", slot);
 
-    if (slots.size() - slot_inuse >= slot) {
+    if (slots.size() - receive_slot_inuse >= slot) {
         epicLog(LOG_DEBUG, "no need to register: inuse = %d, current slots = %d\n",
-                slot_inuse, slots.size());
-        slot_inuse += slot;
+                receive_slot_inuse, slots.size());
+        receive_slot_inuse += slot;
         return 0;
     } else {
-        slot_inuse += slot;
+        receive_slot_inuse += slot;
         int i = slots.size();
-        for (; i < slot_inuse; i += RECV_SLOT_STEP) {
+        for (; i < receive_slot_inuse; i += RECV_SLOT_STEP) {
             int sz = roundup(RECV_SLOT_STEP*MAX_REQUEST_SIZE, page_size);
             void* buf = zmalloc(sz);
             struct ibv_mr *mr = ibv_reg_mr(
@@ -494,7 +496,7 @@ int RdmaContext::RegCommSlot(int slot) {
         }
 
         epicLog(LOG_DEBUG, "registered %d, enlarge to %d with inuse = %d\n", slot,
-                slots.size(), slot_inuse);
+                slots.size(), receive_slot_inuse);
         epicAssert(slots.size() % RECV_SLOT_STEP == 0);
         return 0;
     }
@@ -514,7 +516,7 @@ inline int RdmaContext::PostRecv(int n) {
     int head_init = receive_slot_head;
     for (i = 0; i < n;) {
         if (slots.at(receive_slot_head)) {
-            if (++receive_slot_head == slot_inuse)
+            if (++receive_slot_head == receive_slot_inuse)
                 receive_slot_head = 0;
             if (receive_slot_head == head_init) {
                 epicLog(LOG_FATAL, "cannot find free recv slot (%d)", n);
@@ -537,7 +539,7 @@ inline int RdmaContext::PostRecv(int n) {
 
         //advance the slot_head by 1
         slots.at(receive_slot_head) = true;
-        if (++receive_slot_head == slot_inuse)
+        if (++receive_slot_head == receive_slot_inuse)
             receive_slot_head = 0;
         i++;
     }
@@ -550,10 +552,10 @@ inline int RdmaContext::PostRecv(int n) {
             epicLog(LOG_WARNING, "post recv request failed (%d:%s)\n", errno,
                     strerror(errno));
             int s = bad_rr->wr_id;
-            ret -= RMINUS(receive_slot_head, s, slot_inuse);
+            ret -= RMINUS(receive_slot_head, s, receive_slot_inuse);
             while (s != receive_slot_head) {
                 slots.at(s) = false;
-                if (++s == slot_inuse)
+                if (++s == receive_slot_inuse)
                     s = 0;
             }
             receive_slot_head = s;
@@ -596,7 +598,7 @@ int RdmaContext::PostRecvSlot(int slot) {
 
 
 char* RdmaContext::GetSlot(int slot) {
-    epicAssert(slots.at(slot) == true && slot < slot_inuse);
+    epicAssert(slots.at(slot) == true && slot < receive_slot_inuse);
     //TODO: check slot == tail
     return (char*) ((uintptr_t) comm_buf[BPOS(slot)]->addr + BOFF(slot));
 }

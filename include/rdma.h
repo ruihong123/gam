@@ -156,7 +156,7 @@ class RdmaContext {
     //node-wide communication buf used for receive request
     std::vector<struct ibv_mr*> comm_buf;
     int receive_slot_head;  //current slot head
-    int slot_inuse;  //number of slots in use
+    int receive_slot_inuse;  //number of slots in use
     /*
      * TODO: check whether head + tail is enough
      */
