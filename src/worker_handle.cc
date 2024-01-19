@@ -139,13 +139,13 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       int ret = pthread_cond_wait(&cond, &cond_lock);
       epicAssert(!ret);
 #else
-#ifdef GETANALYSIS
+#ifdef TIMEPRINT
         statistic_start = std::chrono::high_resolution_clock::now();
 #endif
 //      volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
       while (*local_notify_buf != 2);
       epicLog(LOG_DEBUG, "get notified via buf");
-#ifdef GETANALYSIS
+#ifdef TIMEPRINT
         stop = std::chrono::high_resolution_clock::now();
         duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
         epicLog(LOG_WARNING,"Reply message polling  duration is %ld ns\n", duration.count());

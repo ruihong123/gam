@@ -104,4 +104,6 @@ using namespace std;
 
 #define GETANALYSIS
 
+//#define TIMEPRINT
+
 #endif /* INCLUDE_SETTINGS_H_ */
