@@ -492,7 +492,7 @@ run_node_test() {
 echo "**************************run node test****************************"
 result_file=$bin/results/node
 node_range="8"
-thread_range="1"
+thread_range="16"
 remote_range="100" #"20 40 60 80 100"
 shared_range="0"
 read_range="0 50 95 100"
