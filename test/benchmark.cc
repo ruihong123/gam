@@ -297,10 +297,13 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
                   memget_buffer = (GAddr*)alloc->memGet((const char*)&key, sizeof(key),  &v_size);
                   assert(v_size == sizeof(GAddr) * MEMSET_GRANULARITY);
               }
-              GAddr addr = memget_buffer[i%MEMSET_GRANULARITY];;
+              if (shared_ratio>0){
+                  GAddr addr = memget_buffer[i%MEMSET_GRANULARITY];;
+                  shared_data[i] = addr;
+              }
 //              int ret = alloc->Get(i, &addr);
 //              epicAssert(ret == addr_size);
-              shared_data[i] = addr;
+
           }
           shared_data_is_init.store(true);
       }
