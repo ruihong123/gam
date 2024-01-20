@@ -7,23 +7,19 @@
 #include "../include/lockwrapper.h"
 #include "zmalloc.h"
 #include "util.h"
-#include "kernel.h"
 
 LockWrapper WorkerHandle::lock;
-thread_local int WorkerHandle::thread_id = -1;
+
 WorkerHandle::WorkerHandle(Worker* w)
     : worker(w),
-      wqueue(w->GetWorkQ()),
-      registered_thread_num(0){
+      wqueue(w->GetWorkQ()) {
 //#if !defined(USE_PIPE_W_TO_H) || (!defined(USE_BOOST_QUEUE) && !defined(USE_PIPE_H_TO_W))
 #if !(defined(USE_PIPE_W_TO_H) && defined(USE_PIPE_H_TO_W))
   int notify_buf_size = sizeof(WorkRequest) + sizeof(int);
   int ret = posix_memalign((void**) &notify_buf, HARDWARE_CACHE_LINE,
-                           HARDWARE_CACHE_LINE*32);
+                           notify_buf_size);
   epicAssert((uint64_t)notify_buf % HARDWARE_CACHE_LINE == 0 && !ret);
-    for (int i = 0; i < 32; ++i) {
-        *(int*)(&notify_buf[i]) = 2;
-    }
+  *notify_buf = 2;
 #endif
 #ifdef USE_PTHREAD_COND
   pthread_mutex_init(&cond_lock, NULL);
@@ -85,16 +81,13 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
-    if (unlikely(thread_id == -1)) {
-        thread_id = registered_thread_num.fetch_add(1);
-    }
   wr->flag |= LOCAL_REQUEST;
 #ifdef MULTITHREAD
-  *(int*)(&notify_buf[thread_id]) = 1;  //not useful to set it to 1 if boost_queue is enabled
-//  epicAssert(*(int* )notify_buf == 1);
+  *notify_buf = 1;  //not useful to set it to 1 if boost_queue is enabled
+  epicAssert(*(int* )notify_buf == 1);
   wr->fd = recv_pipe[1];  //for legacy code
   //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
-  wr->notify_buf = (int*)&this->notify_buf[thread_id];
+  wr->notify_buf = this->notify_buf;
 //    if (wr->op == WRITE && wr->op == READ){
 //        assert(false);
 //    }
@@ -103,24 +96,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       worker->GetWorkerId(), *wr->notify_buf, wr->op, wr->flag, wr->status,
       wr->addr, wr->size, wr->fd);
     //In case that the pending to evict cache is too much causing cache memory explosion.
-    //May be the code below will also block those operations which will not result in cache eviction. As a result, the design
-    // is not good.
     while (worker->GetCacheToevict() > 512){
         usleep(10);
     }
-#ifdef GETANALYSIS
-    auto statistic_start = std::chrono::high_resolution_clock::now();
-#endif
-    volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
-    assert(*local_notify_buf == 1);
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
-#ifdef GETANALYSIS
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-    epicLog(LOG_WARNING,"ProcessLocalRequest  duration is %ld ns", duration.count());
-#endif
-
-
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
       return SUCCESS;
@@ -139,17 +118,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       int ret = pthread_cond_wait(&cond, &cond_lock);
       epicAssert(!ret);
 #else
-#ifdef GETANALYSIS
-        statistic_start = std::chrono::high_resolution_clock::now();
-#endif
-//      volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
-      while (*local_notify_buf != 2);
+      while (*notify_buf != 2);
       epicLog(LOG_DEBUG, "get notified via buf");
-#ifdef GETANALYSIS
-        stop = std::chrono::high_resolution_clock::now();
-        duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
-        epicLog(LOG_WARNING,"Reply message polling  duration is %ld ns\n", duration.count());
-#endif
 #endif
       return wr->status;
     }

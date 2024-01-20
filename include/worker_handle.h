@@ -10,9 +10,6 @@
 #include "lockwrapper.h"
 #include "worker.h"
 #include "workrequest.h"
-struct cacheline_holder {
-  char pad[64];
-} __attribute__((aligned(64)));
 
 class WorkerHandle {
   boost::lockfree::queue<WorkRequest*>* wqueue;  //work queue used to communicate with worker
@@ -20,15 +17,13 @@ class WorkerHandle {
   //app-side pipe fd
   int send_pipe[2];
   int recv_pipe[2];
-  std::atomic<int> registered_thread_num;
-    static thread_local int thread_id;
-    static LockWrapper lock;
+  static LockWrapper lock;
 #ifdef USE_PTHREAD_COND
   pthread_mutex_t cond_lock;
   pthread_cond_t cond;
 #endif
 #if !(defined(USE_PIPE_W_TO_H) && defined(USE_PIPE_H_TO_W))
-  volatile cacheline_holder* notify_buf;// can support at most 32 concurrent threads.
+  volatile int* notify_buf;
   int notify_buf_size;
 #endif
   public:
