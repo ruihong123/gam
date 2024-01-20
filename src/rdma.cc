@@ -395,7 +395,7 @@ RdmaContext::RdmaContext(RdmaResource *res, bool master)
   {
     ibv_qp_init_attr attr = { };
     //srq may slow down the perfomance when this node round-robinly send msg to other nodes.
-//    attr.srq = res->srq;
+    attr.srq = res->srq;
     attr.send_cq = res->cq;
     attr.recv_cq = res->cq;
     attr.qp_type = IBV_QPT_RC;
