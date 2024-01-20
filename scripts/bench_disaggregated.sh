@@ -9,7 +9,7 @@ compute_nodes=$bin/compute_nodes
 memory_nodes=$bin/memory_nodes
 log_file=$bin/log
 cache_mem_size=8 # 8 gb Local memory size
-remote_mem_size=2 # 48 gb Remote memory size
+remote_mem_size=48 # 48 gb Remote memory size
 master_ip=db3.cs.purdue.edu # make sure this is in accordance with the server whose is_master=1
 master_port=12512
 port=$((13000+RANDOM%1000))
@@ -122,7 +122,7 @@ run() {
     	echo ""
     	echo "compute = $compute, ip = $ip, port = $port"
     	echo "$SRC_HOME/benchmark --workload $workload --zipfian_alpha $zipfian_alpha --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file $result_file --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a $log_file.$ip"
-    	ssh -i ~/.ssh/id_rsa $ip	"cd $SRC_HOME &&  $SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
+    	ssh -i ~/.ssh/id_rsa $ip	"ulimit -c 2000000 && cd $SRC_HOME &&  $SRC_HOME/benchmark --op_type $op_type --no_thread $thread --shared_ratio $shared_ratio --read_ratio $read_ratio --space_locality $space_locality --time_locality $time_locality --result_file "$result_file" --ip_master $master_ip --ip_worker $ip --port_worker $port --is_master $is_master --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num | tee -a '$log_file'.$ip" &
     	sleep 1
     	i=$((i+1))
 #    	if [ "$i" = "$node" ]; then
@@ -491,11 +491,11 @@ run_node_test() {
 # node test
 echo "**************************run node test****************************"
 result_file=$bin/results/node
-node_range="8"
+node_range="1 2 4 8"
 thread_range="1"
 remote_range="100" #"20 40 60 80 100"
 shared_range="100"
-read_range="50 95"
+read_range="0 50 95 100"
 space_range="0"
 time_range="0"
 op_range="1"
