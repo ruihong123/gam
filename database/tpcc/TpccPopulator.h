@@ -370,6 +370,7 @@ class TpccPopulator : public BenchmarkPopulator {
   void InsertItemRecord(ItemRecord* record_ptr, Record *record_buf,
                         size_t thread_id) {
     GAlloc *gallocator = gallocators[thread_id];
+    //TODO： all the insert record should be with REMOTE flag.
     GAddr data_addr = gallocator->Malloc(record_buf->GetSchemaSize());
     record_buf->SetColumn(0, &record_ptr->i_id_);
     record_buf->SetColumn(1, &record_ptr->i_im_id_);
