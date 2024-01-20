@@ -214,7 +214,9 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 //  int l_remote_ratio = remote_ratio;
   int l_space_locality = space_locality;
   int l_shared_ratio = shared_ratio;
-
+  if (shared_ratio == 0){
+      shared_data_is_init.store(true);
+  }
   //the main thread (id == 0) in the master node (is_master == true)
   // is responsible for reference data access pattern
   if (is_master && id == 0) {
