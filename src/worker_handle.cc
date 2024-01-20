@@ -118,12 +118,12 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       int ret = pthread_cond_wait(&cond, &cond_lock);
       epicAssert(!ret);
 #else
-#ifdef TIME_PRINT
+#ifdef GETANALYSIS
         auto statistic_start = std::chrono::high_resolution_clock::now();
 #endif
         while (*notify_buf != 2);
         epicLog(LOG_DEBUG, "get notified via buf");
-#ifdef TIME_PRINT
+#ifdef GETANALYSIS
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
         epicLog(LOG_WARNING,"Reply message polling  duration is %ld ns\n", duration.count());
