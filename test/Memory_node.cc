@@ -174,6 +174,7 @@ int main(int argc, char* argv[]) {
 
     int id;
     node_id = alloc->GetID();
+    assert(node_id > no_node/2);
     no_node = compute_num + memory_num;
     printf("This node id is %d\n", node_id);
     NUMOFBLOCKS = allocated_mem_size/(2*1024);
