@@ -757,7 +757,7 @@ int Worker::ProcessLocalWLock(WorkRequest* wr) {
         }
         fence->unlock();
     }
-    if (IsLocal(wr->addr)) {
+    if (unlikely(IsLocal(wr->addr))) {
         GAddr start = wr->addr;
         GAddr start_blk = TOBLOCK(start);
         void* laddr = ToLocal(start_blk);

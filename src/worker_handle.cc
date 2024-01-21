@@ -121,7 +121,9 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef TIME_PRINT
         auto statistic_start = std::chrono::high_resolution_clock::now();
 #endif
-        while (*notify_buf != 2);
+        while (*notify_buf != 2){
+            usleep(1);
+        };
         epicLog(LOG_DEBUG, "get notified via buf");
 #ifdef TIME_PRINT
         auto stop = std::chrono::high_resolution_clock::now();
