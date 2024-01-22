@@ -740,6 +740,7 @@ int Worker::ProcessLocalWLock(WorkRequest* wr) {
     epicAssert(wr->addr);
     epicAssert(!(wr->flag & ASYNC));
     if (!(wr->flag & FENCE)) {
+        // the Wlock is not fenced. the code will always go to this code path. Why??
         Fence* fence = fences_.at(wr->fd);
         fence->lock();
         if (IsFenced(fence, wr)) {

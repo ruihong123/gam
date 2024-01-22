@@ -745,6 +745,7 @@ void Benchmark(int id) {
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
+    alloc->Read(data[0], BLOCK_SIZE);
   alloc->WLock(data[0], BLOCK_SIZE);
   alloc->UnLock(data[0], BLOCK_SIZE);
 #endif
