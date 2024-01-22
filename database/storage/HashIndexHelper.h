@@ -84,7 +84,7 @@ class BucketHeader : public GAMObject{
   void Init() {
     head_ = Gnullptr;
   }
-
+  //TODO: the hash index does not consider multithread concurrency at all.
   // return false if the key exists
   bool InsertNode(const IndexKey& key, const GAddr& record_ptr,
                   GAlloc *gallocator) {
@@ -130,7 +130,7 @@ class BucketHeader : public GAMObject{
       new_node.items_list_ = new_items_addr;
       GAddr new_node_addr = gallocator->AlignedMalloc(sizeof(BucketNode));
       gallocator->Write(new_node_addr, &new_node, sizeof(BucketNode));
-      
+      //TODO: No local latch acquired can result in lost updates.
       if (prev_node_addr != Gnullptr) {
         BucketNode prev_node;
         gallocator->Read(prev_node_addr, &prev_node,
