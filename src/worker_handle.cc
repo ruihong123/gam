@@ -109,7 +109,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         usleep(5);
         if (worker->GetCacheToevict() > 16384){
             usleep(10);
-            epicLog(LOG_WARNING, "Cache to evict is too much %d", worker->GetCacheToevict());
+            epicLog(LOG_INFO, "Cache to evict is too much %d", worker->GetCacheToevict());
         }
 
     }
