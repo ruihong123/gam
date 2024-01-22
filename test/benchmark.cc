@@ -106,7 +106,13 @@ int items_per_block = BLOCK_SIZE / item_size;
 
 GAddr *shared_data;
 std::atomic<bool> shared_data_is_init(false);
-class ZipfianDistributionGenerator {
+class WorkloadGenerator {
+public:
+    WorkloadGenerator() = default;
+    virtual int getValue() = 0;
+};
+
+class ZipfianDistributionGenerator: public WorkloadGenerator {
 private:
     uint64_t array_size;
     double skewness;
@@ -116,9 +122,16 @@ private:
     std::discrete_distribution<int>* distribution;
 
 public:
-    ZipfianDistributionGenerator(uint64_t size, double s, unsigned int seed) : array_size(size), skewness(s), probabilities(size), generator(seed) {
+    ZipfianDistributionGenerator(uint64_t size, double s, unsigned int seed, uint8_t rank_of_spot = 0,
+                                 uint8_t total_num_of_spot = 1)
+            : array_size(size), skewness(s), probabilities(size), generator(seed) {
+        probabilities.resize(array_size);
+        uint64_t spot_interval = array_size/total_num_of_spot;
+        uint64_t spot_offset = rank_of_spot*spot_interval;
+        uint64_t overflow_offset = 0;
         for(int i = 0; i < array_size; ++i) {
-            probabilities[i] = 1.0 / (pow(i+1, skewness));
+            overflow_offset = (i+spot_offset)%array_size;
+            probabilities[overflow_offset] = 1.0 / (pow(i+1, skewness));
 //            zipfian_values[i] = i;
         }
         double smallest_probability = 1.0 / (pow(array_size, skewness));
@@ -132,7 +145,50 @@ public:
 //        std::shuffle(zipfian_values.begin(), zipfian_values.end(), generator);
     }
 
-    int getZipfianValue() {
+    int getValue() override {
+//        return zipfian_values[distribution(generator)];
+        return (*distribution)(generator);
+    }
+};
+
+class MultiHotSpotGenerator: public WorkloadGenerator {
+private:
+    uint64_t array_size;
+    int spot_num_;
+    double skewness;
+    std::vector<double> probabilities;
+//    std::vector<int> zipfian_values;
+    std::default_random_engine generator;
+    std::discrete_distribution<int>* distribution;
+
+public:
+    MultiHotSpotGenerator(uint64_t size, double s, unsigned int seed, int spot_num) : array_size(size), spot_num_(spot_num),
+                                                                                      skewness(s), probabilities(size), generator(seed) {
+        probabilities.resize(array_size, 0);
+        uint64_t spot_interval = array_size/spot_num_;
+        uint64_t spot_offset = 0;
+        uint64_t overflow_offset = 0;
+        for (int j = 0; j < spot_num; ++j) {
+            spot_offset = spot_interval*j;
+            for(int i = 0; i < array_size; ++i) {
+                overflow_offset = (i+spot_offset)%array_size;
+                probabilities[overflow_offset] = probabilities[overflow_offset] + 1.0 / (pow(i+1, skewness));
+//            zipfian_values[i] = i;
+            }
+        }
+
+        double smallest_probability = 1.0 / (pow(array_size, skewness));
+// Convert smallest_probability to a string
+        char buffer[50];
+        snprintf(buffer, sizeof(buffer), "%.15f", smallest_probability);
+
+        // Print the smallest_probability
+        printf("Smallest Probability: %s\n", buffer);
+        distribution = new std::discrete_distribution<int>(probabilities.begin(), probabilities.end());
+//        std::shuffle(zipfian_values.begin(), zipfian_values.end(), generator);
+    }
+
+    int getValue() override {
 //        return zipfian_values[distribution(generator)];
         return (*distribution)(generator);
     }
@@ -356,9 +412,15 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 #endif
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
-    ZipfianDistributionGenerator* zipf_gen;
+    WorkloadGenerator* workload_gen;
     if (workload == 1){
-        zipf_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp);
+#ifdef EXCLUSIVE_HOTSPOT
+        workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp, ddsm->GetID()/2, compute_num);
+#else
+        workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp, 0, 0);
+#endif
+    } else if (workload > 1){
+        workload_gen = new MultiHotSpotGenerator(STEPS, zipfian_alpha, *seedp, workload);
     }
 #ifdef STATS_COLLECTION
   stat_lock.lock();
@@ -382,10 +444,10 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
             }
             next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
         }else{
-            int64_t pos = zipf_gen->getZipfianValue();
+            int64_t pos = workload_gen->getValue();
             GAddr n = data[pos];
             while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
-                pos = zipf_gen->getZipfianValue();
+                pos = workload_gen->getValue();
                 n = data[pos];
             }
             next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);

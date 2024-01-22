@@ -106,8 +106,9 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
     //May be the code below will also block those operations which will not result in cache eviction. As a result, the design
     // is not good.
     while (worker->GetCacheToevict() > 512){
-        usleep(10);
+        usleep(5);
         if (worker->GetCacheToevict() > 16384){
+            usleep(10);
             epicLog(LOG_WARNING, "Cache to evict is too much %d", worker->GetCacheToevict());
         }
 
