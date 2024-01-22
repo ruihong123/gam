@@ -350,7 +350,7 @@ int Worker::ProcessLocalRead(WorkRequest* wr) {
         fence->lock();
         if (unlikely(IsMFenced(fence, wr))) {
             AddToFence(fence, wr);
-            epicLog(LOG_DEBUG, "fenced (mfenced = %d, sfenced = %d): %d",
+            epicLog(LOG_WARNING, "fenced (mfenced = %d, sfenced = %d): %d",
                     fence->mfenced, fence->sfenced, wr->op);
             fence->unlock();
             return FENCE_PENDING;

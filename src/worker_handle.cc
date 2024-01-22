@@ -107,6 +107,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
     // is not good.
     while (worker->GetCacheToevict() > 512){
         usleep(10);
+        if (worker->GetCacheToevict() > 16384){
+            epicLog(LOG_WARNING, "Cache to evict is too much %d", worker->GetCacheToevict());
+        }
+
     }
     volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
     assert(*local_notify_buf == 1);

@@ -588,12 +588,12 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
     }
   }
 
-  if (op_type == 0) {
+//  if (op_type == 0) {
       // issue a fence and a read request to the last address to ensure all previous
       // op have been done
       alloc->MFence();
       ret = alloc->Read(to_access, buf, item_size);
-  }
+//  }
 
   long end = get_time();
   long throughput = ITERATION / ((double) (end - start) / 1000 / 1000 / 1000);
@@ -745,7 +745,6 @@ void Benchmark(int id) {
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
-    alloc->Read(data[0], BLOCK_SIZE);
   alloc->WLock(data[0], BLOCK_SIZE);
   alloc->UnLock(data[0], BLOCK_SIZE);
 #endif
