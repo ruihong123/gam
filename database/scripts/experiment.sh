@@ -2,14 +2,14 @@
 set -o nounset
 
 # With the specified arguments for benchmark setting, 
-# this script runs tpcc for varied distributed ratios
+# this script_compute runs tpcc for varied distributed ratios
 
 # specify your hosts_file here 
 # hosts_file specify a list of host names and port numbers, with the host names in the first column
 Compute_file="../tpcc/compute.txt"
 Memory_file="../tpcc/memory.txt"
 # specify your directory for log files
-output_dir="/data/wentian"
+output_dir="../data/ruihong"
 
 # working environment
 proj_dir="~/programs/gam/code"
@@ -24,24 +24,32 @@ memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
 port=$((10000+RANDOM%1000))
 
-#USER_ARGS="$@"
+compute_ARGS="$@"
 
-echo "input Arguments: ${USER_ARGS}"
+memory_ARGS=""
+echo "input Arguments: ${compute_ARGS}"
 echo "launch..."
 
 launch () {
   dist_ratio=$1
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
-  script="cd ${bin_dir} && ./tpcc ${USER_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
-  
-  echo "start master: ssh ${ssh_opts} ${master_host} "$script" &"
-  ssh ${ssh_opts} ${master_host} "$script" &
+  memory_file="${output_dir}/Memory.log"
+  script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
+  script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
+  echo "start master: ssh ${ssh_opts} ${master_host} "$script_compute" &"
+  ssh ${ssh_opts} ${master_host} "$script_compute" &
   sleep 3
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
-    echo "start worker: ssh ${ssh_opts} ${compute} "$script" &"
-    ssh ${ssh_opts} ${compute} "$script" &
+    echo "start worker: ssh ${ssh_opts} ${compute} "$script_compute" &"
+    ssh ${ssh_opts} ${compute} "$script_compute" &
     sleep 1
+  done
+  for ((i=1;i<${#memory_nodes[@]};i++)); do
+      memory=${memory_nodes[$i]}
+      echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
+      ssh ${ssh_opts} ${memory} "$script_compute" &
+      sleep 1
   done
   wait
   echo "done for ${dist_ratio}" 
@@ -58,10 +66,10 @@ vary_read_ratios () {
   #read_ratios=(0 30 50 70 90 100)
   read_ratios=(0)
   for read_ratio in ${read_ratios[@]}; do
-    old_user_args=${USER_ARGS}
-    USER_ARGS="${USER_ARGS} -r${read_ratio}"
+    old_user_args=${compute_ARGS}
+    compute_ARGS="${compute_ARGS} -r${read_ratio}"
     run_tpcc
-    USER_ARGS=${old_user_args}
+    compute_ARGS=${old_user_args}
   done
 }
 
@@ -69,16 +77,16 @@ vary_temp_locality () {
   #localities=(0 30 50 70 90 100)
   localities=(0 50 100)
   for locality in ${localities[@]}; do
-    old_user_args=${USER_ARGS}
-    USER_ARGS="${USER_ARGS -l${locality}}"
+    old_user_args=${compute_ARGS}
+    compute_ARGS="${compute_ARGS -l${locality}}"
     run_tpcc
-    USER_ARGS=${old_user_args}
+    compute_ARGS=${old_user_args}
   done
 }
 
 auto_fill_params () {
   # so that users don't need to specify parameters for themselves
-  USER_ARGS="-p11111 -sf32 -sf10 -c4 -t200000"
+  compute_ARGS="-p11111 -sf32 -sf10 -c4 -t200000 -f../tpcc/compute.txt"
 }
 
 auto_fill_params

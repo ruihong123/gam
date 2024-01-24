@@ -14,7 +14,7 @@ static int dist_ratio = 1;
 static int num_txn = -1;
 static int num_core = -1;  // number of cores utilized in a single numa node.
 static int port = -1;
-static std::string config_filename = "config.txt";
+static std::string config_filename = "compute.txt";
 // To modify tpcc workload
 static size_t gReadRatio = 0;
 static size_t gTimeLocality = 0;

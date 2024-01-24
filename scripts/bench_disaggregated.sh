@@ -501,7 +501,7 @@ space_range="0"
 time_range="0"
 op_range="0"
 workload_range="1"
-zipfian_alpha_range="0" #make sure workload = 1 if we want to test zipfian.
+zipfian_alpha_range="1" #make sure workload = 1 if we want to test zipfian.
 
 #cache_th=0.5
 for workload in $workload_range

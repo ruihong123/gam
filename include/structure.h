@@ -41,10 +41,10 @@ typedef uint64_t GAddr;
 
 struct Conf {
   bool is_master = true;  //mark whether current process is the master (obtained from conf and the current ip)
-  int master_port = 12345;
+  int master_port = 19901;
   std::string master_ip = "localhost";
   std::string master_bindaddr;
-  int worker_port = 12346;
+  int worker_port = 12345;
   std::string worker_bindaddr;
   std::string worker_ip = "localhost";
   Size size = 1024 * 1024L * 512;  //per-server size of memory pre-allocated
