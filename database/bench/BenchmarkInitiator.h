@@ -18,12 +18,16 @@ class BenchmarkInitiator {
   }
 
   void InitGAllocator() {
+      //TODO: MODIFY this function, change the conf for compute node
     ServerInfo master = config_->GetMasterHostInfo();
     ServerInfo myhost = config_->GetMyHostInfo();
 
     Conf* conf = new Conf();
+
+
     conf->loglevel = LOG_WARNING;
-    conf->size = 1024 * 1024L * 512 * 2 * 16;
+    conf->size = 8 * 1024LLU * 1024LLU* 1024LLU;
+    conf->cache_th = 1.0;
     conf->is_master = config_->IsMaster();
     conf->master_ip = ClusterHelper::GetIpByHostName(master.addr_);
     conf->worker_ip = ClusterHelper::GetIpByHostName(myhost.addr_);

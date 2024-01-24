@@ -36,10 +36,10 @@ class GAlloc {
    * @param base: used to guarantee the affinity,
    * 				trying to put the newly-allocated addr to be in the same node of the base addr
    */
-  GAddr Malloc(const Size size, Flag flag = 0);
-  GAddr Malloc(const Size size, GAddr base, Flag flag = 0);
-  GAddr AlignedMalloc(const Size size, GAddr base, Flag flag = 0);
-  GAddr AlignedMalloc(const Size size, Flag flag = 0);
+  GAddr Malloc(const Size size, Flag flag = REMOTE);
+  GAddr Malloc(const Size size, GAddr base, Flag flag = REMOTE);
+  GAddr AlignedMalloc(const Size size, GAddr base, Flag flag = REMOTE);
+  GAddr AlignedMalloc(const Size size, Flag flag = REMOTE);
   GAddr Calloc(Size nmemb, Size size, Flag flag, GAddr base);
   GAddr Realloc(GAddr ptr, Size size, Flag flag);
 

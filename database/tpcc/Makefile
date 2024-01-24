@@ -9,11 +9,16 @@ CFLAGS += -O3 -DLOCK -DBACKOFF -ggdb #-DPROFILE
 
 SRC = TpccBenchmarkMain.cpp TpccRandomGenerator.cpp ../Meta.cpp ../txn/TransactionManager2PL.cpp ../txn/TransactionManagerST.cpp ../utils/Profiler.cpp
 OBJ = TpccBenchmarkMain.o TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
+OBJ = TpccBenchmarkMain.o TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
+
 
 $(OBJ): %.o : %.cpp
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
 
 tpcc: $(OBJ)
+	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
+
+tpcc_server: TpccServer.cpp
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
 all: tpcc

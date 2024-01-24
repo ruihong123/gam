@@ -6,7 +6,8 @@ set -o nounset
 
 # specify your hosts_file here 
 # hosts_file specify a list of host names and port numbers, with the host names in the first column
-hosts_file="../tpcc/config.txt"
+Compute_file="../tpcc/compute.txt"
+Memory_file="../tpcc/memory.txt"
 # specify your directory for log files
 output_dir="/data/wentian"
 
@@ -16,11 +17,15 @@ bin_dir="${proj_dir}/database/tpcc"
 script_dir="{proj_dir}/database/scripts"
 ssh_opts="-o StrictHostKeyChecking=no"
 
-hosts_list=`./get_servers.sh ${hosts_file} | tr "\\n" " "`
-hosts=(`echo ${hosts_list}`)
-master_host=${hosts[0]}
+compute_list=`./get_servers.sh ${Compute_file} | tr "\\n" " "`
+memory_list=`./get_servers.sh ${Memory_file} | tr "\\n" " "`
+compute_nodes=(`echo ${compute_list}`)
+memory_nodes=(`echo ${memory_list}`)
+master_host=${compute_nodes[0]}
+port=$((10000+RANDOM%1000))
 
-USER_ARGS="$@"
+#USER_ARGS="$@"
+
 echo "input Arguments: ${USER_ARGS}"
 echo "launch..."
 
@@ -32,10 +37,10 @@ launch () {
   echo "start master: ssh ${ssh_opts} ${master_host} "$script" &"
   ssh ${ssh_opts} ${master_host} "$script" &
   sleep 3
-  for ((i=1;i<${#hosts[@]};i++)); do
-    host=${hosts[$i]}
-    echo "start worker: ssh ${ssh_opts} ${host} "$script" &"
-    ssh ${ssh_opts} ${host} "$script" &
+  for ((i=1;i<${#compute_nodes[@]};i++)); do
+    compute=${compute_nodes[$i]}
+    echo "start worker: ssh ${ssh_opts} ${compute} "$script" &"
+    ssh ${ssh_opts} ${compute} "$script" &
     sleep 1
   done
   wait
