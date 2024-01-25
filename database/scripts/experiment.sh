@@ -12,7 +12,7 @@ Memory_file="../tpcc/memory.txt"
 output_dir="../data/ruihong"
 
 # working environment
-proj_dir="~/programs/gam/code"
+proj_dir="~/gam/code"
 bin_dir="${proj_dir}/database/tpcc"
 script_dir="{proj_dir}/database/scripts"
 ssh_opts="-o StrictHostKeyChecking=no"
@@ -24,7 +24,7 @@ memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
 cache_mem_size=8 # 8 gb Local memory size
 remote_mem_size=48 # 48 gb Remote memory size
-port=$((10000+RANDOM%1000))
+port=$((13000+RANDOM%1000))
 
 compute_ARGS="$@"
 
@@ -47,7 +47,7 @@ launch () {
   done
   for ((i=1;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
-      memory_ARGS="--ip_worker $memory --port_worker $memory --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
+      memory_ARGS="--ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "$script_compute" &
@@ -88,7 +88,7 @@ vary_temp_locality () {
 
 auto_fill_params () {
   # so that users don't need to specify parameters for themselves
-  compute_ARGS="-p11111 -sf32 -sf10 -c4 -t200000 -fc../tpcc/compute.txt -fm../tpcc/memory.txt"
+  compute_ARGS="-p$port -sf32 -sf10 -c4 -t200000 -fc../tpcc/compute.txt -fm../tpcc/memory.txt"
 }
 
 auto_fill_params
