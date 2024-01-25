@@ -51,7 +51,7 @@ launch () {
       memory_ARGS="--ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
-      ssh ${ssh_opts} ${memory} "$script_compute" &
+      ssh ${ssh_opts} ${memory} "ulimit -c 1000000 && $script_memory" &
       sleep 1
   done
   wait
