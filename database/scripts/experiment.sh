@@ -37,13 +37,13 @@ launch () {
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
   memory_file="${output_dir}/Memory.log"
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
-  echo "start master: ssh ${ssh_opts} ${master_host} "$script_compute" &"
-  ssh ${ssh_opts} ${master_host} "ulimit -c 1000000 && $script_compute" &
+  echo "start master: ssh ${ssh_opts} ${master_host} "$script_compute -sn$master_host" &"
+  ssh ${ssh_opts} ${master_host} "ulimit -c 1000000 && $script_compute -sn$master_host" &
   sleep 3
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
-    echo "start worker: ssh ${ssh_opts} ${compute} "$script_compute" &"
-    ssh ${ssh_opts} ${compute} "$script_compute" &
+    echo "start worker: ssh ${ssh_opts} ${compute} "$script_compute -sn$compute" &"
+    ssh ${ssh_opts} ${compute} "$script_compute -sn$compute" &
     sleep 1
   done
   for ((i=1;i<${#memory_nodes[@]};i++)); do
