@@ -12,7 +12,7 @@ Memory_file="../tpcc/memory.txt"
 output_dir="../data/ruihong"
 
 # working environment
-proj_dir="~/gam/code"
+proj_dir="/users/Ruihong/gam/"
 bin_dir="${proj_dir}/database/tpcc"
 script_dir="{proj_dir}/database/scripts"
 ssh_opts="-o StrictHostKeyChecking=no"
