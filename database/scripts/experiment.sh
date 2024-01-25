@@ -26,7 +26,6 @@ port=$((10000+RANDOM%1000))
 
 compute_ARGS="$@"
 
-memory_ARGS=" --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num"
 echo "input Arguments: ${compute_ARGS}"
 echo "launch..."
 
@@ -47,6 +46,7 @@ launch () {
   done
   for ((i=1;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
+      memory_ARGS="--ip_worker $memory --port_worker $memory --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "$script_compute" &
       sleep 1
