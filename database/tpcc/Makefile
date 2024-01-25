@@ -25,4 +25,4 @@ all: tpcc
 build: tpcc
 
 clean:
-	rm -rf tpcc *.o ../*.o ../bench/*.o ../storage/*.o ../txn/*.o ../utils/*.o
+	rm -rf tpcc tpcc_server *.o ../*.o ../bench/*.o ../storage/*.o ../txn/*.o ../utils/*.o
