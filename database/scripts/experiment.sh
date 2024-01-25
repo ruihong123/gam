@@ -33,6 +33,7 @@ echo "launch..."
 
 launch () {
   dist_ratio=$1
+  echo "start tpcc for dist_ratio ${dist_ratio}"
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
   memory_file="${output_dir}/Memory.log"
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
