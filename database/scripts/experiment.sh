@@ -22,6 +22,8 @@ memory_list=`./get_servers.sh ${Memory_file} | tr "\\n" " "`
 compute_nodes=(`echo ${compute_list}`)
 memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
+cache_mem_size=8 # 8 gb Local memory size
+remote_mem_size=48 # 48 gb Remote memory size
 port=$((10000+RANDOM%1000))
 
 compute_ARGS="$@"
@@ -34,7 +36,6 @@ launch () {
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
   memory_file="${output_dir}/Memory.log"
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
-  script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
   echo "start master: ssh ${ssh_opts} ${master_host} "$script_compute" &"
   ssh ${ssh_opts} ${master_host} "$script_compute" &
   sleep 3
@@ -46,7 +47,8 @@ launch () {
   done
   for ((i=1;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
-      memory_ARGS="--ip_worker $memory --port_worker $memory --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num"
+      memory_ARGS="--ip_worker $memory --port_worker $memory --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
+      script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "$script_compute" &
       sleep 1
