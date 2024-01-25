@@ -9,7 +9,7 @@ set -o nounset
 Compute_file="../tpcc/compute.txt"
 Memory_file="../tpcc/memory.txt"
 # specify your directory for log files
-output_dir="./data/"
+output_dir="./data"
 
 # working environment
 proj_dir="/users/Ruihong/gam/"
