@@ -14,7 +14,8 @@ static int dist_ratio = 1;
 static int num_txn = -1;
 static int num_core = -1;  // number of cores utilized in a single numa node.
 static int port = -1;
-static std::string config_filename = "compute.txt";
+static std::string compute_config_filename = "compute.txt";
+static std::string memory_config_filename = "memory.txt";
 // To modify tpcc workload
 static size_t gReadRatio = 0;
 static size_t gTimeLocality = 0;
@@ -93,8 +94,10 @@ static void ArgumentsParser(int argc, char *argv[]) {
     } else if (argv[i][1] == 'c') {
       num_core = atoi(&argv[i][2]);
       gThreadCount = num_core;
-    } else if (argv[i][1] == 'f') {
-      config_filename = std::string(&argv[i][2]);
+    } else if (argv[i][1] == 'f'&& argv[i][2] == 'c') {
+        compute_config_filename = std::string(&argv[i][3]);
+    } else if (argv[i][1] == 'f' && argv[i][2] == 'm') {
+        memory_config_filename = std::string(&argv[i][3]);
     } else if (argv[i][1] == 'z') {
       gParamBatchSize = atoi(&argv[i][2]);
     } else if (argv[i][1] == 'r') {

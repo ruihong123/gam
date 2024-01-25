@@ -26,7 +26,7 @@ port=$((10000+RANDOM%1000))
 
 compute_ARGS="$@"
 
-memory_ARGS=""
+memory_ARGS=" --ip_master $master_ip --ip_worker $ip --port_worker $port --port_master $master_port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num $compute_num --memory_num $memory_num"
 echo "input Arguments: ${compute_ARGS}"
 echo "launch..."
 
@@ -86,7 +86,7 @@ vary_temp_locality () {
 
 auto_fill_params () {
   # so that users don't need to specify parameters for themselves
-  compute_ARGS="-p11111 -sf32 -sf10 -c4 -t200000 -f../tpcc/compute.txt"
+  compute_ARGS="-p11111 -sf32 -sf10 -c4 -t200000 -fc../tpcc/compute.txt -fm../tpcc/memory.txt"
 }
 
 auto_fill_params

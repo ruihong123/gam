@@ -50,12 +50,14 @@ add_custom_target(
 
 add_library(GAM_Base ${src_folder} )
 add_executable(TPCC_CMAKE ${TPCC_DEPENDENCY} )
+add_executable(TPCCMEMORY_CMAKE ${TPCC_DEPENDENCY} ${PROJECT_SOURCE_DIR}/database/tpcc/TPccServer.cpp )
 add_executable(Benchmark ${PROJECT_SOURCE_DIR}/test/benchmark.cc )
 target_link_libraries(Benchmark GAM_Base)
 
 target_link_libraries(GAM_Base pthread)
 target_link_libraries(GAM_Base -libverbs -lboost_filesystem -lboost_system -lboost_date_time -pthread -lboost_thread -lcityhash)
 target_link_libraries(TPCC_CMAKE GAM_Base)
+target_link_libraries(TPCCMEMORY_CMAKE GAM_Base)
 
 
 

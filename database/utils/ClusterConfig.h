@@ -21,8 +21,9 @@ struct ServerInfo {
 class ClusterConfig {
  public:
   ClusterConfig(const std::string& my_host_name, const int port, 
-      const std::string& config_filename)
-      : my_info_(my_host_name, port), config_filename_(config_filename) {
+      const std::string& config_filename1, const std::string& config_filename2)
+      : my_info_(my_host_name, port), compute_config_filename_(config_filename1),
+      memory_config_filename_(config_filename2) {
     this->ReadConfigFile();
   }
   ~ClusterConfig() {
@@ -33,21 +34,24 @@ class ClusterConfig {
   }
 
   ServerInfo GetMasterHostInfo() const {
-    return server_info_.at(0);
+    return computes_info_.at(0);
   }
 
   size_t GetPartitionNum() const {
-    return server_info_.size();
+    return computes_info_.size();
   }
+    size_t GetMemoryNum() const {
+        return memories_info_.size();
+    }
 
   size_t GetMyPartitionId() const {
-    for (size_t i = 0; i < server_info_.size(); ++i) {
-      ServerInfo host = server_info_.at(i);
+    for (size_t i = 0; i < computes_info_.size(); ++i) {
+      ServerInfo host = computes_info_.at(i);
       if (host.addr_ == my_info_.addr_ && host.port_no_ == my_info_.port_no_) {
         return i;
       }
     }
-    return server_info_.size() + 1;
+    return computes_info_.size() + 1;
   }
 
   bool IsMaster() const {
@@ -61,27 +65,46 @@ private:
     std::string name;
     int port;
 
-    std::ifstream readfile(config_filename_);
-    assert(readfile.is_open() == true);
-    while (!readfile.eof()) {
+    std::ifstream computereadfile(compute_config_filename_);
+    assert(computereadfile.is_open() == true);
+    while (!computereadfile.eof()) {
       name = "";
       port = -1;
-      readfile >> name >> port;
+      computereadfile >> name >> port;
       if (name == "" && port < 0)
         continue;
-      server_info_.push_back(ServerInfo(name, port));
+      computes_info_.push_back(ServerInfo(name, port));
     }
-    readfile.close();
+    computereadfile.close();
 
-    for (auto& entry : server_info_) {
+    for (auto& entry : computes_info_) {
       std::cout << "server name=" << entry.addr_ << ",port_no="
                 << entry.port_no_ << std::endl;
     }
+
+      std::ifstream memoryreadfile(compute_config_filename_);
+      assert(memoryreadfile.is_open() == true);
+      while (!memoryreadfile.eof()) {
+          name = "";
+          port = -1;
+          memoryreadfile >> name >> port;
+          if (name == "" && port < 0)
+              continue;
+          memories_info_.push_back(ServerInfo(name, port));
+      }
+      memoryreadfile.close();
+
+      for (auto& entry : memories_info_) {
+          std::cout << "server name=" << entry.addr_ << ",port_no="
+                    << entry.port_no_ << std::endl;
+      }
   }
 private:
-  std::vector<ServerInfo> server_info_;
+  std::vector<ServerInfo> computes_info_;
+  std::vector<ServerInfo> memories_info_;
   ServerInfo my_info_;
-  std::string config_filename_;
+  std::string compute_config_filename_;
+  std::string memory_config_filename_;
 };
 }
 

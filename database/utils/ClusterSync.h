@@ -11,7 +11,19 @@ public:
     sync_key_ = 0;
   }
 
-  void Fence() {
+    void Fence_XALLNodes() {
+        int SYNC_KEY = 16384;// a big enough number.
+        int node_id = default_gallocator->GetID();
+        int id;
+//    STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
+        default_gallocator->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
+        int no_node = config_->GetPartitionNum() + config_->GetMemoryNum();
+        for (int i = 1; i <= no_node; i++) {
+            default_gallocator->Get(SYNC_KEY + i, &id);
+            epicAssert(id == i);
+        }
+    }
+  void Fence_XComputes() {
     size_t partition_id = config_->GetMyPartitionId();
     size_t partition_num = config_->GetPartitionNum();
     bool *flags = new bool[partition_num];

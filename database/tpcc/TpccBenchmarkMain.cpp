@@ -15,12 +15,11 @@ using namespace Database;
 
 void ExchPerfStatistics(ClusterConfig* config, 
     ClusterSync* synchronizer, PerfStatistics* s);
-
 int main(int argc, char* argv[]) {
   ArgumentsParser(argc, argv);
 
   std::string my_host_name = ClusterHelper::GetLocalHostName();
-  ClusterConfig config(my_host_name, port, config_filename);
+  ClusterConfig config(my_host_name, port, compute_config_filename, memory_config_filename);
   ClusterSync synchronizer(&config);
   FillScaleParams(config);
   PrintScaleParams();
@@ -28,7 +27,8 @@ int main(int argc, char* argv[]) {
   TpccInitiator initiator(gThreadCount, &config);
   // initialize GAM storage layer
   initiator.InitGAllocator();
-  synchronizer.Fence();
+  synchronizer.Fence_XALLNodes();
+//    synchronizer.Fence_XComputes();
   // initialize benchmark data
   GAddr storage_addr = initiator.InitStorage();
   synchronizer.MasterBroadcast<GAddr>(&storage_addr); 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
   populator.Start();
   REPORT_PROFILE_TIME
   (gThreadCount);
-  synchronizer.Fence();
+    synchronizer.Fence_XComputes();
 
   // generate workload
   IORedirector redirector(gThreadCount);
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
                      config.GetMyPartitionId());
   //TpccSource sourcer(&tpcc_scale_params, &redirector, num_txn, SourceType::RANDOM_SOURCE, gThreadCount, dist_ratio);
   sourcer.Start();
-  synchronizer.Fence();
+    synchronizer.Fence_XComputes();
 
   {
     // warm up
@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
     executor.Start();
     REPORT_PROFILE_TIME(gThreadCount);
   }
-  synchronizer.Fence();
+    synchronizer.Fence_XComputes();
 
   {
     // run workload
@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
   }
 
   std::cout << "prepare to exit..." << std::endl;
-  synchronizer.Fence();
+    synchronizer.Fence_XComputes();
   std::cout << "over.." << std::endl;
   return 0;
 }
