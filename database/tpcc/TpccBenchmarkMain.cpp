@@ -18,7 +18,7 @@ void ExchPerfStatistics(ClusterConfig* config,
 int main(int argc, char* argv[]) {
   ArgumentsParser(argc, argv);
 
-  std::string my_host_name = ClusterHelper::GetLocalHostName();
+  my_host_name = ClusterHelper::GetLocalHostName();
   ClusterConfig config(my_host_name, port, compute_config_filename, memory_config_filename);
   ClusterSync synchronizer(&config);
   FillScaleParams(config);

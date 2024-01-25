@@ -13,6 +13,7 @@ static int factor_count = 0;
 static int dist_ratio = 1;
 static int num_txn = -1;
 static int num_core = -1;  // number of cores utilized in a single numa node.
+static std::string my_host_name;
 static int port = -1;
 static std::string compute_config_filename = "compute.txt";
 static std::string memory_config_filename = "memory.txt";
@@ -84,6 +85,8 @@ static void ArgumentsParser(int argc, char *argv[]) {
     }
     if (argv[i][1] == 'p') {
       port = atoi(&argv[i][2]);
+    } else if (argv[i][1] == 's' && argv[i][2] == 'n') {
+        my_host_name.assign(&argv[i][3]);
     } else if (argv[i][1] == 's' && argv[i][2] == 'f') {
       scale_factors[factor_count] = atof(&argv[i][3]);
       ++factor_count;
