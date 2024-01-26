@@ -181,9 +181,10 @@ int main(int argc, char* argv[]) {
 
     int id;
     node_id = alloc->GetID();
-    assert(node_id > no_node/2);
+
     no_node = compute_num + memory_num;
     printf("This node id is %d\n", node_id);
+    assert(node_id > no_node/2);
     NUMOFBLOCKS = 16384;// a big enough number.
     SYNC_KEY = NUMOFBLOCKS;
     STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
