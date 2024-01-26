@@ -36,6 +36,7 @@ launch () {
   read -r -a memcached_node <<< $(head -n 1 $proj_dir/memcached_ip.conf)
   echo "restart memcached on ${memcached_node[0]}"
   ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
+
   dist_ratio=$1
   echo "start tpcc for dist_ratio ${dist_ratio}"
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
@@ -43,7 +44,9 @@ launch () {
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
   ssh ${ssh_opts} ${master_host} "ulimit -c 1000000 && $script_compute -sn$master_host" &
+
   sleep 3
+
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
