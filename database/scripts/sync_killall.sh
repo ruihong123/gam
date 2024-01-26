@@ -84,7 +84,7 @@ for node in ${compute_shard[@]}
 do
   echo "kill the zombie process on $node"
   ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark"
-  ssh -o StrictHostKeyChecking=no $node "pkill -f memory_server"
+  ssh -o StrictHostKeyChecking=no $node "pkill -f tpcc_server"
 done
 for node in ${memory_shard[@]}
 do
