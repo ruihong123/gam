@@ -53,7 +53,7 @@ launch () {
     ssh ${ssh_opts} ${compute} "$script_compute -sn$compute" &
     sleep 1
   done
-  for ((i=1;i<${#memory_nodes[@]};i++)); do
+  for ((i=0;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
       memory_ARGS="--ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
