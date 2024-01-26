@@ -32,6 +32,10 @@ echo "input Arguments: ${compute_ARGS}"
 echo "launch..."
 
 launch () {
+
+  read -r -a memcached_node <<< $(head -n 1 $proj_dir/memcached_ip.conf)
+  echo "restart memcached on ${memcached_node[0]}"
+  ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
   dist_ratio=$1
   echo "start tpcc for dist_ratio ${dist_ratio}"
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
