@@ -15,7 +15,6 @@ class GAddrArray : public GAMObject{
 
   void Init(const uint64_t& element_count, 
       size_t element_size, GAlloc* gallocator) {
-      assert(element_size == sizeof(T));
     // Decide the size for each layer
     array_size_ = element_count;
     element_size_ = element_size;
