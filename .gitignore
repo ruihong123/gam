@@ -6,6 +6,8 @@
 *.a
 *.orig
 scripts/log.*
+tpcc
+tpcc_server
 
 # Build directory.
 build/
