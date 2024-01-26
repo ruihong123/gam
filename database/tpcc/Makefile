@@ -21,8 +21,8 @@ tpcc: $(OBJ)
 tpcc_server: TpccServer.cpp
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
-all: tpcc
-build: tpcc
+all: tpcc tpcc_server
+build: tpcc tpcc_server
 
 clean:
 	rm -rf tpcc tpcc_server *.o ../*.o ../bench/*.o ../storage/*.o ../txn/*.o ../utils/*.o
