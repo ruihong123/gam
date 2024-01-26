@@ -7,18 +7,21 @@ CFLAGS += -O0 -DLOCK -DBACKOFF -ggdb #-DPROFILE
 
 
 
-SRC = TpccBenchmarkMain.cpp TpccRandomGenerator.cpp ../Meta.cpp ../txn/TransactionManager2PL.cpp ../txn/TransactionManagerST.cpp ../utils/Profiler.cpp
-OBJ = TpccBenchmarkMain.o TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
-OBJ = TpccBenchmarkMain.o TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
+SRC = TpccRandomGenerator.cpp ../Meta.cpp ../txn/TransactionManager2PL.cpp ../txn/TransactionManagerST.cpp ../utils/Profiler.cpp
+#OBJ = TpccBenchmarkMain.o TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
+OBJ =  TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
 
-
+#TpccBenchmarkMain.cpp TpccBenchmarkMain.o
 $(OBJ): %.o : %.cpp
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
-
-tpcc: $(OBJ)
+TpccBenchmarkMain.o: TpccBenchmarkMain.cpp
+	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
+TpccServer.o: TpccServer.cpp
+	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
+tpcc: $(OBJ)  TpccBenchmarkMain.o
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
-tpcc_server: TpccServer.cpp
+tpcc_server:$(OBJ) TpccServer.o
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
 all: tpcc tpcc_server
