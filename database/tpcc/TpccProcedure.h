@@ -139,7 +139,7 @@ class NewOrderProcedure : public StoredProcedure {
     for (size_t i = 0; i < new_order_param->ol_cnt_; ++i) {
       int item_id = new_order_param->i_ids_[i];
       // "getItemInfo": "SELECT I_PRICE, I_NAME, I_DATA FROM ITEM WHERE I_ID = ?"
-      IndexKey item_key = GetItemPrimaryKey(item_id, new_order_param->w_id_);
+      IndexKey item_key = GetItemPrimaryKey(item_id, new_order_param->w_id_); // I think I_ID is enough.
       Record *item_record = nullptr;
       if (transaction_manager_->SearchRecord(
           &context_, ITEM_TABLE_ID, item_key, item_record,
@@ -179,6 +179,7 @@ class NewOrderProcedure : public StoredProcedure {
       stock_record->SetColumn(13, &ytd);
       int quantity = 0;
       stock_record->GetColumn(2, &quantity);
+      // The code below is a hack, we should have abortation below.
       if (quantity >= ol_quantity + 10) {
         quantity -= ol_quantity;
         stock_record->SetColumn(2, &quantity);
