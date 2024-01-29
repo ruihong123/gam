@@ -30,7 +30,7 @@ class GAddrArray : public GAMObject{
     }
     assert(layer_num_ < 4);
     assert(array_size_ <= layer_size_[layer_num_]);
-
+    //TODO: Make the GAddrArray sharable accross all the compute node
     // Allocate memory for each layer
     if (layer_num_ == 1) {
       root_addr_ = gallocator->AlignedMalloc(element_size * N);

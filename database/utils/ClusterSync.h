@@ -8,20 +8,20 @@ namespace Database {
 class ClusterSync{
 public:
   ClusterSync(ClusterConfig *config) : config_(config) {
-    sync_key_ = 0;
+      sync_key_xcompute_ = 0;
+      sync_key_xall_ = SYNC_XALL_OFFSET;
   }
-
+    // shall be run exactly once by each node.
     void Fence_XALLNodes() {
-        int SYNC_KEY = 16384;// a big enough number.
         int node_id = default_gallocator->GetID();
         int id;
-//    STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
-        default_gallocator->Put(SYNC_KEY + node_id, &node_id, sizeof(int));
+        default_gallocator->Put(sync_key_xall_ + node_id, &node_id, sizeof(int));
         int no_node = config_->GetPartitionNum() + config_->GetMemoryNum();
         for (int i = 1; i <= no_node; i++) {
-            default_gallocator->Get(SYNC_KEY + i, &id);
+            default_gallocator->Get(sync_key_xall_ + i, &id);
             epicAssert(id == i);
         }
+        sync_key_xall_ += no_node;
     }
   void Fence_XComputes() {
     size_t partition_id = config_->GetMyPartitionId();
@@ -43,7 +43,7 @@ public:
       for (size_t i = 0; i < partition_num; ++i) {
         if (i != partition_id) {
           default_gallocator->Get(
-              (uint64_t)(sync_key_ + i), &data);
+                  (uint64_t)(sync_key_xcompute_ + i), &data);
           memcpy(receive + i, &data, sizeof(T));
         }
         else {
@@ -53,9 +53,9 @@ public:
     }
     else {
       default_gallocator->Put((uint64_t)
-          (sync_key_ + partition_id), send, sizeof(T));
+          (sync_key_xcompute_ + partition_id), send, sizeof(T));
     }
-    sync_key_ += partition_num;
+      sync_key_xcompute_ += partition_num;
   }
 
   template<class T>
@@ -64,19 +64,20 @@ public:
     size_t partition_num = config_->GetPartitionNum();
     if (config_->IsMaster()) {
       default_gallocator->Put(
-          (uint64_t)(sync_key_ + partition_id), send, sizeof(T));
+              (uint64_t)(sync_key_xcompute_ + partition_id), send, sizeof(T));
     }
     else {
       const size_t master_partition_id = 0;
       default_gallocator->Get((uint64_t)
-          (sync_key_ + master_partition_id), send);
+          (sync_key_xcompute_ + master_partition_id), send);
     }
-    sync_key_ += partition_num;
+      sync_key_xcompute_ += partition_num;
   }
 
 private:
   ClusterConfig *config_;
-  uint64_t sync_key_;
+  uint64_t sync_key_xcompute_;
+  uint64_t sync_key_xall_;
 };
 }
 

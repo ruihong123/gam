@@ -7,6 +7,7 @@
 
 namespace Database {
 class HashIndex : public GAMObject{
+    //TODO: make the hash index sharable.
 public:
   HashIndex() {
   }

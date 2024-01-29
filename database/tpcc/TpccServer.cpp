@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
     no_node = compute_num + memory_num;
     printf("This node id is %d\n", node_id);
     assert(node_id > no_node/2);
-    NUMOFBLOCKS = 16384;// a big enough number.
+    NUMOFBLOCKS = SYNC_XALL_OFFSET;// a big enough number.
     SYNC_KEY = NUMOFBLOCKS;
     STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
     alloc->Put(SYNC_KEY + node_id, &node_id, sizeof(int));

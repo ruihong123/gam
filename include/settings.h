@@ -108,4 +108,8 @@ using namespace std;
 
 //#define TIME_PRINT
 
+#define SYNC_INDEX_ROOT_OFFSET 65536
+
+#define SYNC_XALL_OFFSET (16384*2)
+
 #endif /* INCLUDE_SETTINGS_H_ */
