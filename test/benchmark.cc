@@ -329,6 +329,12 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
         epicAssert(readback == data[i]);
       }
 #endif
+#ifdef GETANALYSIS
+              if (i ==10000 && Alloccounter.load()!=0){
+                  printf("Notice here!! Average remote allocation time elapse is %lu\n", AllocTotal.load()/Alloccounter.load());
+
+              }
+#endif
           }
           shared_data_is_init.store(true);
 
@@ -403,13 +409,9 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
         shared[i] = false;
       }
     }
-  }
-#ifdef GETANALYSIS
-    if (Alloccounter.load()!=0){
-        printf("Notice here!! Average remote allocation time elapse is %lu\n", AllocTotal.load()/Alloccounter.load());
 
-    }
-#endif
+  }
+
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
     WorkloadGenerator* workload_gen;
@@ -417,7 +419,7 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 #ifdef EXCLUSIVE_HOTSPOT
         workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp, ddsm->GetID()/2, compute_num);
 #else
-        workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp, 0, 0);
+        workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp);
 #endif
     } else if (workload > 1){
         workload_gen = new MultiHotSpotGenerator(STEPS, zipfian_alpha, *seedp, workload);
