@@ -43,7 +43,7 @@ void Server::ProcessRdmaRequest(ibv_wc& wc) {
   }
 
   if (wc.status != IBV_WC_SUCCESS) {
-    epicLog(LOG_WARNING, "Completion with error to server node %d, op = %d (%d:%s)",  cli->GetWorkerId(), wc.opcode,
+    epicLog(LOG_WARNING, "Completion with error from server %d to server node %d, op = %d (%d:%s)",  GetWorkerId(), cli->GetWorkerId(), wc.opcode,
             wc.status, ibv_wc_status_str(wc.status));
     epicAssert(false);
     return;
