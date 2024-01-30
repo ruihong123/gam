@@ -655,8 +655,10 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
 //  if (op_type == 0) {
       // issue a fence and a read request to the last address to ensure all previous
       // op have been done
-      alloc->MFence();
-      ret = alloc->Read(data[0], buf, item_size);
+    for (int i = 0; i < compute_num; ++i) {
+        alloc->MFence();
+        ret = alloc->Read(data[i], buf, item_size);
+    }
 //  }
 
   long end = get_time();
