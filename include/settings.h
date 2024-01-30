@@ -102,7 +102,7 @@ using namespace std;
 
 #define MAX_MEM_STATS_SIZE  64 //10+10+20+20+4 in decimal
 
-#define GETANALYSIS
+//#define GETANALYSIS
 
 //#define EXCLUSIVE_HOTSPOT // exclusive hotspot per compute. workload == 1.
 
