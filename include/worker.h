@@ -109,6 +109,7 @@ class Worker : public Server {
    */
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };
+  std::mutex pending_works_mutex;
 //    std::map<unsigned int, WorkRequest*> pending_works2;
 //    std::mutex pending_works2_mutex;
   /*

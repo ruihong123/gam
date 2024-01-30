@@ -816,7 +816,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
 }
 
 int Worker::ErasePendingWork(unsigned int id) {
-  //LOCK_MICRO(pending_works, id);
+  LOCK_MICRO(pending_works, id);
   epicLog(LOG_DEBUG, "remove pending work %d", id);
   int ret = pending_works.erase(id);
 //    pending_works2_mutex.lock();
@@ -824,12 +824,12 @@ int Worker::ErasePendingWork(unsigned int id) {
 //    pending_works2.erase(id);
 //    pending_works2_mutex.unlock();
 
-    //UNLOCK_MICRO(pending_works, id);
+    UNLOCK_MICRO(pending_works, id);
   return ret;
 }
 
 WorkRequest* Worker::GetPendingWork(unsigned int id) {
-  //LOCK_MICRO(pending_works, id);
+  LOCK_MICRO(pending_works, id);
   WorkRequest* ret = nullptr;
   epicLog(LOG_DEBUG, "get pending work %d", id);
   try {
@@ -840,12 +840,12 @@ WorkRequest* Worker::GetPendingWork(unsigned int id) {
     //UNLOCK_MICRO(pending_works, id);
     return nullptr;
   }
-  //UNLOCK_MICRO(pending_works, id);
+  UNLOCK_MICRO(pending_works, id);
   return ret;
 }
 
 int Worker::GetAndErasePendingWork(unsigned int id, WorkRequest** wp) {
-  //LOCK_MICRO(pending_works, id);
+  LOCK_MICRO(pending_works, id);
   epicLog(LOG_WARNING, "get and erase pending work %d", id);
   try {
     *wp = pending_works.at(id);
@@ -855,7 +855,7 @@ int Worker::GetAndErasePendingWork(unsigned int id, WorkRequest** wp) {
     return 0;
   }
   int ret = pending_works.erase(id);
-  //UNLOCK_MICRO(pending_works, id);
+  UNLOCK_MICRO(pending_works, id);
   return ret;
 }
 
