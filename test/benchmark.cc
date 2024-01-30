@@ -658,6 +658,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
     for (int i = 0; i < compute_num; ++i) {
         alloc->MFence();
         ret = alloc->Read(data[i], buf, item_size);
+        printf("read data on node %lu", WID(data[i]));
     }
 //  }
 
