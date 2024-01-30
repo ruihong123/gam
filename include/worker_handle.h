@@ -45,7 +45,12 @@ class WorkerHandle {
   inline void* GetLocal(GAddr addr) {
     return worker->ToLocal(addr);
   }
-
+  Size GetWriteReplyCounter() {
+    return worker->GetWriteReplyCounter();
+  }
+  void ResetWriteReplyCounter() {
+    worker->ResetWriteReplyCounter();
+  }
   void ReportCacheStatistics();
   void ResetCacheStatistics();
 

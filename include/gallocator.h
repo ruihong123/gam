@@ -79,7 +79,12 @@ class GAlloc {
     // btween the memory servers.
   Size Put(uint64_t key, const void* value, Size count);
   Size Get(uint64_t key, void* value);
-
+    Size GetWriteReplyCounter(){
+        return wh->GetWriteReplyCounter();
+    }
+    Size ResetWriteReplyCounter(){
+        wh->ResetWriteReplyCounter();
+    }
 #ifdef DHT
   int HTable(void*);
 #endif

@@ -655,11 +655,14 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
 //  if (op_type == 0) {
       // issue a fence and a read request to the last address to ensure all previous
       // op have been done
-    for (int i = 0; i < compute_num; ++i) {
+    printf("write reply counter is %lu part 1\n", alloc->GetWriteReplyCounter());
+      for (int i = 0; i < compute_num; ++i) {
         alloc->MFence();
         ret = alloc->Read(data[i], buf, item_size);
-        printf("read data on node %lu", WID(data[i]));
+        printf("read data on node %lu\n", WID(data[i]));
     }
+    printf("write reply counter is %lu part 2\n", alloc->GetWriteReplyCounter());
+    alloc->ResetWriteReplyCounter();
 //  }
 
   long end = get_time();
