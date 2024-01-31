@@ -29,7 +29,9 @@ Worker::Worker(const Conf& conf, RdmaResource* res)
   : st(),
   wr_psn(),
   ghost_size(),
-  wqueue(new boost::lockfree::queue<WorkRequest*>(INIT_WORKQ_SIZE))
+  wqueue(new boost::lockfree::queue<WorkRequest*>(INIT_WORKQ_SIZE)),
+  write_reply_counter(0),
+  write_hit_counter(0)
 #ifdef ASYNC_RDMA_SEND
     ,rdma_queue(new boost::lockfree::queue<RDMASendData*>(INIT_WORKQ_SIZE))
 #endif

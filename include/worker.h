@@ -179,8 +179,8 @@ class Worker : public Server {
   atomic<Size> no_remote_writes_;
   atomic<Size> no_remote_writes_hit_;
   atomic<Size> no_remote_writes_direct_hit_;
-  atomic<Size> write_reply_counter = 0;
-    atomic<Size> write_hit_counter = 0;
+  atomic<Size> write_reply_counter;
+    atomic<Size> write_hit_counter;
   std::mutex Psn_mtx;
   // logging
   void logWrite(GAddr addr, Size sz, const void* content) {
