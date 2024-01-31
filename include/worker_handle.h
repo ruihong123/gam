@@ -48,6 +48,9 @@ class WorkerHandle {
   Size GetWriteReplyCounter() {
     return worker->GetWriteReplyCounter();
   }
+    Size GetWriteHitCounter() {
+        return worker->GetWriteHitCounter();
+    }
   void ResetWriteReplyCounter() {
     worker->ResetWriteReplyCounter();
   }

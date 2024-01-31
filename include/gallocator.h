@@ -82,6 +82,9 @@ class GAlloc {
     Size GetWriteReplyCounter(){
         return wh->GetWriteReplyCounter();
     }
+    Size GetWriteHitCounter(){
+        return wh->GetWriteHitCounter();
+    }
     Size ResetWriteReplyCounter(){
         wh->ResetWriteReplyCounter();
     }

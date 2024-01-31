@@ -179,7 +179,8 @@ class Worker : public Server {
   atomic<Size> no_remote_writes_;
   atomic<Size> no_remote_writes_hit_;
   atomic<Size> no_remote_writes_direct_hit_;
-  atomic<Size> write_reply_counter;
+  atomic<Size> write_reply_counter = 0;
+    atomic<Size> write_hit_counter = 0;
   std::mutex Psn_mtx;
   // logging
   void logWrite(GAddr addr, Size sz, const void* content) {
@@ -281,8 +282,12 @@ class Worker : public Server {
     Size GetWriteReplyCounter() {
         return write_reply_counter.load();
     }
+    Size GetWriteHitCounter() {
+        return write_hit_counter.load();
+    }
     void ResetWriteReplyCounter() {
-        return write_reply_counter.store(0);
+        write_reply_counter.store(0);
+        write_hit_counter.store(0);
     }
 #ifdef DHT
   int ProcessLocalHTable(WorkRequest* wr);

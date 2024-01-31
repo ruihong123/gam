@@ -196,6 +196,7 @@ int Cache::ReadWrite(WorkRequest* wr) {
           //put submit request at last in case reply comes before we process afterwards works
           worker->SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
         } else {
+            worker->write_hit_counter.fetch_add(1);
 #ifdef GFUNC_SUPPORT
           if (wr->flag & GFUNC) {
             epicAssert(wr->gfunc);
