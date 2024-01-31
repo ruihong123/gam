@@ -160,6 +160,7 @@ void Worker::ProcessPendingWrite(Client* cli, WorkRequest* wr) {
 #ifdef SELECTIVE_CACHING
   wr->addr = TOBLOCK(wr->addr);
 #endif
+    write_reply_counter.fetch_add(1);
   epicAssert(
       (wr->op == WRITE || wr->op == WRITE_PERMISSION_ONLY)
           xor IsLocal(wr->addr));

@@ -995,7 +995,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
             delete wr;
             wr = nullptr;
         } else {  //WRITE_FORWARD
-//            assert(wr->op == WRITE_FORWARD);
+            assert(wr->op == WRITE_FORWARD);
             Client* cli = FindClientWid(wr->pwid);//New owner.
             if (deadlock) {
 #ifdef SELECTIVE_CACHING
