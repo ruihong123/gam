@@ -66,6 +66,9 @@ class HashTable : public cuckoohash_map<Key, T, CityHasher<Key>> {
     }
     return ret;
   }
+  bool empty() {
+    return this->size() == 0;
+  }
 
  private:
   array<LockWrapper, lock_array_size> lock_;

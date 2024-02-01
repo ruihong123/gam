@@ -88,6 +88,9 @@ class GAlloc {
     Size ResetWriteReplyCounter(){
         wh->ResetWriteReplyCounter();
     }
+    void WaitPendingRequest(){
+        wh->WaitPendingRequest();
+    }
 #ifdef DHT
   int HTable(void*);
 #endif

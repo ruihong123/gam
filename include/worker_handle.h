@@ -54,6 +54,7 @@ class WorkerHandle {
   void ResetWriteReplyCounter() {
     worker->ResetWriteReplyCounter();
   }
+  void WaitPendingRequest();
   void ReportCacheStatistics();
   void ResetCacheStatistics();
 

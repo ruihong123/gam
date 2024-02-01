@@ -289,6 +289,14 @@ class Worker : public Server {
         write_reply_counter.store(0);
         write_hit_counter.store(0);
     }
+    void WaitPendingRequest() {
+        while (!pending_works.empty()) {
+            usleep(100);
+        }
+        while (!to_serve_requests.empty()) {
+            usleep(1);
+        }
+    }
 #ifdef DHT
   int ProcessLocalHTable(WorkRequest* wr);
 	void ProcessRemoteHTable(Client* client, WorkRequest* wr);

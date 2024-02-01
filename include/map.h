@@ -176,6 +176,14 @@ public:
     }
     return 0;
   }
+  bool empty() {
+    for (int i = 0; i < (1 << BUCKET_SIZE_POWER); i++) {
+      if (!buckets_[i]->kvs.empty()) {
+        return false;
+      }
+    }
+    return true;
+  }
 };
 
 #endif /* INCLUDE_MAP_H_ */

@@ -276,3 +276,7 @@ void WorkerHandle::ResetCacheStatistics() {
     worker->no_remote_writes_direct_hit_ = 0;
 }
 
+void WorkerHandle::WaitPendingRequest() {
+    worker->WaitPendingRequest();
+}
+
