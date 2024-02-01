@@ -659,7 +659,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
       for (int i = 0; i < compute_num; ++i) {
         alloc->MFence();
         ret = alloc->Read(data[i], buf, item_size);
-        printf("read data on node %lu\n", WID(data[i]));
+//        printf("read data on node %lu\n", WID(data[i]));
     }
     printf("Node %d thread %d write reply counter is %lu, write hit counter is %lu part 2\n", node_id, id, alloc->GetWriteReplyCounter(), alloc->GetWriteHitCounter());
 //  }
