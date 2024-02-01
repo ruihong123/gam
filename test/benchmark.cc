@@ -662,7 +662,6 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
         printf("read data on node %lu\n", WID(data[i]));
     }
     printf("Node %d thread %d write reply counter is %lu, write hit counter is %lu part 2\n", node_id, id, alloc->GetWriteReplyCounter(), alloc->GetWriteHitCounter());
-    alloc->ResetWriteReplyCounter();
 //  }
 
   long end = get_time();
@@ -779,7 +778,7 @@ void Benchmark(int id) {
   Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
     // print cache statistics
     alloc->ReportCacheStatistics();
-//    alloc->ResetCacheStatistics();
+    alloc->ResetWriteReplyCounter();
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
