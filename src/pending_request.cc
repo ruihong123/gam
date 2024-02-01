@@ -160,8 +160,8 @@ void Worker::ProcessPendingWrite(Client* cli, WorkRequest* wr) {
 #ifdef SELECTIVE_CACHING
   wr->addr = TOBLOCK(wr->addr);
 #endif
-    write_reply_counter.fetch_add(1);
-  epicAssert(
+    //    write_reply_counter.fetch_add(1);
+    epicAssert(
       (wr->op == WRITE || wr->op == WRITE_PERMISSION_ONLY)
           xor IsLocal(wr->addr));
   WorkRequest* parent;
@@ -294,7 +294,8 @@ void Worker::ProcessPendingWrite(Client* cli, WorkRequest* wr) {
 #endif
 
     if (!(wr->flag & LOCKED)) {
-      GAddr pend = GADD(parent->addr, parent->size);
+        write_reply_counter.fetch_add(1);
+        GAddr pend = GADD(parent->addr, parent->size);
       GAddr end = GADD(wr->addr, wr->size);
       GAddr gs = wr->addr > parent->addr ? wr->addr : parent->addr;
       void* ls = (void*) ((ptr_t) parent->ptr + GMINUS(gs, parent->addr));
