@@ -12,7 +12,7 @@ SRC = TpccRandomGenerator.cpp ../Meta.cpp ../txn/TransactionManager2PL.cpp ../tx
 OBJ =  TpccRandomGenerator.o ../Meta.o ../txn/TransactionManager2PL.o ../txn/TransactionManagerST.o ../utils/Profiler.o
 
 #TpccBenchmarkMain.cpp TpccBenchmarkMain.o
-$(OBJ): %.o : %.cpp
+$(OBJ): %.o : %.cpp *.h ../txn/*.h ../utils/*.h ../storage/*.h ../bench/*.h ../*.h
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
 TpccBenchmarkMain.o: TpccBenchmarkMain.cpp
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
