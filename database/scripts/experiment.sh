@@ -50,7 +50,7 @@ launch () {
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
-    ssh ${ssh_opts} ${compute} "$script_compute -sn$compute" &
+    ssh ${ssh_opts} ${compute} "ulimit -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
   for ((i=0;i<${#memory_nodes[@]};i++)); do
