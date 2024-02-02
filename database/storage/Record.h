@@ -75,6 +75,9 @@ public:
     if (!data_ptr_) {
       data_ptr_ = new char[data_size_];
     }
+      if (data_size_ == 152){
+          printf("break here");
+      }
     gallocator->Read(addr, data_ptr_, data_size_);
 #ifndef NDEBUG
       if (data_size_ == 152){
