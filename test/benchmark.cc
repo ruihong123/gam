@@ -661,6 +661,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
         ret = alloc->Read(data[i], buf, item_size);
 
     }
+      alloc->WaitPendingRequest();
     printf("Node %d thread %d write reply counter is %lu, write hit counter is %lu part 2\n", node_id, id, alloc->GetWriteReplyCounter(), alloc->GetWriteHitCounter());
 //  }
 

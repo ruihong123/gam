@@ -186,6 +186,7 @@ class TpccPopulator : public BenchmarkPopulator {
     for (size_t i = 0; i < kTableCount; ++i) {
       storage_manager_->tables_[i]->ReportTableSize();
     }
+    gallocator->WaitPendingRequest();
   }
 
  private:

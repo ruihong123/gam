@@ -55,6 +55,13 @@ public:
     
 
   virtual void Serialize(const GAddr& addr, GAlloc *gallocator) {
+#ifndef NDEBUG
+      if (data_size_ == 152){
+          int temp;
+          GetColumn(10, &temp) ;
+          assert(temp != 0);
+      }
+#endif
     gallocator->Write(addr, data_ptr_, data_size_);
   }
   void Serialize(const GAddr& addr, GAlloc *gallocator, size_t col_id) {
