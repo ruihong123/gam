@@ -48,6 +48,11 @@ namespace Database {
     if (lock_success) {
       record = new Record(schema_ptr);
       record->Deserialize(data_addr, gallocators[thread_id_]);
+#ifndef NDEBUG
+      char temp[32];
+        record->GetColumn(record->GetSchema()->GetColumnCount()-1, temp);
+        assert(temp[0]!=0);
+#endif
       Access* access = access_list_.NewAccess();
       access->access_type_ = access_type;
       access->access_record_ = record;
