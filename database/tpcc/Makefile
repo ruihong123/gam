@@ -18,10 +18,10 @@ TpccBenchmarkMain.o: TpccBenchmarkMain.cpp
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
 TpccServer.o: TpccServer.cpp
 	$(CPP) $< $(CFLAGS) $(INCLUDE) -g -c -o $@
-tpcc: $(OBJ)  TpccBenchmarkMain.o
+tpcc: $(OBJ)  TpccBenchmarkMain.o ../../src/libgalloc.a
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
-tpcc_server:$(OBJ) TpccServer.o
+tpcc_server:$(OBJ) TpccServer.o ../../src/libgalloc.a
 	$(CPP) $(CFLAGS) $(INCLUDE) -g -o $@ $^ $(LIBS)
 
 all: tpcc tpcc_server
