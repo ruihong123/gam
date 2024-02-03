@@ -18,9 +18,10 @@ namespace Database {
     access->access_addr_ = data_addr;
     PROFILE_TIME_START(thread_id_, INDEX_INSERT);
     //TODO: we need a new function to update the record and insert the record into the index.
-    //bool ret = storage_manager_->tables_[table_id]->InsertRecord(keys, key_num, record->data_addr_, thread_id_);
+    bool ret = storage_manager_->tables_[table_id]->InsertRecord(keys, key_num, data_addr,  gallocators[thread_id_], thread_id_);
     PROFILE_TIME_END(thread_id_, INDEX_INSERT);
     PROFILE_TIME_END(thread_id_, CC_INSERT);
+    //TODO: make it return ret.
     return true;
   }
 
