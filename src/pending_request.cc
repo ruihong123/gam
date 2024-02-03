@@ -54,7 +54,7 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
     epicLog(LOG_WARNING, "shouldn't happen");
     epicAssert(false);
   }
-
+    //Copy the workrequest data from cache to wr memory.
   if (!(wr->flag & LOCKED)) {
     GAddr pend = GADD(parent->addr, parent->size);
     GAddr end = GADD(wr->addr, wr->size);
@@ -128,8 +128,8 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
     parent->unlock();
 #ifndef NDEBUG
     if (wr->op == READ){
-        assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-        printf("Buffer %p content is not zero, parent->ptr = %p, parent->size = %d\n", parent->ptr, parent->size);
+        assert(buffer_is_not_all_zero((char*)parent->ptr, parent->size));
+        printf("Buffer %p content is not zero, parent->size = %zu\n", parent->ptr, parent->size);
     }
 #endif
     //notify the read buffer.
