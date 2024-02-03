@@ -140,8 +140,11 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         while (*local_notify_buf != 2){
             usleep(1);
         };
-        assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-        epicLog(LOG_DEBUG, "get notified via buf");
+        if (wr->op == READ){
+            assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
+            epicLog(LOG_DEBUG, "get notified via buf");
+        }
+
 #ifdef TIME_PRINT
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - statistic_start);
