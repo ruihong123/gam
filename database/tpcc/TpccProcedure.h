@@ -151,7 +151,7 @@ class NewOrderProcedure : public StoredProcedure {
       }
       double price = 0;
       item_record->GetColumn(3, &price);
-      assert(price != 0);
+      assert(price > 0);
 
         ret.Memcpy(ret.size_, (char*) (&item_id), sizeof(item_id));
       ret.size_ += sizeof(item_id);
