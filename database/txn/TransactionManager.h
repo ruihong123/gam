@@ -27,10 +27,11 @@ class TransactionManager {
   }
   ~TransactionManager() {
   }
-
+    // First write back the tuple to Remote memory outside this function,
+    // then WLock this GAddr. FInally, insert record GAddr to Primary index.
   bool InsertRecord(TxnContext* context, size_t table_id, const IndexKey* keys,
                     size_t key_num, Record *record, const GAddr& data_addr);
-
+    // Search the Index to get the GAddr of the record, then lock the record and return the record.
   bool SearchRecord(TxnContext* context, size_t table_id,
                     const IndexKey& primary_key, Record *&record,
                     AccessType access_type) {

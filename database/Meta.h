@@ -32,7 +32,7 @@ const size_t kMaxColumnNum = 32;
 const size_t kMaxSecondaryIndexNum = 5;
 const uint64_t kHashIndexBucketHeaderNum = 1000007;
 // txn
-const size_t kTryLockLimit = 1;
+const size_t kTryLockLimit = 8000;
 const size_t kMaxAccessLimit = 256;
 
 extern GAlloc* default_gallocator;
