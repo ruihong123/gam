@@ -127,7 +127,7 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
   if (--parent->counter == 0) {  //read all the data
     parent->unlock();
 #ifndef NDEBUG
-    if (wr->op == READ){
+    if (parent->op == READ){
         assert(buffer_is_not_all_zero((char*)parent->ptr, parent->size));
         printf("Buffer %p content is not zero, parent->size = %zu\n", parent->ptr, parent->size);
     }
