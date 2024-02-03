@@ -18,7 +18,14 @@
 #include "zmalloc.h"
 #include "kernel.h"
 #include "chars.h"
-
+bool buffer_is_not_all_zero(char* buf, int size) {
+  for (int i = 0; i < size; i++) {
+    if (buf[i] != 0) {
+      return true;
+    }
+  }
+  return false;
+}
 void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
   epicAssert(wr->parent);
   epicAssert(
@@ -119,6 +126,7 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
 
   if (--parent->counter == 0) {  //read all the data
     parent->unlock();
+    assert(buffer_is_not_all_zero((char*)parent->ptr, parent->size));
     //notify the read buffer.
     Notify(parent);
   } else {
