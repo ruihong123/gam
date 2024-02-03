@@ -359,6 +359,7 @@ class PaymentProcedure : public StoredProcedure {
         SearchRecord(&context_, WAREHOUSE_TABLE_ID, warehouse_key, warehouse_record, (AccessType)payment_param->warehouse_access_type_));
     double w_ytd = 0;
     warehouse_record->GetColumn(8, &w_ytd);
+      assert(w_ytd != 0);
     ret.Memcpy(ret.size_, (char*) (&w_ytd), sizeof(w_ytd));
     ret.size_ += sizeof(w_ytd);
     double new_w_ytd = w_ytd + payment_param->h_amount_;
