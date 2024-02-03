@@ -8,7 +8,7 @@
 #include "zmalloc.h"
 #include "util.h"
 #include "kernel.h"
-
+bool buffer_is_not_all_zero(char* buf, int size);
 LockWrapper WorkerHandle::lock;
 thread_local int WorkerHandle::thread_id = -1;
 WorkerHandle::WorkerHandle(Worker* w)
@@ -140,6 +140,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         while (*local_notify_buf != 2){
             usleep(1);
         };
+        assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
         epicLog(LOG_DEBUG, "get notified via buf");
 #ifdef TIME_PRINT
         auto stop = std::chrono::high_resolution_clock::now();

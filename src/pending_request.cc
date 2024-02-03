@@ -19,12 +19,12 @@
 #include "kernel.h"
 #include "chars.h"
 bool buffer_is_not_all_zero(char* buf, int size) {
-  for (int i = 0; i < size; i++) {
-    if (buf[i] != 0) {
-      return true;
+    for (int i = 0; i < size; i++) {
+        if (buf[i] != 0) {
+            return true;
+        }
     }
-  }
-  return false;
+    return false;
 }
 void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
   epicAssert(wr->parent);
