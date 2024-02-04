@@ -437,8 +437,6 @@ class Worker : public Server {
 
   static void StartService(Worker* w);
   static void AsyncRdmaSendThread(Worker* w);
-
-  ~Worker();
 };
 
 class WorkerFactory {

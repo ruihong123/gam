@@ -85,7 +85,7 @@ class GAlloc {
     Size GetWriteHitCounter(){
         return wh->GetWriteHitCounter();
     }
-    Size ResetWriteReplyCounter(){
+    void ResetWriteReplyCounter(){
         wh->ResetWriteReplyCounter();
     }
     void WaitPendingRequest(){
