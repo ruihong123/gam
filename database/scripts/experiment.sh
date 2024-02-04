@@ -46,14 +46,14 @@ launch () {
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
   ssh ${ssh_opts} ${master_host} "echo 'core' | sudo tee /proc/sys/kernel/core_pattern"
 
-  ssh ${ssh_opts} ${master_host} "ulimit -c unlimited && $script_compute -sn$master_host" &
+  ssh ${ssh_opts} ${master_host} "ulimit -S -c unlimited && $script_compute -sn$master_host" &
   sleep 3
 
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
     ssh ${ssh_opts} ${compute} "echo 'core' | sudo tee /proc/sys/kernel/core_pattern"
-    ssh ${ssh_opts} ${compute} "ulimit -c unlimited && $script_compute -sn$compute" &
+    ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
   for ((i=0;i<${#memory_nodes[@]};i++)); do
@@ -62,7 +62,7 @@ launch () {
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "echo 'core' | sudo tee /proc/sys/kernel/core_pattern"
-      ssh ${ssh_opts} ${memory} "ulimit -c unlimited && $script_memory" &
+      ssh ${ssh_opts} ${memory} "ulimit -S -c unlimited && $script_memory" &
       sleep 1
   done
   wait
