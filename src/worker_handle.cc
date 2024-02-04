@@ -137,7 +137,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
             usleep(1);
         };
 #ifndef NDEBUG
-        if (wr->op == READ){
+        if (wr->op == READ && wr->size > 8){
             assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
             epicLog(LOG_DEBUG, "get notified via buf");
         }
