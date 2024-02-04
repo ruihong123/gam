@@ -201,6 +201,10 @@ class Worker : public Server {
    * 2) get a cached copy of the whole picture about the global memory allocator
    */
   Worker(const Conf& conf, RdmaResource* res = nullptr);
+  ~Worker(){
+      delete wqueue;
+      delete st;
+  };
   inline void Join() {
     st->join();
   }

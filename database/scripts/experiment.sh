@@ -23,7 +23,7 @@ compute_nodes=(`echo ${compute_list}`)
 memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
 cache_mem_size=8 # 8 gb Local memory size
-remote_mem_size=48 # 48 gb Remote memory size
+remote_mem_size=8 # 8 gb Remote memory size pernode is enough
 port=$((13000+RANDOM%1000))
 
 compute_ARGS="$@"
@@ -52,7 +52,7 @@ launch () {
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
-    ssh ${ssh_opts} ${compute} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
+#    ssh ${ssh_opts} ${compute} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
     ssh ${ssh_opts} ${compute} "ulimit -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
@@ -61,7 +61,7 @@ launch () {
       memory_ARGS="--ip_master $master_host --ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
-      ssh ${ssh_opts} ${memory} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
+#      ssh ${ssh_opts} ${memory} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
       ssh ${ssh_opts} ${memory} "ulimit -c unlimited && $script_memory" &
       sleep 1
   done
