@@ -62,7 +62,7 @@ launch () {
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
-      ssh ${ssh_opts} ${memory} "ulimit -c unlimited && && $script_memory" &
+      ssh ${ssh_opts} ${memory} "ulimit -c unlimited && $script_memory" &
       sleep 1
   done
   wait
