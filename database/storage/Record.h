@@ -6,7 +6,14 @@
 #include "CharArray.h"
 #include "Meta.h"
 #include "RecordSchema.h"
-
+bool buffer_is_not_all_zero1(char* buf, int size){
+    for (int i = 0; i < size; i++) {
+        if (buf[i] != 0) {
+            return true;
+        }
+    }
+    return false;
+}
 namespace Database {
 class Record : public GAMObject{
 public:
@@ -75,17 +82,8 @@ public:
     if (!data_ptr_) {
       data_ptr_ = new char[data_size_];
     }
-      if (data_size_ == 152){
-          printf("break here");
-      }
     gallocator->Read(addr, data_ptr_, data_size_);
-#ifndef NDEBUG
-      if (data_size_ == 152){
-          int temp;
-          GetColumn(10, &temp) ;
-          assert(temp != 0);
-      }
-#endif
+    assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
   }
 
   size_t GetSerializeSize() const {
