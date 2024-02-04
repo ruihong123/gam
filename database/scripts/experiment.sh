@@ -45,7 +45,7 @@ launch () {
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
 #  ssh ${ssh_opts} ${master_host} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
 
-  ssh ${ssh_opts} ${master_host} "ulimit -c unlimited && $script_compute -sn$master_host" &
+  ssh ${ssh_opts} ${master_host} "rm /proj/purduedb-PG0/logs/core && ulimit -c unlimited && $script_compute -sn$master_host" &
 
   sleep 3
 
@@ -53,7 +53,7 @@ launch () {
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
 #    ssh ${ssh_opts} ${compute} "echo '/proj/purduedb-PG0/logs/core' | sudo tee /proc/sys/kernel/core_pattern"
-    ssh ${ssh_opts} ${compute} "ulimit -c unlimited && $script_compute -sn$compute" &
+    ssh ${ssh_opts} ${compute} "rm /proj/purduedb-PG0/logs/core && ulimit -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
   for ((i=0;i<${#memory_nodes[@]};i++)); do
