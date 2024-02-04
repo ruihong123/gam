@@ -928,10 +928,10 @@ int main(int argc, char* argv[]) {
   // The formula below is to guranttee that the  Global allocated data is a constant even if
   // the thread number and share_ratio varied.
   NUMOFBLOCKS = allocated_mem_size/(2*1024);
-    printf("number of blocks is %d\n", NUMOFBLOCKS);
+    printf("number of blocks is %lu\n", NUMOFBLOCKS);
   SYNC_KEY = NUMOFBLOCKS;
   STEPS = NUMOFBLOCKS/((no_thread - 1)*(100-shared_ratio)/100.00L + 1);
-  printf("number of steps is %d\n", STEPS);
+  printf("number of steps is %lu\n", STEPS);
   ITERATION = ITERATION_TOTAL/no_thread;
   sleep(1);
 

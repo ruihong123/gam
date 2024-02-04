@@ -6,8 +6,18 @@
 #include "CharArray.h"
 #include "Meta.h"
 #include "RecordSchema.h"
-bool buffer_is_not_all_zero1(char* buf, int size);
+
 namespace Database {
+
+
+bool buffer_is_not_all_zero1(char* buf, int size){
+    for (int i = 0; i < size; i++){
+        if (buf[i] != 0){
+            return true;
+        }
+    }
+    return false;
+}
 class Record : public GAMObject{
 public:
   Record(RecordSchema *schema_ptr) : schema_ptr_(schema_ptr) {

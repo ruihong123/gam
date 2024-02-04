@@ -12,14 +12,7 @@
 
 using namespace Database::TpccBenchmark;
 using namespace Database;
-bool buffer_is_not_all_zero1(char* buf, int size){
-    for (int i = 0; i < size; i++){
-        if (buf[i] != 0){
-            return true;
-        }
-    }
-    return false;
-}
+
 void ExchPerfStatistics(ClusterConfig* config, 
     ClusterSync* synchronizer, PerfStatistics* s);
 int main(int argc, char* argv[]) {
