@@ -6,9 +6,9 @@
 #include "CharArray.h"
 #include "Meta.h"
 #include "RecordSchema.h"
-bool buffer_is_not_all_zero1(char* buf, int size){
-    for (int i = 0; i < size; i++) {
-        if (buf[i] != 0) {
+bool buffer_is_not_all_zero(char* buf, int size){
+    for (int i = 0; i < size; i++){
+        if (buf[i] != 0){
             return true;
         }
     }
@@ -83,7 +83,7 @@ public:
       data_ptr_ = new char[data_size_];
     }
     gallocator->Read(addr, data_ptr_, data_size_);
-    assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
+    assert(buffer_is_not_all_zero(data_ptr_, data_size_));
   }
 
   size_t GetSerializeSize() const {

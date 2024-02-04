@@ -40,7 +40,6 @@
 #define REQUEST_ASYNC 1 << 6
 
 class Cache;
-
 struct Fence {
   bool sfenced = false;bool mfenced = false;
   atomic<int> pending_writes;
