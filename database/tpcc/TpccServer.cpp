@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
     node_id = alloc->GetID();
 
     no_node = compute_num + memory_num;
-    printf("This node id is %d\n", node_id);
+    epicLog(LOG_WARNING, "This node id is %d, no_node is", node_id, no_node);
     assert(node_id > no_node/2);
     NUMOFBLOCKS = SYNC_XALL_OFFSET;// a big enough number.
     SYNC_KEY = NUMOFBLOCKS;
