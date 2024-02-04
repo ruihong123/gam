@@ -10,14 +10,7 @@
 namespace Database {
 
 
-bool buffer_is_not_all_zero1(char* buf, int size){
-    for (int i = 0; i < size; i++){
-        if (buf[i] != 0){
-            return true;
-        }
-    }
-    return false;
-}
+
 class Record : public GAMObject{
 public:
   Record(RecordSchema *schema_ptr) : schema_ptr_(schema_ptr) {
@@ -79,6 +72,14 @@ public:
     size_t col_size = schema_ptr_->GetColumnSize(col_id);
     gallocator->Write(addr, offset, data_ptr_ + offset, col_size);
   }
+    bool buffer_is_not_all_zero1(char* buf, int size){
+        for (int i = 0; i < size; i++){
+            if (buf[i] != 0){
+                return true;
+            }
+        }
+        return false;
+    }
 
   virtual void Deserialize(const GAddr& addr, GAlloc *gallocator) {
     data_size_ = schema_ptr_->GetSchemaSize();
