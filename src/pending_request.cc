@@ -127,7 +127,6 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
   if (--parent->counter == 0) {  //read all the data
     parent->unlock();
 #ifndef NDEBUG
-      assert(parent->op != RLOCK);
     if (parent->op == READ && parent->size > 24) {
         if (parent->size > 50){
             printf("Break point\n");

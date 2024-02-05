@@ -21,7 +21,7 @@ class WorkerHandle {
   int send_pipe[2];
   int recv_pipe[2];
   std::atomic<int> registered_thread_num;
-    static thread_local int thread_id;
+    thread_local static int thread_id;
     static LockWrapper lock;
 #ifdef USE_PTHREAD_COND
   pthread_mutex_t cond_lock;
