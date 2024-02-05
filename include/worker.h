@@ -110,8 +110,8 @@ class Worker : public Server {
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };
   std::mutex pending_works_mutex;
-//    std::map<unsigned int, WorkRequest*> pending_works2;
-//    std::mutex pending_works2_mutex;
+    std::map<unsigned int, WorkRequest*> pending_works2;
+    std::mutex pending_works2_mutex;
   /*
    * the pending work requests from remote nodes
    * because some states are in intermediate state
@@ -236,12 +236,12 @@ class Worker : public Server {
   }
   inline unsigned int GetWorkPsn() {
       //TODO: under multi-threaded environment, this code shall be thread-safe
-    volatile unsigned int ret = ++wr_psn;
+    volatile unsigned int ret = wr_psn.fetch_add(1);
 
-    Psn_mtx.lock();
+//    Psn_mtx.lock();
     if (ret == 0)
-      ret = ++wr_psn;
-    Psn_mtx.unlock();
+      ret = wr_psn.fetch_add(1);
+//    Psn_mtx.unlock();
     return ret;
   }
 
