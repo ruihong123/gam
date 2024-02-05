@@ -10,16 +10,16 @@
 #include "kernel.h"
 bool buffer_is_not_all_zero(char* buf, int size);
 LockWrapper WorkerHandle::lock;
-thread_local int WorkerHandle::thread_id = 0;
+thread_local int WorkerHandle::thread_id = -1;
 WorkerHandle::WorkerHandle(Worker* w)
     : worker(w),
       wqueue(w->GetWorkQ()),
-      registered_thread_num(1){
+      registered_thread_num(0){
 //#if !defined(USE_PIPE_W_TO_H) || (!defined(USE_BOOST_QUEUE) && !defined(USE_PIPE_H_TO_W))
 #if !(defined(USE_PIPE_W_TO_H) && defined(USE_PIPE_H_TO_W))
   int notify_buf_size = sizeof(WorkRequest) + sizeof(int);
   int ret = posix_memalign((void**) &notify_buf, HARDWARE_CACHE_LINE,
-                           HARDWARE_CACHE_LINE*33);
+                           HARDWARE_CACHE_LINE*32);
   epicAssert((uint64_t)notify_buf % HARDWARE_CACHE_LINE == 0 && !ret);
     for (int i = 0; i < 32; ++i) {
         *(int*)(&notify_buf[i]) = 2;
@@ -85,7 +85,7 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
-    if (unlikely(thread_id == 0)) {
+    if (unlikely(thread_id == -1)) {
         thread_id = registered_thread_num.fetch_add(1);
     }
   wr->flag |= LOCAL_REQUEST;

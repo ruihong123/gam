@@ -86,6 +86,13 @@ public:
     if (!data_ptr_) {
       data_ptr_ = new char[data_size_];
     }
+#ifndef NDEBUG
+      if (data_size_ == 152){
+          int temp;
+          GetColumn(10, &temp) ;
+          assert(temp != 0);
+      }
+#endif
     gallocator->Read(addr, data_ptr_, data_size_);
     assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
   }
