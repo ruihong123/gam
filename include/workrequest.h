@@ -153,7 +153,8 @@ struct WorkRequest {
 #endif
 
   int wid;
-
+    // Counter is for the case that the target work request splitted into muliptle blocks,
+    // and every block requires a children work request.
   atomic<int> counter;  //maybe negative in Write Case 4
 
   WorkRequest* parent;
