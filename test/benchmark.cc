@@ -91,6 +91,7 @@ atomic<long> read_access(0);
 
 atomic<long> total_throughput(0);
 atomic<long> avg_latency(0);
+atomic<int> thread_ready(0);
 
 bool reset = false;
 
@@ -662,6 +663,10 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
 
     }
       alloc->WaitPendingRequest();
+      thread_ready.fetch_add(1);
+    while (thread_ready.load()!= no_thread){
+        usleep(10);
+    }
     printf("Node %d thread %d write reply counter is %lu, write hit counter is %lu part 2\n", node_id, id, alloc->GetWriteReplyCounter(), alloc->GetWriteHitCounter());
 //  }
 
@@ -777,6 +782,7 @@ void Benchmark(int id) {
 
   bool warmup = true;
   Run(alloc, data, access, addr_to_pos, shared, id, &seedp, warmup);
+  thread_ready.store(0);
     // print cache statistics
     alloc->ReportCacheStatistics();
 #ifndef LOCAL_MEMORY
@@ -812,6 +818,7 @@ void Benchmark(int id) {
   epicLog(LOG_WARNING, "start run the benchmark on thread %d", id);
   //Second half of access is for the real test.
   Run(alloc, data, &access[ITERATION], addr_to_pos, shared, id, &seedp, warmup);
+  thread_ready.store(0);
 #ifndef LOCAL_MEMORY
   //make sure all the requests are complete
   alloc->MFence();
