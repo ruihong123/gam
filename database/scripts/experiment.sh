@@ -23,7 +23,7 @@ compute_nodes=(`echo ${compute_list}`)
 memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
 cache_mem_size=4 # 8 gb Local memory size
-remote_mem_size=16 # 8 gb Remote memory size pernode is enough
+remote_mem_size=20 # 8 gb Remote memory size pernode is enough
 port=$((13000+RANDOM%1000))
 
 compute_ARGS="$@"
@@ -70,7 +70,7 @@ launch () {
 }
 
 run_tpcc () {
-  dist_ratios=(0 10 20 30 40 50 60 70 80 90 100)
+  dist_ratios=(0)
   for dist_ratio in ${dist_ratios[@]}; do
     launch ${dist_ratio}
   done
