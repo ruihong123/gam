@@ -78,13 +78,14 @@ for node in ${memory_shard[@]}
 do
   echo "kill the zombie process on $node"
   ssh -o StrictHostKeyChecking=no $node "pkill -f tpcc" #> /dev/null 2>&1
-#  sudo rm /users/Ruihong/gam/database/tpcc/core
+  ssh -o StrictHostKeyChecking=no $node "sudo rm /users/Ruihong/gam/database/tpcc/core"
   ssh -o StrictHostKeyChecking=no $node "pkill -f tpcc_server"
 done
 for node in ${compute_shard[@]}
 do
   echo "kill the zombie process on $node"
   ssh -o StrictHostKeyChecking=no $node "pkill -f tpcc"
+  ssh -o StrictHostKeyChecking=no $node "sudo rm /users/Ruihong/gam/database/tpcc/core"
   ssh -o StrictHostKeyChecking=no $node "pkill -f tpcc_server"
 done
 for node in ${memory_shard[@]}
