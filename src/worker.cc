@@ -387,15 +387,18 @@ void Worker::ProcessToServeRequest(WorkRequest* wr) {
   }
 
   LOCK_MICRO(to_serve_requests, block);
+  to_serve_requests2_mutex.lock();
   //process these pending remote requests due to in transition state
   if (to_serve_requests.count(block)) {
     auto* entry = to_serve_requests.at(block);
     int size = entry->size();
     queue<pair<Client*, WorkRequest*>> lq(*entry);  //copy it to local queue so that we don't need to hold the lock after that
     to_serve_requests.erase(block);
+    to_serve_requests2.erase(block);
     delete entry;
     entry = nullptr;
     UNLOCK_MICRO(to_serve_requests, block);
+    to_serve_requests2_mutex.unlock();
 
     for (int i = 0; i < size; i++) {
       //auto& to_serve = to_serve_requests[block].front();

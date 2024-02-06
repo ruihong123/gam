@@ -109,7 +109,7 @@ class Worker : public Server {
    */
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };
-  std::mutex pending_works_mutex;
+//  std::mutex pending_works_mutex;
     std::map<unsigned int, WorkRequest*> pending_works2;
     std::mutex pending_works2_mutex;
   /*
@@ -120,6 +120,8 @@ class Worker : public Server {
 #ifdef USE_SIMPLE_MAP
   Map<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests {
       "to_serve_requests" };
+    std::map<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests2;
+    std::mutex to_serve_requests2_mutex;
 #else
   HashTable<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests {"to_serve_requests"};
 #endif
@@ -390,16 +392,20 @@ class Worker : public Server {
 #endif
     WorkRequest* nw = wr;
     epicAssert(BLOCK_ALIGNED(addr));
+    to_serve_requests2_mutex.lock();
     LOCK_MICRO(to_serve_requests, addr);
     if (to_serve_requests.count(addr)) {
       auto* entry = to_serve_requests.at(addr);
       entry->push(pair<Client*, WorkRequest*>(client, wr));
+
     } else {
       auto* entry = new queue<pair<Client*, WorkRequest*>>();
       entry->push(pair<Client*, WorkRequest*>(client, wr));
       to_serve_requests[addr] = entry;
+      to_serve_requests2[addr] = entry;
     }
     UNLOCK_MICRO(to_serve_requests, addr);
+    to_serve_requests2_mutex.unlock();
   }
 
   void CompletionCheck(unsigned int id);
