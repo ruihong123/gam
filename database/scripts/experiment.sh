@@ -22,7 +22,7 @@ memory_list=`./get_servers.sh ${Memory_file} | tr "\\n" " "`
 compute_nodes=(`echo ${compute_list}`)
 memory_nodes=(`echo ${memory_list}`)
 master_host=${compute_nodes[0]}
-cache_mem_size=4 # 8 gb Local memory size
+cache_mem_size=4 # 8 gb Local memory size (Currently not working)
 remote_mem_size=48 # 8 gb Remote memory size pernode is enough
 port=$((13000+RANDOM%1000))
 
