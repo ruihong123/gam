@@ -45,7 +45,7 @@ launch () {
   memory_file="${output_dir}/Memory.log"
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
-  ssh ${ssh_opts} ${master_host} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
+  ssh ${ssh_opts} ${master_host} "echo '$core_dump_dir/core$master_host' | sudo tee /proc/sys/kernel/core_pattern"
 
 
   ssh ${ssh_opts} ${master_host} "ulimit -S -c unlimited && $script_compute -sn$master_host" &
@@ -54,7 +54,7 @@ launch () {
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
-      ssh ${ssh_opts} ${compute} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
+      ssh ${ssh_opts} ${compute} "echo '$core_dump_dir/core$compute' | sudo tee /proc/sys/kernel/core_pattern"
     ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
