@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 //    synchronizer.Fence_XComputes();
   // initialize benchmark data
   GAddr storage_addr = initiator.InitStorage();
-  synchronizer.MasterBroadcast<GAddr>(&storage_addr); 
+  synchronizer.MasterBroadcast<GAddr>(&storage_addr);
   std::cout << "storage_addr=" << storage_addr << std::endl;
   StorageManager storage_manager;
   storage_manager.Deserialize(storage_addr, default_gallocator);

@@ -68,30 +68,30 @@ class DeliveryProcedure : public StoredProcedure {
       c_ids[no_d_id - 1] = c_id;
     }
 
-    // for (int no_d_id = 1; no_d_id <= DISTRICTS_PER_WAREHOUSE; ++no_d_id){
-    // 	if (no_o_ids[no_d_id - 1] == -1){
-    // 		continue;
-    // 	}
+     for (int no_d_id = 1; no_d_id <= DISTRICTS_PER_WAREHOUSE; ++no_d_id){
+     	if (no_o_ids[no_d_id - 1] == -1){
+     		continue;
+     	}
 
-    // 	IndexKey order_line_key = GetOrderLineSecondaryKey(no_o_ids[no_d_id - 1], no_d_id, delivery_param->w_id_);
-    // 	Records order_line_records(15);
-    // 	// "updateOrderLine": "UPDATE ORDER_LINE SET OL_DELIVERY_D = ? WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?"
-    // 	// "sumOLAmount": "SELECT SUM(OL_AMOUNT) FROM ORDER_LINE WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?"
-    // 	// access secondary index here !
-    // 	DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, &order_line_records, READ_WRITE));
+     	IndexKey order_line_key = GetOrderLineSecondaryKey(no_o_ids[no_d_id - 1], no_d_id, delivery_param->w_id_);
+     	Records order_line_records(15);
+     	// "updateOrderLine": "UPDATE ORDER_LINE SET OL_DELIVERY_D = ? WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?"
+     	// "sumOLAmount": "SELECT SUM(OL_AMOUNT) FROM ORDER_LINE WHERE OL_O_ID = ? AND OL_D_ID = ? AND OL_W_ID = ?"
+     	// access secondary index here !
+     	DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, &order_line_records, READ_WRITE));
 
-    // 	double sum = 0, tmp = 0;
-    // 	ItemsIter iter(order_line_items_addr);
-    // 	GAddr record_addr = 0;
-    // 	while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
-    // 		RecordGAM order_line_record;
-    // 		gallocators[thread_id_]->Read(record_addr, &order_line_record, sizeof(RecordGAM));
-    // 		order_line_record.SetColumn(6, order_line_schema_ptr_, &delivery_param->ol_delivery_d_, gallocators[thread_id_]);
-    // 		order_line_record.GetColumn(8, order_line_schema_ptr_, &tmp, gallocators[thread_id_]);
-    // 		sum += tmp;
-    // 	}
-    // 	sums[no_d_id - 1] = sum;
-    // }
+     	double sum = 0, tmp = 0;
+     	ItemsIter iter(order_line_items_addr);
+     	GAddr record_addr = 0;
+     	while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
+     		RecordGAM order_line_record;
+     		gallocators[thread_id_]->Read(record_addr, &order_line_record, sizeof(RecordGAM));
+     		order_line_record.SetColumn(6, order_line_schema_ptr_, &delivery_param->ol_delivery_d_, gallocators[thread_id_]);
+     		order_line_record.GetColumn(8, order_line_schema_ptr_, &tmp, gallocators[thread_id_]);
+     		sum += tmp;
+     	}
+     	sums[no_d_id - 1] = sum;
+     }
 
     for (int no_d_id = 1; no_d_id <= DISTRICTS_PER_WAREHOUSE; ++no_d_id) {
       if (no_o_ids[no_d_id - 1] == -1) {
@@ -446,39 +446,39 @@ class OrderStatusProcedure : public StoredProcedure {
   virtual bool Execute(TxnParam *param, CharArray &ret) {
     OrderStatusParam *order_status_param = static_cast<OrderStatusParam*>(param);
 
-    // if (order_status_param->c_id_ == -1) {
-      // "getCustomersByLastName": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_BALANCE FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_LAST = ? ORDER BY C_FIRST"
-    // } else {
-      // "getCustomerByCustomerId": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_BALANCE FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?"
-    // }
+     if (order_status_param->c_id_ == -1) {
+//       "getCustomersByLastName": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_BALANCE FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_LAST = ? ORDER BY C_FIRST"
+     } else {
+//       "getCustomerByCustomerId": "SELECT C_ID, C_FIRST, C_MIDDLE, C_LAST, C_BALANCE FROM CUSTOMER WHERE C_W_ID = ? AND C_D_ID = ? AND C_ID = ?"
+     }
 
-    //"getLastOrder": "SELECT O_ID, O_CARRIER_ID, O_ENTRY_D FROM ORDERS WHERE O_W_ID = ? AND O_D_ID = ? AND O_C_ID = ? ORDER BY O_ID DESC LIMIT 1"
-    // IndexKey order_key = GetOrderPrimaryKey(order_status_param->c_id_, order_status_param->d_id_, order_status_param->w_id_);
-    // GAddr order_addr = 0;
-    // DB_QUERY(SearchRecord(&context_, ORDER_TABLE_ID, order_key, order_addr, READ_ONLY));
-    // assert(order_addr != 0);
-    // RecordGAM order_record;
-    // gallocators[thread_id_]->Read(order_addr, &order_record, sizeof(RecordGAM));
-    // //"getOrderLines": "SELECT OL_SUPPLY_W_ID, OL_I_ID, OL_QUANTITY, OL_AMOUNT, OL_DELIVERY_D FROM ORDER_LINE WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID = ?"
-    // int o_id = 0;
-    // order_record.GetColumn(0, order_schema_ptr_, &o_id, gallocators[thread_id_]);
-    // assert(o_id != 0);
-    // IndexKey order_line_key = GetOrderLineSecondaryKey(o_id, order_status_param->d_id_, order_status_param->w_id_);
-    // GAddr order_line_items_addr = 0;
-    // DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, order_line_items_addr, READ_ONLY));
-    // assert(order_line_items_addr != 0);
+//    "getLastOrder": "SELECT O_ID, O_CARRIER_ID, O_ENTRY_D FROM ORDERS WHERE O_W_ID = ? AND O_D_ID = ? AND O_C_ID = ? ORDER BY O_ID DESC LIMIT 1"
+     IndexKey order_key = GetOrderPrimaryKey(order_status_param->c_id_, order_status_param->d_id_, order_status_param->w_id_);
+     GAddr order_addr = 0;
+     DB_QUERY(SearchRecord(&context_, ORDER_TABLE_ID, order_key, order_addr, READ_ONLY));
+     assert(order_addr != 0);
+     RecordGAM order_record;
+     gallocators[thread_id_]->Read(order_addr, &order_record, sizeof(RecordGAM));
+     //"getOrderLines": "SELECT OL_SUPPLY_W_ID, OL_I_ID, OL_QUANTITY, OL_AMOUNT, OL_DELIVERY_D FROM ORDER_LINE WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID = ?"
+     int o_id = 0;
+     order_record.GetColumn(0, order_schema_ptr_, &o_id, gallocators[thread_id_]);
+     assert(o_id != 0);
+     IndexKey order_line_key = GetOrderLineSecondaryKey(o_id, order_status_param->d_id_, order_status_param->w_id_);
+     GAddr order_line_items_addr = 0;
+     DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, order_line_items_addr, READ_ONLY));
+     assert(order_line_items_addr != 0);
 
-    // ItemsIter iter(order_line_items_addr);
-    // GAddr record_addr = 0;
-    // while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
-    // 	RecordGAM order_line_record;
-    // 	gallocators[thread_id_]->Read(record_addr, &order_line_record, sizeof(RecordGAM));
-    // 	int i_id = 0;
-    // 	order_line_record.GetColumn(4, order_schema_ptr_, &i_id, gallocators[thread_id_]);
-    // 	assert(i_id != 0);
-    // 	ret.Memcpy(ret.size_, (char*)(&i_id), sizeof(i_id));
-    // 	ret.size_ += sizeof(i_id);
-    // }
+     ItemsIter iter(order_line_items_addr);
+     GAddr record_addr = 0;
+     while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
+     	RecordGAM order_line_record;
+     	gallocators[thread_id_]->Read(record_addr, &order_line_record, sizeof(RecordGAM));
+     	int i_id = 0;
+     	order_line_record.GetColumn(4, order_schema_ptr_, &i_id, gallocators[thread_id_]);
+     	assert(i_id != 0);
+     	ret.Memcpy(ret.size_, (char*)(&i_id), sizeof(i_id));
+     	ret.size_ += sizeof(i_id);
+     }
 
     return transaction_manager_->CommitTransaction(&context_, param, ret);
   }
@@ -495,34 +495,34 @@ class StockLevelProcedure : public StoredProcedure {
 
   virtual bool Execute(TxnParam *param, CharArray &ret) {
     StockLevelParam *stock_level_param = static_cast<StockLevelParam*>(param);
-    // "getOId": "SELECT D_NEXT_O_ID FROM DISTRICT WHERE D_W_ID = ? AND D_ID = ?"
-    // IndexKey district_key = GetDistrictPrimaryKey(stock_level_param->d_id_, stock_level_param->w_id_);
-    // GAddr district_addr = 0;
-    // DB_QUERY(SearchRecord(&context_, DISTRICT_TABLE_ID, district_key, district_addr, READ_ONLY));
-    // assert(district_addr != 0);
-    // RecordGAM district_record;
-    // gallocators[thread_id_]->Read(district_addr, &district_record, sizeof(RecordGAM));
-    // int d_next_o_id = 0;
-    // district_record.GetColumn(10, district_schema_ptr_, &d_next_o_id, gallocators[thread_id_]);
-    // assert(d_next_o_id != 0);
+//     "getOId": "SELECT D_NEXT_O_ID FROM DISTRICT WHERE D_W_ID = ? AND D_ID = ?"
+     IndexKey district_key = GetDistrictPrimaryKey(stock_level_param->d_id_, stock_level_param->w_id_);
+     GAddr district_addr = 0;
+     DB_QUERY(SearchRecord(&context_, DISTRICT_TABLE_ID, district_key, district_addr, READ_ONLY));
+     assert(district_addr != 0);
+     RecordGAM district_record;
+     gallocators[thread_id_]->Read(district_addr, &district_record, sizeof(RecordGAM));
+     int d_next_o_id = 0;
+     district_record.GetColumn(10, district_schema_ptr_, &d_next_o_id, gallocators[thread_id_]);
+     assert(d_next_o_id != 0);
 
-    // size_t count = 0;
-    // for (int o_id = d_next_o_id - 5; o_id < d_next_o_id; ++o_id){
-    // 	// "getStockCount": "SELECT COUNT(DISTINCT(OL_I_ID)) FROM ORDER_LINE, STOCK WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID < ? AND OL_O_ID >= ? AND S_W_ID = ? AND S_I_ID = OL_I_ID AND S_QUANTITY < ?"
-    // 	IndexKey order_line_key = GetOrderLineSecondaryKey(o_id, stock_level_param->d_id_, stock_level_param->w_id_);
-    // 	GAddr order_line_items_addr = 0;
-    // 	DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, order_line_items_addr, READ_ONLY));
-    // 	ItemsIter iter(order_line_items_addr);
-    // 	GAddr record_addr = 0;
-    // 	while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
-    // 		++count;
-    // 	}
-    // }
+     size_t count = 0;
+     for (int o_id = d_next_o_id - 5; o_id < d_next_o_id; ++o_id){
+     	// "getStockCount": "SELECT COUNT(DISTINCT(OL_I_ID)) FROM ORDER_LINE, STOCK WHERE OL_W_ID = ? AND OL_D_ID = ? AND OL_O_ID < ? AND OL_O_ID >= ? AND S_W_ID = ? AND S_I_ID = OL_I_ID AND S_QUANTITY < ?"
+     	IndexKey order_line_key = GetOrderLineSecondaryKey(o_id, stock_level_param->d_id_, stock_level_param->w_id_);
+     	GAddr order_line_items_addr = 0;
+     	DB_QUERY(SearchRecords(&context_, ORDER_LINE_TABLE_ID, 1, order_line_key, order_line_items_addr, READ_ONLY));
+     	ItemsIter iter(order_line_items_addr);
+     	GAddr record_addr = 0;
+     	while ((record_addr = iter.GetNext(gallocators[thread_id_])) != 0){
+     		++count;
+     	}
+     }
 
-    // ret.Memcpy(ret.size_, (char*)(&d_next_o_id), sizeof(int));
-    // ret.size_ += sizeof(int);
-    // ret.Memcpy(ret.size_, (char*)(&count), sizeof(size_t));
-    // ret.size_ += sizeof(size_t);
+     ret.Memcpy(ret.size_, (char*)(&d_next_o_id), sizeof(int));
+     ret.size_ += sizeof(int);
+     ret.Memcpy(ret.size_, (char*)(&count), sizeof(size_t));
+     ret.size_ += sizeof(size_t);
 
     return transaction_manager_->CommitTransaction(&context_, param, ret);
   }

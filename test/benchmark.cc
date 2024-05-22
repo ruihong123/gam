@@ -64,7 +64,7 @@ const char* result_file = "result.csv";
 //exp parameters
 // Cache can hold 4Million cache entries. Considering the random filling mechanism,
 // if we want to gurantee that the cache has been filled, we need to run 8Million iterations.
-long ITERATION_TOTAL = 8192000;
+long ITERATION_TOTAL = 8192000 + 4096000;
 long ITERATION = 0;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
@@ -442,17 +442,17 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
     } else {
         if (workload == 0){
             GAddr n = data[GetRandom(0, STEPS, seedp)];
-            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
-                n = data[GetRandom(0, STEPS, seedp)];
-            }
+//            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
+//                n = data[GetRandom(0, STEPS, seedp)];
+//            }
             next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
         }else{
             int64_t pos = workload_gen->getValue();
             GAddr n = data[pos];
-            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
-                pos = workload_gen->getValue();
-                n = data[pos];
-            }
+//            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
+//                pos = workload_gen->getValue();
+//                n = data[pos];
+//            }
             next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
         }
 
