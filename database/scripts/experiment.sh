@@ -10,6 +10,7 @@ Compute_file="../tpcc/compute.txt"
 Memory_file="../tpcc/memory.txt"
 # specify your directory for log files
 output_dir="/users/Ruihong/gam/database/scripts/data"
+core_dump_dir="/mnt/core_dump"
 
 # working environment
 proj_dir="/users/Ruihong/gam/"
@@ -44,7 +45,8 @@ launch () {
   memory_file="${output_dir}/Memory.log"
   script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
-  ssh ${ssh_opts} ${master_host} "echo '/proj/purduedb-PG0/logs/core$master_host' | sudo tee /proc/sys/kernel/core_pattern"
+  ssh ${ssh_opts} ${memory} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
+
 
   ssh ${ssh_opts} ${master_host} "ulimit -S -c unlimited && $script_compute -sn$master_host" &
   sleep 3
@@ -52,7 +54,7 @@ launch () {
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
-    ssh ${ssh_opts} ${compute} "echo '/proj/purduedb-PG0/logs/core$compute' | sudo tee /proc/sys/kernel/core_pattern"
+      ssh ${ssh_opts} ${memory} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
     ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
@@ -61,7 +63,7 @@ launch () {
       memory_ARGS="--ip_master $master_host --ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
       script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
-      ssh ${ssh_opts} ${memory} "echo '/proj/purduedb-PG0/logs/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
+      ssh ${ssh_opts} ${memory} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
       ssh ${ssh_opts} ${memory} "ulimit -S -c unlimited && $script_memory" &
       sleep 1
   done
