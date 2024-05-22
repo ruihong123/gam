@@ -49,7 +49,7 @@ launch () {
 
 
   ssh ${ssh_opts} ${master_host} "ulimit -S -c unlimited && $script_compute -sn$master_host" &
-  sleep 3
+  sleep 1
 
   for ((i=1;i<${#compute_nodes[@]};i++)); do
     compute=${compute_nodes[$i]}
