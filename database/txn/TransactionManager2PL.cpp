@@ -51,6 +51,8 @@ namespace Database {
       record->Deserialize(data_addr, gallocators[thread_id_]);
 
       Access* access = access_list_.NewAccess();
+        printf("access's address is %p\n", access);
+        fflush(stdout);
       access->access_type_ = access_type;
       access->access_record_ = record;
       access->access_addr_ = data_addr;
