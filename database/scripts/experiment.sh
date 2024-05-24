@@ -58,6 +58,7 @@ launch () {
     ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute" &
     sleep 1
   done
+  sleep 3
   for ((i=0;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
       memory_ARGS="--ip_master $master_host --ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
