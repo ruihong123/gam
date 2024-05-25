@@ -73,11 +73,22 @@ public:
       }
 #endif
     gallocator->Write(addr, data_ptr_, data_size_);
+      gallocator->MFence();
+      gallocator->Read(addr, data_ptr_, data_size_);
+#ifndef NDEBUG
+      if (data_size_ == 152){
+          int temp;
+          GetColumn(10, &temp) ;
+          assert(temp != 0);
+      }
+#endif
+    assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
   }
   void Serialize(const GAddr& addr, GAlloc *gallocator, size_t col_id) {
     size_t offset = schema_ptr_->GetColumnOffset(col_id);
     size_t col_size = schema_ptr_->GetColumnSize(col_id);
     gallocator->Write(addr, offset, data_ptr_ + offset, col_size);
+
   }
 
 
