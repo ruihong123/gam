@@ -12,9 +12,11 @@ namespace Database {
     inline bool buffer_is_not_all_zero1(char* buf, int size){
         for (int i = 0; i < size; i++){
             if (buf[i] != 0){
+                usleep(100);
                 return true;
             }
         }
+
         return false;
     }
 
