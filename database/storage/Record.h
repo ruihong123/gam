@@ -76,6 +76,7 @@ public:
     gallocator->Write(addr, data_ptr_, data_size_);
       gallocator->MFence();
       gallocator->WaitPendingRequest();
+      usleep(10);
       gallocator->Read(addr, data_ptr_, data_size_);
 #ifndef NDEBUG
       if (data_size_ == 152){
