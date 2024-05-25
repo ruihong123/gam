@@ -72,8 +72,10 @@ public:
           assert(temp != 0);
       }
 #endif
+      assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
     gallocator->Write(addr, data_ptr_, data_size_);
       gallocator->MFence();
+      gallocator->WaitPendingRequest();
       gallocator->Read(addr, data_ptr_, data_size_);
 #ifndef NDEBUG
       if (data_size_ == 152){
