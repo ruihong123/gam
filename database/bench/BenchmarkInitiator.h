@@ -26,7 +26,7 @@ class BenchmarkInitiator {
 
 
     conf->loglevel = LOG_INFO;
-      epicLog(LOG_INFO, "log level is %d", conf->loglevel);
+//      epicLog(LOG_INFO, "log level is %d", conf->loglevel);
     conf->size = 8 * 1024LLU * 1024LLU* 1024LLU;
     conf->cache_th = 1.0;
     conf->is_master = config_->IsMaster();
