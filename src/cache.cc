@@ -113,7 +113,10 @@ int Cache::ReadWrite(WorkRequest* wr) {
         cline->nread++;
         nread++;
 #endif
-        memcpy(ls, cs, len);
+          epicLog(LOG_INFO, "cache read hit, addr is %p", wr->addr);
+
+          memcpy(ls, cs, len);
+
 #ifdef USE_LRU
         UnLinkLRU(cline);
         LinkLRU(cline);
@@ -196,6 +199,8 @@ int Cache::ReadWrite(WorkRequest* wr) {
           //put submit request at last in case reply comes before we process afterwards works
           worker->SubmitRequest(cli, lwr, ADD_TO_PENDING | REQUEST_SEND);
         } else {
+            epicLog(LOG_INFO, "cache write hit, addr is %p", wr->addr);
+
             worker->write_hit_counter.fetch_add(1);
 #ifdef GFUNC_SUPPORT
           if (wr->flag & GFUNC) {
@@ -663,8 +668,7 @@ void Cache::UnLinkLRU(CacheLine* cline) {
 void Cache::Evict() {
   epicLog(LOG_INFO,
       "used_bytes = %ld, max_cache_mem = %ld,  BLOCK_SIZE = %ld, th = %lf, to_evicted = %ld",
-      used_bytes.load(), max_cache_mem, BLOCK_SIZE, max_cache_mem,
-      worker->conf->cache_th, to_evicted.load());
+      used_bytes.load(), max_cache_mem, BLOCK_SIZE, worker->conf->cache_th, to_evicted.load());
   long long used = used_bytes - to_evicted * BLOCK_SIZE;
   if (used > 0 && used > max_cache_mem) {
     int n = (used - max_cache_mem) / BLOCK_SIZE;
