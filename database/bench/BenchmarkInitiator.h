@@ -25,7 +25,7 @@ class BenchmarkInitiator {
     Conf* conf = new Conf();
 
 
-    conf->loglevel = LOG_INFO;
+    conf->loglevel = LOG_WARNING;
 //      epicLog(LOG_INFO, "log level is %d", conf->loglevel);
     conf->size = 8 * 1024LLU * 1024LLU* 1024LLU;
     conf->cache_th = 1.0;

@@ -585,7 +585,7 @@ unsigned long long Worker::SubmitRequest(Client* cli, WorkRequest* wr, int flag,
 //      statistic_start = std::chrono::high_resolution_clock::now();
 //#endif
     epicAssert(!ret);
-      epicLog(LOG_INFO,
+      epicLog(LOG_DEBUG,
               "RDMA send request local addr is %p", sbuf);
     if ((ret = cli->Send(sbuf, len)) != len) {
       epicAssert(ret == -1);
