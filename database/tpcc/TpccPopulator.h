@@ -141,7 +141,9 @@ class TpccPopulator : public BenchmarkPopulator {
         InsertStockRecord(stock_record, stock_record_buf, 0);
       }
     }
-    delete item_record;
+    gallocator->WaitPendingRequest();
+
+      delete item_record;
     item_record = NULL;
     delete warehouse_record;
     warehouse_record = NULL;

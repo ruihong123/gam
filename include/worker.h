@@ -292,11 +292,20 @@ class Worker : public Server {
         write_hit_counter.store(0);
     }
     void WaitPendingRequest() {
+        uint64_t counter = 0;
         while (!pending_works.empty()) {
-            usleep(100);
+            usleep(4);
+            counter++;
+            if (counter%1000 == 0 ){
+                epicLog(LOG_WARNING, "Waiting for pending requests to finish, time elaspsed %d us", counter*4);
+            }
         }
+        counter = 0;
         while (!to_serve_requests.empty()) {
-            usleep(1);
+            usleep(4);
+            if (counter%1000 == 0 ){
+                epicLog(LOG_WARNING, "Waiting for to serve requests to finish, time elaspsed %d us", counter*4);
+            }
         }
     }
 #ifdef DHT
