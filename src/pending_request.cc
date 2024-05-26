@@ -129,10 +129,10 @@ void Worker::ProcessPendingRead(Client* cli, WorkRequest* wr) {
 #ifndef NDEBUG
     if (parent->op == READ && parent->size > 24) {
         if (parent->size > 50){
-            printf("Break point\n");
+//            printf("Break point\n");
         }
         assert(buffer_is_not_all_zero((char*)parent->ptr, parent->size));
-        printf("Buffer %p content is not zero, parent->size = %zu\n", parent->ptr, parent->size);
+//        printf("Buffer %p content is not zero, parent->size = %zu\n", parent->ptr, parent->size);
         if (parent->size == 152){
             int temp;
             memcpy(&temp, (char*)parent->ptr + 147, sizeof(int));
