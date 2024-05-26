@@ -25,7 +25,7 @@ class BenchmarkInitiator {
     Conf* conf = new Conf();
 
 
-    conf->loglevel = LOG_WARNING;
+    conf->loglevel = LOG_INFO;
     conf->size = 8 * 1024LLU * 1024LLU* 1024LLU;
     conf->cache_th = 1.0;
     conf->is_master = config_->IsMaster();
