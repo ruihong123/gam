@@ -139,7 +139,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifndef NDEBUG
         if (wr->op == READ && wr->size > 8){
             assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-            epicLog(LOG_DEBUG, "get notified via buf");
+            epicLog(LOG_WARNING, "get notified via buf %p size is %d", wr->ptr, wr->size);
         }
 #endif
 #ifdef TIME_PRINT
