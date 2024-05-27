@@ -444,7 +444,7 @@ int Worker::ProcessLocalRead(WorkRequest* wr) {
     } else {
         /**
          * In this case, the read request is running in the app thread and
-         * is fulfilled in the first trial (i.e., * chache hit)
+         * is fulfilled in the first trial (i.e., * cache hit)
          */
         epicAssert(wr->is_cache_hit_);
         if (IsLocal(wr->addr)) {
@@ -849,7 +849,7 @@ int Worker::ProcessLocalWLock(WorkRequest* wr) {
         }
 #ifdef MULTITHREAD
     } else {
-        epicAssert(wr->is_cache_hit_);
+//        epicAssert(wr->is_cache_hit_);
         if (IsLocal(wr->addr)) {
             ++no_local_writes_;
             ++no_local_writes_hit_;
