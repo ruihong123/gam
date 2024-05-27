@@ -4,7 +4,8 @@ GAM_INCLUDE = -I../../include -I../ -I../../lib/libcuckoo/src
 DB_INCLUDE = -I.. -I../bench -I../storage -I../txn -I../utils
 INCLUDE = $(GAM_INCLUDE) $(DB_INCLUDE)
 LIBS = ../../src/libgalloc.a -libverbs -lboost_filesystem -lboost_system -lboost_date_time -pthread -lboost_thread -lcityhash -lmemcached
-CFLAGS += -O0 -DLOCK -DBACKOFF -ggdb -fsanitize=address
+CFLAGS += -O0 -DLOCK -DBACKOFF -ggdb
+#-fsanitize=address
 #-DPROFILE
 
 
