@@ -421,6 +421,7 @@ class TpccPopulator : public BenchmarkPopulator {
     record_buf->SetColumn(8, &record_ptr->d_tax_);
     record_buf->SetColumn(9, &record_ptr->d_ytd_);
     record_buf->SetColumn(10, &record_ptr->d_next_o_id_);
+      assert(record_ptr->d_next_o_id_ > 0);
     record_buf->SetVisible(true);
     record_buf->Serialize(data_addr, gallocator);
     IndexKey k = GetDistrictPrimaryKey(record_ptr->d_id_, record_ptr->d_w_id_);
