@@ -162,6 +162,9 @@ int GAlloc::Write(const GAddr addr, const Size offset, void* buf,
   memcpy(laddr+offset, buf, count);
   return count;
 #else
+  //TODO； we need to copy the buffer value from the orginal buffer to a new created buffer here.
+  // or we need to make every write synchronous because the orginal buffer will be freed after the function returns.
+  // we need to add gallocator->WaitPendingRequest() after the write operation.
   //for asynchronous request, we must ensure the WorkRequest is valid after this function returns
   WorkRequest wr { };
   wr.op = WRITE;
