@@ -109,7 +109,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         }
 
     }
-    volatile int* local_notify_buf = (int*)&this->notify_buf[thread_id];
+    volatile int* local_notify_buf = wr->notify_buf;
     assert(*local_notify_buf == 1);
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
   if (ret) {  //not complete due to remote or previously-sent similar requests
