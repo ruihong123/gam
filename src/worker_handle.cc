@@ -94,7 +94,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   wr->fd = recv_pipe[1];  //for legacy code
   //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
   wr->notify_buf = (int*)&this->notify_buf[thread_id];
-  epicLog(LOG_DEBUG,
+  epicLog(LOG_WARNING,
       "workid = %d, wr->notify_buf = %d, wr->op = %d, wr->flag = %d, wr->status = %d, wr->addr = %lx, wr->size = %d, wr->fd = %d",
       worker->GetWorkerId(), *wr->notify_buf, wr->op, wr->flag, wr->status,
       wr->addr, wr->size, wr->fd);
