@@ -93,7 +93,10 @@ namespace Database {
       // unlock
       this->UnLockRecord(access->access_addr_, record->GetSchemaSize());
     }
-    //GC
+    //In case that the asynchronous write back is not finished.we need to wait for it before deallcoate
+    // the local tuples
+    gallocators[thread_id_]->WaitPendingRequest();
+      //GC
     for (size_t i = 0; i < access_list_.access_count_; ++i) {
       Access* access = access_list_.GetAccess(i);
       if (access->access_type_ == DELETE_ONLY) {
@@ -122,6 +125,7 @@ namespace Database {
         gallocators[thread_id_]->Free(access->access_addr_);
       }
     }
+    gallocators[thread_id_]->WaitPendingRequest();
     //GC
     for (size_t i = 0; i < access_list_.access_count_; ++i) {
       Access* access = access_list_.GetAccess(i);

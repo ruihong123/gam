@@ -184,7 +184,7 @@ public:
     }
     return true;
   }
-    size_t number() {
+    size_t size() {
         size_t sum = 0;
         for (int i = 0; i < (1 << BUCKET_SIZE_POWER); i++) {
             sum += buckets_[i]->kvs.size();

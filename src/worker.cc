@@ -808,7 +808,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
   epicAssert(
       !(wr->flag & ASYNC) || !(wr->flag & LOCAL_REQUEST) || ((wr->flag & ASYNC) && (wr->flag & COPY)));
   epicAssert(id == wr->id);
-  //LOCK_MICRO(pending_works, id);
+  LOCK_MICRO(pending_works, id);
   //epicAssert(!(wr->flag & ASYNC) || wr->IsACopy());
   epicLog(LOG_DEBUG, "add pending work %d, wr->op = %d, wr addr = %lx", id,
       wr->op, wr);
