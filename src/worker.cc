@@ -817,7 +817,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
 //    pending_works2_mutex.lock();
 //  pending_works2.insert({id, wr});
 //    pending_works2_mutex.unlock();
-  //UNLOCK_MICRO(pending_works, id);
+  UNLOCK_MICRO(pending_works, id);
 }
 
 int Worker::ErasePendingWork(unsigned int id) {
