@@ -155,6 +155,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       return wr->status;
     }
   } else {
+      if (wr->op == READ && wr->size > 8){
+          assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
+          epicLog(LOG_WARNING, "get hit buf %p size is %d", wr->ptr, wr->size);
+      }
     return wr->status;
   }
 #else //if not MULTITHREAD
