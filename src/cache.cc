@@ -129,6 +129,11 @@ int Cache::ReadWrite(WorkRequest* wr) {
               memcpy((void*)&temp, (char*)ls+147, 4);
               assert(temp != 0);
           }
+          if (len == 113 && wr->size == len){
+              double temp;
+              memcpy((void*)&temp, (char*)ls+40, 8);
+              assert(temp != 0);
+          }
           if (wr->op == READ && wr->size > 50){
               assert(buffer_is_not_all_zero2((char*)wr->ptr, wr->size));
               epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
