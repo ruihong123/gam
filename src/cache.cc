@@ -7,7 +7,14 @@
 #include "worker.h"
 #include "slabs.h"
 #include "kernel.h"
-
+bool buffer_is_not_all_zero2(char* buf, int size) {
+    for (int i = 0; i < size; i++) {
+        if (buf[i] != 0) {
+            return true;
+        }
+    }
+    return false;
+}
 int Cache::ReadWrite(WorkRequest* wr) {
 #ifdef NOCACHE
   epicLog(LOG_WARNING, "shouldn't come here");
@@ -115,8 +122,19 @@ int Cache::ReadWrite(WorkRequest* wr) {
         nread++;
 #endif
           epicLog(LOG_INFO, "cache read hit, addr is %p", wr->addr);
-
           memcpy(ls, cs, len);
+#ifndef NDEBUG
+          if (len == 152 && wr->size == len){
+              int temp;
+              memcpy((void*)&temp, (char*)ls+147, 4);
+              assert(temp != 0);
+          }
+          if (wr->op == READ && wr->size > 50){
+              assert(buffer_is_not_all_zero2((char*)wr->ptr, wr->size));
+              epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
+          }
+#endif
+
 
 #ifdef USE_LRU
         UnLinkLRU(cline);

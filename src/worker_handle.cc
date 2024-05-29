@@ -155,10 +155,12 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       return wr->status;
     }
   } else {
+#ifndef NDEBUG
       if (wr->op == READ && wr->size > 50){
           assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-          epicLog(LOG_WARNING, "get hit buf %p size is %d", wr->ptr, wr->size);
+          epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
       }
+#endif
     return wr->status;
   }
 #else //if not MULTITHREAD
