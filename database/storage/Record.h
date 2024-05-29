@@ -77,9 +77,9 @@ public:
       assert(buffer_is_not_all_zero1(data_ptr_, data_size_));
     gallocator->Write(addr, data_ptr_, data_size_);
 //      gallocator->MFence(); Do not use fense because it will fail WaitPendingRequest;
-      gallocator->WaitPendingRequest();
-//      usleep(10);
-      gallocator->Read(addr, data_ptr_, data_size_);
+//      gallocator->WaitPendingRequest();
+////      usleep(10);
+//      gallocator->Read(addr, data_ptr_, data_size_);
 #ifndef NDEBUG
       if (data_size_ == 152){
           int temp;
