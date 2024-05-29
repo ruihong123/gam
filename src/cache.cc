@@ -311,23 +311,26 @@ int Cache::ReadWrite(WorkRequest* wr) {
     unlock(i);
     i = nextb;
   }
+
+  int ret = wr->counter;
 #ifndef NDEBUG
-    if ( wr->size == 152){
-        int temp;
-        memcpy((void*)&temp, (char*)wr->ptr+147, 4);
-        assert(temp != 0);
-    }
-    if (wr->size == 113){
-        double temp;
-        memcpy((void*)&temp, (char*)wr->ptr+40, 8);
-        assert(temp != 0);
-    }
-    if (wr->op == READ && wr->size > 50){
-        assert(buffer_is_not_all_zero2((char*)wr->ptr, wr->size));
-        epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
+    if (ret == 0){
+        if ( wr->size == 152){
+            int temp;
+            memcpy((void*)&temp, (char*)wr->ptr+147, 4);
+            assert(temp != 0);
+        }
+        if (wr->size == 113){
+            double temp;
+            memcpy((void*)&temp, (char*)wr->ptr+40, 8);
+            assert(temp != 0);
+        }
+        if (wr->op == READ && wr->size > 50){
+            assert(buffer_is_not_all_zero2((char*)wr->ptr, wr->size));
+            epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
+        }
     }
 #endif
-  int ret = wr->counter;
   wr->unlock();
 #ifdef USE_LRU
   if (newcline) {
