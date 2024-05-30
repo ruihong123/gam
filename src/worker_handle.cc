@@ -95,7 +95,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   //TOFIX(ruihong): the notify buf is not thread safe. Make the notify_buf thread safe.
   wr->notify_buf = (int*)&this->notify_buf[thread_id];
     if (wr->op == READ || wr->op == WRITE){
-        epicLog(LOG_WARNING,
+        epicLog(LOG_INFO,
                 "workid = %d, wr->notify_buf = %d, wr->op = %d, wr->flag = %d, wr->status = %d, wr->addr = %lx, wr->size = %d, wr->fd = %d",
                 worker->GetWorkerId(), *wr->notify_buf, wr->op, wr->flag, wr->status,
                 wr->addr, wr->size, wr->fd);
@@ -142,7 +142,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifndef NDEBUG
         if (wr->op == READ && wr->size > 8){
             assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-            epicLog(LOG_WARNING, "get notified via buf %p size is %d", wr->ptr, wr->size);
+            epicLog(LOG_INFO, "get notified via buf %p size is %d", wr->ptr, wr->size);
         }
 #endif
 #ifdef TIME_PRINT
@@ -158,7 +158,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifndef NDEBUG
       if (wr->op == READ && wr->size > 50){
           assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
-          epicLog(LOG_WARNING, "read hit buf %p size is %d", wr->ptr, wr->size);
+          epicLog(LOG_INFO, "read hit buf %p size is %d", wr->ptr, wr->size);
       }
 #endif
     return wr->status;
