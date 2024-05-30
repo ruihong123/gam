@@ -40,12 +40,15 @@ int Cache::ReadWrite(WorkRequest* wr) {
   if (wr->flag & TO_SERVE) {
     wr->counter--;
   }
+    CacheLine* clines[2] = {nullptr, nullptr};
+  int index = 0;
   for (GAddr i = start_blk; i < end;) {
     epicAssert(!(wr->flag & COPY) || ((wr->flag & COPY) && (wr->flag & ASYNC)));
 
     GAddr nextb = BADD(i, 1);
     lock(i);
-    CacheLine* cline = nullptr;
+    CacheLine*& cline = clines[index];
+      index++;
 #ifdef SELECTIVE_CACHING
     if((cline = GetCLine(i)) && cline->state != CACHE_NOT_CACHE) {
 #else
