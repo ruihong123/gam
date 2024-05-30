@@ -141,8 +141,8 @@ class Worker : public Server {
   /*
    *per thread fence data
    */
-  //unordered_map<int, Fence> fences; //worker-side receive pipe -> fence structure for that thread
-  HashTable<int, Fence*> fences_ { "fences_" };
+  unordered_map<int, Fence*> fences_; //worker-side receive pipe -> fence structure for that thread
+//  HashTable<int, Fence*> fences_ { "fences_" };
 
   Directory directory;
   Cache cache;
