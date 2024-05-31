@@ -825,7 +825,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
 
 int Worker::ErasePendingWork(unsigned int id) {
   LOCK_MICRO(pending_works, id);
-  epicLog(LOG_DEBUG, "remove pending work %d", id);
+  epicLog(LOG_INFO, "remove pending work %d", id);
   int ret = pending_works.erase(id);
     pending_works2_mutex.lock();
 
@@ -846,6 +846,7 @@ WorkRequest* Worker::GetPendingWork(unsigned int id) {
   } catch (const exception& e) {
     epicLog(LOG_WARNING, "cannot find the pending work %d (%s)", id, e.what());
     UNLOCK_MICRO(pending_works, id);
+    exit(1);
     return nullptr;
   }
   UNLOCK_MICRO(pending_works, id);
