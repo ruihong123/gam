@@ -831,7 +831,9 @@ int Worker::ErasePendingWork(unsigned int id) {
 
     pending_works2.erase(id);
     pending_works2_mutex.unlock();
-
+    if (ret == 0) {
+        epicLog(LOG_WARNING, "Erase cannot find the pending work %d", id);
+    }
     UNLOCK_MICRO(pending_works, id);
   return ret;
 }
