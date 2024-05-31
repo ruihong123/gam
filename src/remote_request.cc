@@ -844,6 +844,8 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
     cache.lock(to_lock);
     CacheLine* cline = cache.GetCLine(wr->addr);
     if (!cline) {
+        epicLog(LOG_WARNING, "Cache miss");
+
         if (INVALIDATE == op_orin || INVALIDATE_FORWARD == op_orin) {
             //this should because of cache line eviction from shared to invalid
             //so we reply as if it is shared
@@ -892,19 +894,20 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
              * there are two causes: cache from shared to dirty (ToDirty State)
              * cache from dirty to invalid (ToInvalid state)
              */
+
             if ((INVALIDATE == wr->op || INVALIDATE_FORWARD == wr->op)
                 && cline->state == CACHE_TO_DIRTY) {
                 //deadlock case 1
-                epicLog(LOG_INFO, "!!!deadlock detected!!!");
+                epicLog(LOG_WARNING, "!!!deadlock detected!!!");
                 deadlock = true;
             } else {
                 if (cline->state == CACHE_TO_INVALID) {
                     //deadlock case 2
-                    epicLog(LOG_INFO, "!!!deadlock detected!!!");
+                    epicLog(LOG_WARNING, "!!!deadlock detected!!!");
                     deadlock = true;
                 } else {
                     AddToServeRemoteRequest(wr->addr, client, wr);
-                    epicLog(LOG_INFO, "cache in transition state %d", cline->state);
+                    epicLog(LOG_WARNING, "cache in transition state %d", cline->state);
                     cache.unlock(to_lock);
                     return;
                 }
@@ -913,6 +916,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
 
         //add the lock support
         if (cache.IsBlockLocked(cline)) {
+
             if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
                 epicAssert(wr->flag & LOCKED);
                 wr->status = LOCK_FAILED;
@@ -943,7 +947,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 //been changed to WRITE by the home node as agreed)
                 if (!deadlock) {
                     AddToServeRemoteRequest(wr->addr, client, wr);
-                    epicLog(LOG_INFO, "addr %lx is locked by %d", wr->addr,
+                    epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
                             GetWorkerId());
                     cache.unlock(to_lock);
                     return;
