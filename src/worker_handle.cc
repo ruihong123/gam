@@ -136,10 +136,17 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #ifdef TIME_PRINT
         auto statistic_start = std::chrono::high_resolution_clock::now();
 #endif
+        int cnt = 0;
         while (*local_notify_buf != 2){
             usleep(1);
-        };
+//            if (cnt++ > 100){
+//                break;
+//            }
+        }
 #ifndef NDEBUG
+        if (wr->op == WLOCK ){
+            epicLog(LOG_WARNING, "remote WLOCK request received %p size is %d", wr->ptr, wr->size);
+        }
         if (wr->op == READ && wr->size > 8){
             assert(buffer_is_not_all_zero((char*)wr->ptr, wr->size));
             epicLog(LOG_INFO, "get notified via buf %p size is %d", wr->ptr, wr->size);
