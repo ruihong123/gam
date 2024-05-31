@@ -1055,7 +1055,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
 }
 
 void Worker::ProcessRemoteWriteReply(Client* client, WorkRequest* wr) {
-    write_reply_counter.fetch_add(1);
+//    write_reply_counter.fetch_add(1);
     WorkRequest* pwr = GetPendingWork(wr->id);
     epicAssert(pwr);
     epicAssert(pwr->id == wr->id);
