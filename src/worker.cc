@@ -755,8 +755,10 @@ int Worker::Notify(WorkRequest* wr) {
       if (wr->is_cache_hit_)
         ++no_remote_reads_hit_;
     }
-  } 
-
+  }
+    if(wr->op == WLOCK){
+        epicLog(LOG_WARNING, "wr->notify_buf = %d, wr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr, wr->notify_buf);
+    }
   if (wr->flag & ASYNC) {
     epicAssert(wr->op == WRITE || wr->op == MFENCE || wr->op == UNLOCK);  //currently only writes, mfence and unlock are asynchronous
     Fence* fence = fences_.at(wr->fd);
@@ -792,6 +794,7 @@ int Worker::Notify(WorkRequest* wr) {
 #ifdef USE_BUF_ONLY
     epicAssert(*wr->notify_buf == 0);
 #else
+
     //epicLog(LOG_WARNING, "wr->notify_buf = %d, wr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr, wr->notify_buf);
     epicAssert(*wr->notify_buf == 1);
 #endif
