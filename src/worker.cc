@@ -757,7 +757,7 @@ int Worker::Notify(WorkRequest* wr) {
     }
   }
     if(wr->op == WLOCK){
-        epicLog(LOG_WARNING, "wr->notify_buf = %d, wr->addr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr->addr, wr->notify_buf);
+        epicLog(LOG_INFO, "wr->notify_buf = %d, wr->addr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr->addr, wr->notify_buf);
     }
   if (wr->flag & ASYNC) {
     epicAssert(wr->op == WRITE || wr->op == MFENCE || wr->op == UNLOCK);  //currently only writes, mfence and unlock are asynchronous
@@ -845,7 +845,7 @@ WorkRequest* Worker::GetPendingWork(unsigned int id) {
     epicAssert(ret);
   } catch (const exception& e) {
     epicLog(LOG_WARNING, "cannot find the pending work %d (%s)", id, e.what());
-    //UNLOCK_MICRO(pending_works, id);
+    UNLOCK_MICRO(pending_works, id);
     return nullptr;
   }
   UNLOCK_MICRO(pending_works, id);

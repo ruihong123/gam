@@ -132,7 +132,7 @@ class NewOrderProcedure : public StoredProcedure {
   virtual ~NewOrderProcedure() {
   }
   virtual bool Execute(TxnParam *param, CharArray &ret) {
-    epicLog(LOG_WARNING, "thread_id=%u,start new order", thread_id_);
+    epicLog(LOG_INFO, "thread_id=%u,start new order", thread_id_);
     NewOrderParam *new_order_param = static_cast<NewOrderParam*>(param);
     double total = 0;
     //new_order_param->ol_cnt_ : number of item to be checked out.

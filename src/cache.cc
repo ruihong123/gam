@@ -26,7 +26,7 @@ int Cache::ReadWrite(WorkRequest* wr) {
   GAddr end = GADD(wr->addr, wr->size);
   GAddr end_blk = TOBLOCK(end-1);
   if (end_blk != start_blk) {
-    epicLog(LOG_WARNING, "read/write split to multiple blocks, start %lx, end %lx",
+    epicLog(LOG_INFO, "read/write split to multiple blocks, start %lx, end %lx",
              start_blk, end_blk);
   }
   Client* cli = worker->GetClient(wr->addr);
