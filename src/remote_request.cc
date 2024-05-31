@@ -1011,7 +1011,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
 #endif
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
                 cli->WriteWithImm(wr->ptr, cline->line, wr->size, wr->pid);  //reply the new owner
-                epicLog(LOG_DEBUG, "send to %d with pid %d", wr->pwid, wr->pid);
+                epicLog(LOG_WARNING, "send to %d with pid %d", wr->pwid, wr->pid);
                 client->WriteWithImm(nullptr, nullptr, 0, wr->id);  //transfer ownership
 #ifdef SELECTIVE_CACHING
                 }
