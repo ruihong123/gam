@@ -757,7 +757,7 @@ int Worker::Notify(WorkRequest* wr) {
     }
   }
     if(wr->op == WLOCK){
-        epicLog(LOG_WARNING, "wr->notify_buf = %d, wr->addr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr->addr, wr->notify_buf);
+        epicLog(LOG_INFO, "wr->notify_buf = %d, wr->addr = %lx, wr->notify_buf = %lx", *wr->notify_buf, wr->addr, wr->notify_buf);
     }
   if (wr->flag & ASYNC) {
     epicAssert(wr->op == WRITE || wr->op == MFENCE || wr->op == UNLOCK);  //currently only writes, mfence and unlock are asynchronous
@@ -817,9 +817,9 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
       wr->op, wr);
   //TODO: how to syncrhonize the access to pending_works?
   pending_works[id] = wr;
-//    pending_works2_mutex.lock();
-//  pending_works2.insert({id, wr});
-//    pending_works2_mutex.unlock();
+    pending_works2_mutex.lock();
+  pending_works2.insert({id, wr});
+    pending_works2_mutex.unlock();
   UNLOCK_MICRO(pending_works, id);
 }
 
@@ -827,10 +827,10 @@ int Worker::ErasePendingWork(unsigned int id) {
   LOCK_MICRO(pending_works, id);
   epicLog(LOG_DEBUG, "remove pending work %d", id);
   int ret = pending_works.erase(id);
-//    pending_works2_mutex.lock();
-//
-//    pending_works2.erase(id);
-//    pending_works2_mutex.unlock();
+    pending_works2_mutex.lock();
+
+    pending_works2.erase(id);
+    pending_works2_mutex.unlock();
 
     UNLOCK_MICRO(pending_works, id);
   return ret;

@@ -349,7 +349,7 @@ class PaymentProcedure : public StoredProcedure {
   }
 
   virtual bool Execute(TxnParam *param, CharArray &ret) {
-    epicLog(LOG_WARNING, "thread_id=%u,start payment", thread_id_);
+    epicLog(LOG_INFO, "thread_id=%u,start payment", thread_id_);
     PaymentParam *payment_param = static_cast<PaymentParam*>(param);
     // "getWarehouse": "SELECT W_NAME, W_STREET_1, W_STREET_2, W_CITY, W_STATE, W_ZIP FROM WAREHOUSE WHERE W_ID = ?"
     // "updateWarehouseBalance": "UPDATE WAREHOUSE SET W_YTD = W_YTD + ? WHERE W_ID = ?"
