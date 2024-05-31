@@ -11,7 +11,7 @@ using namespace std;
 
 //#define NDEBUG
 
-#define USE_SIMPLE_MAP
+//#define USE_SIMPLE_MAP
 
 #define HARDWARE_CACHE_LINE 64
 

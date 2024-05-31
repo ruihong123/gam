@@ -294,17 +294,22 @@ class Worker : public Server {
     void WaitPendingRequest() {
         uint64_t counter = 0;
         while (!pending_works.empty()) {
-            usleep(4);
+            usleep(5);
             counter++;
-            if (counter%1000 == 0 ){
-                epicLog(LOG_WARNING, "Waiting for pending requests to finish, time elaspsed %d us", counter*4);
+            if (counter> 1000 == 0 ){
+                epicLog(LOG_WARNING, "Waiting for pending queue to finish longer than 5ms, time elaspsed %d us, force to clear the pending queue");
+//                pending_works.clear();
+//                to_serve_requests.clear();
+                break;
             }
         }
         counter = 0;
         while (!to_serve_requests.empty()) {
-            usleep(4);
-            if (counter%1000 == 0 ){
-                epicLog(LOG_WARNING, "Waiting for to serve requests to finish, time elaspsed %d us", counter*4);
+            usleep(5);
+            if (counter > 1000 == 0 ){
+                epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, time elaspsed %d us, force to clear the to_serve queue");
+//                to_serve_requests.clear();
+//                break;
             }
         }
     }

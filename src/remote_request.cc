@@ -628,7 +628,7 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
 }
 // process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
-    epicLog(LOG_INFO, "Process remote write request from %d", client->GetWorkerId());
+    epicLog(LOG_INFO, "Process remote write request from %d, onto global address %p", client->GetWorkerId(), wr->addr);
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
     epicAssert(wr->size == BLOCK_SIZE);
