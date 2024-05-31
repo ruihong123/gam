@@ -1010,6 +1010,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
         } else {
 #endif
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
+                    //this should be processed
                 cli->WriteWithImm(wr->ptr, cline->line, wr->size, wr->pid);  //reply the new owner
                 epicLog(LOG_WARNING, "send to %d with pid %d", wr->pwid, wr->pid);
                 client->WriteWithImm(nullptr, nullptr, 0, wr->id);  //transfer ownership
@@ -1025,7 +1026,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 //			cache.ToInvalid(wr->addr);
                 //			delete wr;
                 unsigned int orig_id = wr->id;
-                epicLog(LOG_DEBUG, "send to %d with pid %d", wr->pwid, wr->pid);
+                epicLog(LOG_WARNING, "send to %d with pid %d", wr->pwid, wr->pid);
                 wr->id = GetWorkPsn();
                 wr->op = PENDING_INVALIDATE;
                 // todo: implement the pending mechanism like the way in cache eviction write back. use send to generate a write back.
