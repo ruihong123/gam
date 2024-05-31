@@ -628,7 +628,6 @@ void Worker::ProcessRemoteReadReply(Client* client, WorkRequest* wr) {
 }
 // process write request from the remote side. happen in the event loop
 void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
-    epicLog(LOG_WARNING, "Process remote write request from %d, onto global address %p, wr id is %u", client->GetWorkerId(), wr->addr, wr->id);
     Work op_orin = wr->op;
 #ifndef SELECTIVE_CACHING
     epicAssert(wr->size == BLOCK_SIZE);
@@ -675,6 +674,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         }
 
         if (state == DIR_SHARED) {
+            epicLog(LOG_WARNING, "DIR_SHARED Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
             //change the invalidate strategy (home node accepts invalidation responses)
             //in order to simply the try_lock failed case
             list<GAddr>& shared = directory.GetSList(entry);
@@ -791,6 +791,8 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         delete wr;
         wr = nullptr;
     } else {  //Case 4
+        epicLog(LOG_WARNING, "DIR_DIRTY Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
+
         epicAssert(!directory.IsBlockLocked(entry));
         WorkRequest* lwr = new WorkRequest(*wr);
 #ifdef SELECTIVE_CACHING
