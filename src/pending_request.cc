@@ -432,7 +432,9 @@ void Worker::ProcessPendingWrite(Client* cli, WorkRequest* wr) {
       epicAssert(false);
     }
     parent->unlock();
-
+      if (parent->op == WLOCK){
+          epicLog(LOG_WARNING, "PENDING WLOCK is under execution and the notify signal is %d", notify);
+      }
     if (notify)
       Notify(parent);
 
