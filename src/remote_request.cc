@@ -832,6 +832,8 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
 // Remote write to the cache in this worker
 void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
     epicAssert(wr->op != WRITE_PERMISSION_ONLY_FORWARD);  //this cannot happen
+    epicLog(LOG_WARNING, "Write Cache send entrance to %d with pid %d", wr->pwid, wr->pid);
+
     Work op_orin = wr->op;
     bool deadlock = false;
     epicAssert(wr->size == BLOCK_SIZE);
