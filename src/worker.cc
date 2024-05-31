@@ -825,7 +825,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
 
 int Worker::ErasePendingWork(unsigned int id) {
   LOCK_MICRO(pending_works, id);
-  epicLog(LOG_INFO, "remove pending work %d", id);
+  epicLog(LOG_WARNING, "remove pending work %d", id);
   int ret = pending_works.erase(id);
     pending_works2_mutex.lock();
 
