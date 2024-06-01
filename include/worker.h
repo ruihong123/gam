@@ -30,6 +30,7 @@
 #include "lockwrapper.h"
 #include "util.h"
 #include "logging.h"
+#include "TimeMeasurer.h"
 
 #define REQUEST_WRITE_IMM 1
 #define REQUEST_SEND 1 << 1
@@ -40,7 +41,26 @@
 #define REQUEST_ASYNC 1 << 6
 
 class Cache;
+static void spin_wait_us(int64_t time){
+    TimeMeasurer timer;
+    timer.StartTimer();
+    timer.EndTimer();
+    while(timer.GetElapsedMicroSeconds() < time){
+        timer.EndTimer();
 
+        asm volatile("pause\n": : :"memory");
+    }
+}
+static void spin_wait_ns(int64_t time){
+    TimeMeasurer timer;
+    timer.StartTimer();
+    timer.EndTimer();
+    while(timer.GetElapsedNanoSeconds() < time){
+        timer.EndTimer();
+
+        asm volatile("pause\n": : :"memory");
+    }
+}
 struct Fence {
   bool sfenced = false;bool mfenced = false;
   atomic<int> pending_writes;
@@ -294,22 +314,22 @@ class Worker : public Server {
     void WaitPendingRequest() {
         uint64_t counter = 0;
         while (!pending_works.empty()) {
-            usleep(5);
+            spin_wait_us(5);
             counter++;
             if (counter== 1000 ){
                 epicLog(LOG_WARNING, "Waiting for pending queue to finish longer than 5ms, lefted entry number is %d, force to clear the pending queue", pending_works.size());
-//                pending_works.clear();
-//                to_serve_requests.clear();
+                pending_works.clear();
+                to_serve_requests.clear();
                 break;
             }
         }
         counter = 0;
         while (!to_serve_requests.empty()) {
-            usleep(5);
-            if (counter ==1000 ){
+            spin_wait_us(5);
+            if (counter++ ==1000 ){
                 epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, lefted entry number is %d, force to clear the to_serve queue", to_serve_requests.size());
-//                to_serve_requests.clear();
-//                break;
+                to_serve_requests.clear();
+                break;
             }
         }
     }
