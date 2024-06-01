@@ -253,31 +253,29 @@ class Cache {
 
   int RLock(GAddr addr);
   inline int RLock(CacheLine* cline, GAddr addr) {
-      cline->mtx.lock();
-    if (IsWLocked(cline, addr))
-      return -1;
+      std::unique_lock<std::mutex> lck (cline->mtx);
+    if (IsWLocked(cline, addr)){
+        return -1;
+    }
     if (cline->locks.count(addr)) {
       cline->locks[addr]++;
     } else {
       cline->locks[addr] = 1;
     }
     epicAssert(cline->locks[addr] <= MAX_SHARED_LOCK);
-    cline->mtx.unlock();
     return 0;
   }
   int RLock(CacheLine* cline) = delete;
 
   int WLock(GAddr addr);
   inline int WLock(CacheLine* cline, GAddr addr) {
-      cline->mtx.lock();
+      std::unique_lock<std::mutex> lck (cline->mtx);
 
       if (IsWLocked(cline, addr) || IsRLocked(cline, addr)){
-          cline->mtx.unlock();
           return -1;
 
       }
     cline->locks[addr] = EXCLUSIVE_LOCK_TAG;
-    cline->mtx.unlock();
     return 0;
   }
   int WLock(CacheLine* cline) = delete;

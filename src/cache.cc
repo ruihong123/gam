@@ -1093,7 +1093,7 @@ void Cache::UnLock(GAddr addr) {
   lock(block);
   try {
     CacheLine* cline = caches.at(block);
-    cline->mtx.lock();
+    std::unique_lock<std::mutex> lck (cline->mtx);
     epicAssert(cline->locks.count(addr));
     if (cline->locks.at(addr) == EXCLUSIVE_LOCK_TAG) {  //exclusive lock
       cline->locks.erase(addr);
@@ -1101,7 +1101,6 @@ void Cache::UnLock(GAddr addr) {
       cline->locks.at(addr)--;
       if (cline->locks.at(addr) == 0) cline->locks.erase(addr);
     }
-      cline->mtx.unlock();
 
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
