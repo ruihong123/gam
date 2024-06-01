@@ -1106,7 +1106,7 @@ void Cache::UnLock(GAddr addr) {
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
     epicAssert(false);
-      exit(0);
+//    exit(0);
   }
 
   unlock(block);
