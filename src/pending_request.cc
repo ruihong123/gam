@@ -182,7 +182,7 @@ void Worker::ProcessPendingWrite(Client* cli, WorkRequest* wr) {
   wr->addr = TOBLOCK(wr->addr);
 #endif
     //    write_reply_counter.fetch_add(1);
-    epicLog(LOG_WARNING, "Process pending write request onto global address %p, wr id is %u", wr->addr, wr->id);
+    epicLog(LOG_INFO, "Process pending write request onto global address %p, wr id is %u", wr->addr, wr->id);
 
     epicAssert(
       (wr->op == WRITE || wr->op == WRITE_PERMISSION_ONLY)

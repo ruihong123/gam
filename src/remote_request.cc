@@ -674,7 +674,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         }
 
         if (state == DIR_SHARED) {
-            epicLog(LOG_WARNING, "DIR_SHARED Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
+            epicLog(LOG_INFO, "DIR_SHARED Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
             //change the invalidate strategy (home node accepts invalidation responses)
             //in order to simply the try_lock failed case
             list<GAddr>& shared = directory.GetSList(entry);
@@ -791,7 +791,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         delete wr;
         wr = nullptr;
     } else {  //Case 4
-        epicLog(LOG_WARNING, "DIR_DIRTY Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
+        epicLog(LOG_WARNING, "LOG_INFO Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
 
         epicAssert(!directory.IsBlockLocked(entry));
         WorkRequest* lwr = new WorkRequest(*wr);
@@ -832,7 +832,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
 // Remote write to the cache in this worker
 void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
     epicAssert(wr->op != WRITE_PERMISSION_ONLY_FORWARD);  //this cannot happen
-    epicLog(LOG_WARNING, "Write Cache send entrance to %d with pid %d", wr->pwid, wr->pid);
+    epicLog(LOG_INFO, "Write Cache send entrance to %d with pid %d", wr->pwid, wr->pid);
 
     Work op_orin = wr->op;
     bool deadlock = false;
@@ -916,47 +916,47 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
 //TODO: the following code can result in deadlock need to understand why.
 
 //add the lock support
-//        if (cache.IsBlockLocked(cline)) {
-//
-//            if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
-//                epicAssert(wr->flag & LOCKED);
-//                wr->status = LOCK_FAILED;
-//                wr->op = WRITE_REPLY;
-//                if (INVALIDATE == op_orin || FETCH_AND_INVALIDATE == op_orin) {
-//                    SubmitRequest(client, wr);
-//                } else if (INVALIDATE_FORWARD == op_orin) {
-//                    //				Client* cli = FindClientWid(wr->pwid);
-//                    //				wr->id = wr->pid;
-//                    //				SubmitRequest(cli, wr);
-//                    SubmitRequest(client, wr);
-//                } else {  //WRITE_FORWARD or WRITE_PERMISSION_ONLY_FORWARD
-//                    SubmitRequest(client, wr);
-//                    Client* cli = FindClientWid(wr->pwid);
-//                    wr->id = wr->pid;
-//                    SubmitRequest(cli, wr);
-//                }
-//                cache.unlock(to_lock);
-//                delete wr;
-//                wr = nullptr;
-//                return;
-//            } else {
-//                //deadlock case 3
-//                //if it is rlocked, and in deadlock status (in transition state from shared to dirty)
-//                //we are still safe to act as it was in shared state and ack the invalidation request
-//                //because the intransition state will block other r/w requests
-//                //until we get replies from the home node (then WRITE_PERMISSION_ONLY has
-//                //been changed to WRITE by the home node as agreed)
-//                if (!deadlock) {
-//                    AddToServeRemoteRequest(wr->addr, client, wr);
-//                    epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
-//                            GetWorkerId());
-//                    cache.unlock(to_lock);
-//                    return;
-//                } else {
-//                    epicLog(LOG_WARNING, "Deadlock detected");
-//                }
-//            }
-//        }
+        if (cache.IsBlockLocked(cline)) {
+
+            if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
+                epicAssert(wr->flag & LOCKED);
+                wr->status = LOCK_FAILED;
+                wr->op = WRITE_REPLY;
+                if (INVALIDATE == op_orin || FETCH_AND_INVALIDATE == op_orin) {
+                    SubmitRequest(client, wr);
+                } else if (INVALIDATE_FORWARD == op_orin) {
+                    //				Client* cli = FindClientWid(wr->pwid);
+                    //				wr->id = wr->pid;
+                    //				SubmitRequest(cli, wr);
+                    SubmitRequest(client, wr);
+                } else {  //WRITE_FORWARD or WRITE_PERMISSION_ONLY_FORWARD
+                    SubmitRequest(client, wr);
+                    Client* cli = FindClientWid(wr->pwid);
+                    wr->id = wr->pid;
+                    SubmitRequest(cli, wr);
+                }
+                cache.unlock(to_lock);
+                delete wr;
+                wr = nullptr;
+                return;
+            } else {
+                //deadlock case 3
+                //if it is rlocked, and in deadlock status (in transition state from shared to dirty)
+                //we are still safe to act as it was in shared state and ack the invalidation request
+                //because the intransition state will block other r/w requests
+                //until we get replies from the home node (then WRITE_PERMISSION_ONLY has
+                //been changed to WRITE by the home node as agreed)
+                if (!deadlock) {
+                    AddToServeRemoteRequest(wr->addr, client, wr);
+                    epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
+                            GetWorkerId());
+                    cache.unlock(to_lock);
+                    return;
+                } else {
+                    epicLog(LOG_WARNING, "Deadlock detected");
+                }
+            }
+        }
 
         //TODO: add the write completion check
         //can add it to the pending work and check it upon done
@@ -1021,7 +1021,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 epicAssert(BLOCK_ALIGNED(wr->addr) || wr->size < BLOCK_SIZE);
                     //this should be processed
                 cli->WriteWithImm(wr->ptr, cline->line, wr->size, wr->pid);  //reply the new owner
-                epicLog(LOG_WARNING, "send to %d with pid %d", wr->pwid, wr->pid);
+                epicLog(LOG_INFO, "send to %d with pid %d", wr->pwid, wr->pid);
                 client->WriteWithImm(nullptr, nullptr, 0, wr->id);  //transfer ownership
 #ifdef SELECTIVE_CACHING
                 }
@@ -1035,7 +1035,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 //			cache.ToInvalid(wr->addr);
                 //			delete wr;
                 unsigned int orig_id = wr->id;
-                epicLog(LOG_WARNING, "send to %d with pid %d", wr->pwid, wr->pid);
+                epicLog(LOG_INFO, "send to %d with pid %d", wr->pwid, wr->pid);
                 wr->id = GetWorkPsn();
                 wr->op = PENDING_INVALIDATE;
                 // todo: implement the pending mechanism like the way in cache eviction write back. use send to generate a write back.

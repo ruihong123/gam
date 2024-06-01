@@ -863,24 +863,24 @@ int Worker::ProcessLocalWLock(WorkRequest* wr) {
 }
 
 int Worker::ProcessLocalUnLock(WorkRequest* wr) {
-    if (!(wr->flag & FENCE)) {
-        Fence* fence = fences_.at(wr->fd);
-        fence->lock();
-        if (IsFenced(fence, wr)) {
-            AddToFence(fence, wr);
-            fence->unlock();
-            epicLog(LOG_DEBUG, "fenced (mfenced = %d, sfenced = %d): %d",
-                    fence->mfenced, fence->sfenced, wr->op);
-            return FENCE_PENDING;
-        } else if (fence->pending_writes) {  //we only mark fenced when there are pending writes
-            fence->mfenced = true;
-            epicLog(LOG_DEBUG, "mfenced from UNLOCK!");
-            AddToFence(fence, wr);
-            fence->unlock();
-            return FENCE_PENDING;
-        }
-        fence->unlock();
-    }
+//    if (!(wr->flag & FENCE)) {
+//        Fence* fence = fences_.at(wr->fd);
+//        fence->lock();
+//        if (IsFenced(fence, wr)) {
+//            AddToFence(fence, wr);
+//            fence->unlock();
+//            epicLog(LOG_DEBUG, "fenced (mfenced = %d, sfenced = %d): %d",
+//                    fence->mfenced, fence->sfenced, wr->op);
+//            return FENCE_PENDING;
+//        } else if (fence->pending_writes) {  //we only mark fenced when there are pending writes
+//            fence->mfenced = true;
+//            epicLog(LOG_DEBUG, "mfenced from UNLOCK!");
+//            AddToFence(fence, wr);
+//            fence->unlock();
+//            return FENCE_PENDING;
+//        }
+//        fence->unlock();
+//    }
 
     if (IsLocal(wr->addr)) {
         GAddr start_blk = TOBLOCK(wr->addr);
