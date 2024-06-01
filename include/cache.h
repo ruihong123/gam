@@ -41,6 +41,7 @@ struct CacheLine {
   void* line = nullptr;
   GAddr addr = 0;
   CacheState state = CACHE_INVALID;
+//  std::mutex mtx;
   unordered_map<GAddr, int> locks;
   //used for LRU
 #ifdef USE_APPR_LRU
