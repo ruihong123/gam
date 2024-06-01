@@ -913,49 +913,50 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 }
             }
         }
+//TODO: the following code can result in deadlock need to understand why.
 
-//        //add the lock support
-//        if (cache.IsBlockLocked(cline)) {
-//
-//            if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
-//                epicAssert(wr->flag & LOCKED);
-//                wr->status = LOCK_FAILED;
-//                wr->op = WRITE_REPLY;
-//                if (INVALIDATE == op_orin || FETCH_AND_INVALIDATE == op_orin) {
-//                    SubmitRequest(client, wr);
-//                } else if (INVALIDATE_FORWARD == op_orin) {
-//                    //				Client* cli = FindClientWid(wr->pwid);
-//                    //				wr->id = wr->pid;
-//                    //				SubmitRequest(cli, wr);
-//                    SubmitRequest(client, wr);
-//                } else {  //WRITE_FORWARD or WRITE_PERMISSION_ONLY_FORWARD
-//                    SubmitRequest(client, wr);
-//                    Client* cli = FindClientWid(wr->pwid);
-//                    wr->id = wr->pid;
-//                    SubmitRequest(cli, wr);
-//                }
-//                cache.unlock(to_lock);
-//                delete wr;
-//                wr = nullptr;
-//                return;
-//            } else {
-//                //deadlock case 3
-//                //if it is rlocked, and in deadlock status (in transition state from shared to dirty)
-//                //we are still safe to act as it was in shared state and ack the invalidation request
-//                //because the intransition state will block other r/w requests
-//                //until we get replies from the home node (then WRITE_PERMISSION_ONLY has
-//                //been changed to WRITE by the home node as agreed)
-//                if (!deadlock) {
-//                    AddToServeRemoteRequest(wr->addr, client, wr);
-//                    epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
-//                            GetWorkerId());
-//                    cache.unlock(to_lock);
-//                    return;
-//                } else {
-//                    epicLog(LOG_WARNING, "Deadlock detected");
-//                }
-//            }
-//        }
+//add the lock support
+        if (cache.IsBlockLocked(cline)) {
+
+            if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
+                epicAssert(wr->flag & LOCKED);
+                wr->status = LOCK_FAILED;
+                wr->op = WRITE_REPLY;
+                if (INVALIDATE == op_orin || FETCH_AND_INVALIDATE == op_orin) {
+                    SubmitRequest(client, wr);
+                } else if (INVALIDATE_FORWARD == op_orin) {
+                    //				Client* cli = FindClientWid(wr->pwid);
+                    //				wr->id = wr->pid;
+                    //				SubmitRequest(cli, wr);
+                    SubmitRequest(client, wr);
+                } else {  //WRITE_FORWARD or WRITE_PERMISSION_ONLY_FORWARD
+                    SubmitRequest(client, wr);
+                    Client* cli = FindClientWid(wr->pwid);
+                    wr->id = wr->pid;
+                    SubmitRequest(cli, wr);
+                }
+                cache.unlock(to_lock);
+                delete wr;
+                wr = nullptr;
+                return;
+            } else {
+                //deadlock case 3
+                //if it is rlocked, and in deadlock status (in transition state from shared to dirty)
+                //we are still safe to act as it was in shared state and ack the invalidation request
+                //because the intransition state will block other r/w requests
+                //until we get replies from the home node (then WRITE_PERMISSION_ONLY has
+                //been changed to WRITE by the home node as agreed)
+                if (!deadlock) {
+                    AddToServeRemoteRequest(wr->addr, client, wr);
+                    epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
+                            GetWorkerId());
+                    cache.unlock(to_lock);
+                    return;
+                } else {
+                    epicLog(LOG_WARNING, "Deadlock detected");
+                }
+            }
+        }
 
         //TODO: add the write completion check
         //can add it to the pending work and check it upon done
