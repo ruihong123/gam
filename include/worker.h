@@ -30,7 +30,7 @@
 #include "lockwrapper.h"
 #include "util.h"
 #include "logging.h"
-#include "TimeMeasurer.h"
+#include <chrono>
 
 #define REQUEST_WRITE_IMM 1
 #define REQUEST_SEND 1 << 1
@@ -39,25 +39,29 @@
 #define REQUEST_NO_ID 1 << 4
 #define ADD_TO_PENDING 1 << 5
 #define REQUEST_ASYNC 1 << 6
-
+using std::chrono::high_resolution_clock;
+using std::chrono::system_clock;
+using std::chrono::milliseconds;
+using std::chrono::microseconds;
+using std::chrono::nanoseconds;
 class Cache;
 static void spin_wait_us(int64_t time){
-    TimeMeasurer timer;
-    timer.StartTimer();
-    timer.EndTimer();
-    while(timer.GetElapsedMicroSeconds() < time){
-        timer.EndTimer();
-
+    system_clock::time_point start_time_ = high_resolution_clock::now();
+    system_clock::time_point end_time_ = high_resolution_clock::now();
+    long long duration_us = std::chrono::duration_cast<microseconds>(end_time_ - start_time_).count();
+    while(duration_us < time){
+        end_time_ = high_resolution_clock::now();;
+        duration_us = std::chrono::duration_cast<microseconds>(end_time_ - start_time_).count();
         asm volatile("pause\n": : :"memory");
     }
 }
 static void spin_wait_ns(int64_t time){
-    TimeMeasurer timer;
-    timer.StartTimer();
-    timer.EndTimer();
-    while(timer.GetElapsedNanoSeconds() < time){
-        timer.EndTimer();
-
+    system_clock::time_point start_time_ = high_resolution_clock::now();
+    system_clock::time_point end_time_ = high_resolution_clock::now();
+    long long duration_ns = std::chrono::duration_cast<nanoseconds >(end_time_ - start_time_).count();
+    while(duration_ns < time){
+        end_time_ = high_resolution_clock::now();;
+        duration_ns = std::chrono::duration_cast<nanoseconds >(end_time_ - start_time_).count();
         asm volatile("pause\n": : :"memory");
     }
 }
