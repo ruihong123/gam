@@ -791,7 +791,7 @@ void Worker::ProcessRemoteWrite(Client* client, WorkRequest* wr) {
         delete wr;
         wr = nullptr;
     } else {  //Case 4
-        epicLog(LOG_WARNING, "LOG_INFO Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
+        epicLog(LOG_INFO, "DIR_DIRTY Process remote write request from %d, wr id is %u", client->GetWorkerId(),  wr->id);
 
         epicAssert(!directory.IsBlockLocked(entry));
         WorkRequest* lwr = new WorkRequest(*wr);
