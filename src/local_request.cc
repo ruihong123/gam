@@ -345,18 +345,18 @@ int Worker::ProcessLocalRead(WorkRequest* wr) {
     epicAssert(wr->addr);
     epicAssert(!(wr->flag & ASYNC));
 
-    if (!(wr->flag & FENCE)) {
-        Fence* fence = fences_.at(wr->fd);
-        fence->lock();
-        if (unlikely(IsMFenced(fence, wr))) {
-            AddToFence(fence, wr);
-            epicLog(LOG_INFO, "fenced (mfenced = %d, sfenced = %d): %d",
-                    fence->mfenced, fence->sfenced, wr->op);
-            fence->unlock();
-            return FENCE_PENDING;
-        }
-        fence->unlock();
-    }
+//    if (!(wr->flag & FENCE)) {
+//        Fence* fence = fences_.at(wr->fd);
+//        fence->lock();
+//        if (unlikely(IsMFenced(fence, wr))) {
+//            AddToFence(fence, wr);
+//            epicLog(LOG_INFO, "fenced (mfenced = %d, sfenced = %d): %d",
+//                    fence->mfenced, fence->sfenced, wr->op);
+//            fence->unlock();
+//            return FENCE_PENDING;
+//        }
+//        fence->unlock();
+//    }
 
     if (unlikely(IsLocal(wr->addr))) {
         GAddr start = wr->addr;
