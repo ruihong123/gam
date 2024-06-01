@@ -139,9 +139,9 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         int cnt = 0;
         while (*local_notify_buf != 2){
             spin_wait_ns(65);
-//            if (cnt++ > 100000){
-//                break;
-//            }
+            if (cnt++ > 100000){
+                break;
+            }
         }
 #ifndef NDEBUG
         if (wr->op == WLOCK ){
