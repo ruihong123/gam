@@ -297,7 +297,7 @@ class Worker : public Server {
             usleep(5);
             counter++;
             if (counter== 1000 ){
-                epicLog(LOG_WARNING, "Waiting for pending queue to finish longer than 5ms, time elaspsed %d us, force to clear the pending queue");
+                epicLog(LOG_WARNING, "Waiting for pending queue to finish longer than 5ms, lefted entry number is %d, force to clear the pending queue", pending_works.size());
 //                pending_works.clear();
 //                to_serve_requests.clear();
                 break;
@@ -307,7 +307,7 @@ class Worker : public Server {
         while (!to_serve_requests.empty()) {
             usleep(5);
             if (counter ==1000 ){
-                epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, time elaspsed %d us, force to clear the to_serve queue");
+                epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, lefted entry number is %d, force to clear the to_serve queue", to_serve_requests.size());
 //                to_serve_requests.clear();
 //                break;
             }

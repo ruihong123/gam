@@ -33,8 +33,8 @@ enum TableType
   kTableCount
 };
 const int FREQUENCY_DELIVERY = 0;  //4;
-const int FREQUENCY_PAYMENT = 43;
-const int FREQUENCY_NEW_ORDER = 45;
+const int FREQUENCY_PAYMENT = 50;
+const int FREQUENCY_NEW_ORDER = 50;
 const int FREQUENCY_ORDER_STATUS = 0;  //4;
 const int FREQUENCY_STOCK_LEVEL = 0;  //4;
 
