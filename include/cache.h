@@ -41,7 +41,7 @@ struct CacheLine {
   void* line = nullptr;
   GAddr addr = 0;
   CacheState state = CACHE_INVALID;
-//  std::mutex mtx;
+  std::mutex mtx;
   unordered_map<GAddr, int> locks;
   //used for LRU
 #ifdef USE_APPR_LRU
@@ -253,6 +253,7 @@ class Cache {
 
   int RLock(GAddr addr);
   inline int RLock(CacheLine* cline, GAddr addr) {
+      cline->mtx.lock();
     if (IsWLocked(cline, addr))
       return -1;
     if (cline->locks.count(addr)) {
@@ -261,15 +262,22 @@ class Cache {
       cline->locks[addr] = 1;
     }
     epicAssert(cline->locks[addr] <= MAX_SHARED_LOCK);
+    cline->mtx.unlock();
     return 0;
   }
   int RLock(CacheLine* cline) = delete;
 
   int WLock(GAddr addr);
   inline int WLock(CacheLine* cline, GAddr addr) {
-    if (IsWLocked(cline, addr) || IsRLocked(cline, addr))
-      return -1;
+      cline->mtx.lock();
+
+      if (IsWLocked(cline, addr) || IsRLocked(cline, addr)){
+          cline->mtx.unlock();
+          return -1;
+
+      }
     cline->locks[addr] = EXCLUSIVE_LOCK_TAG;
+    cline->mtx.unlock();
     return 0;
   }
   int WLock(CacheLine* cline) = delete;
