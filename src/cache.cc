@@ -1037,24 +1037,33 @@ bool Cache::InTransitionState(GAddr addr) {
 
 int Cache::RLock(GAddr addr) {
   GAddr block = GTOBLOCK(addr);
+    lock(block);
+    int ret;
   try {
     CacheLine* cline = caches.at(block);
-    return RLock(cline, addr);
+      ret =  RLock(cline, addr);
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
-    return -1;
+    ret =  -1;
   }
+    unlock(block);
+    return ret;
 }
 
 int Cache::WLock(GAddr addr) {
   GAddr block = GTOBLOCK(addr);
+    lock(block);
+    int ret;
   try {
     CacheLine* cline = caches.at(block);
-    return WLock(cline, addr);
+    ret =  WLock(cline, addr);
+
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
-    return -1;
+      ret =  -1;
   }
+    unlock(block);
+    return ret;
 }
 
 bool Cache::IsWLocked(GAddr addr) {
