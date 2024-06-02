@@ -90,6 +90,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
     bool delete_mr = false;
     WorkRequest* new_wr = nullptr;
     WorkRequest* old_wr = nullptr;
+    //Is it possible that some non WLock request also receive some fales notification? but the workrequest
+    // in still in the to_server request list.
     if (wr->op == WLOCK){
         new_wr = new WorkRequest(*wr);
         old_wr = wr;
@@ -158,8 +160,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #endif
         int cnt = 0;
         while (*local_notify_buf != 2){
-            spin_wait_ns(5000);
+            spin_wait_ns(1000);
             if (cnt++ > 100000 && wr->op == WLOCK && populate_end){
+                epicLog(LOG_WARNING, "WLOCK Wait too long, directly release the lock");
+
                 delete_mr = false;
                 break;
             }
