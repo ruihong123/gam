@@ -87,9 +87,17 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
-    WorkRequest* new_mr = new WorkRequest(*wr);
-    wr = new_mr;
-    bool delete_mr = true;
+    bool delete_mr = false;
+    WorkRequest* new_wr = nullptr;
+    WorkRequest* old_wr = nullptr;
+    if (wr->op == WLOCK){
+        new_wr = new WorkRequest(*wr);
+        old_wr = wr;
+        wr = new_wr;
+        delete_mr = true;
+
+    }
+
     if (unlikely(thread_id == -1)) {
         thread_id = registered_thread_num.fetch_add(1);
     }
@@ -123,7 +131,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
         if (delete_mr){
-            delete wr;
+            old_wr->CopyFrom(wr);
+            delete new_wr;
+            wr  = old_wr;
+
         }
 
       return SUCCESS;
@@ -170,7 +181,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 
 #endif
         if (delete_mr){
-            delete wr;
+            old_wr->CopyFrom(wr);
+            delete new_wr;
+            wr  = old_wr;
+
         }
       return wr->status;
     }
@@ -182,7 +196,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
       }
 #endif
       if (delete_mr){
-          delete wr;
+          old_wr->CopyFrom(wr);
+          delete new_wr;
+          wr  = old_wr;
+
       }
     return wr->status;
   }

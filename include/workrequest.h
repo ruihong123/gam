@@ -190,7 +190,8 @@ struct WorkRequest {
 #endif
   }
   ;
-  WorkRequest(WorkRequest& wr);bool operator==(const WorkRequest& wr);
+  WorkRequest(WorkRequest& wr);
+  bool operator==(const WorkRequest& wr);
   int Ser(char* buf, int& len);
   int Deser(const char* buf, int& len);
 
@@ -219,6 +220,40 @@ struct WorkRequest {
       return nw;
     }
   }
+    void CopyFrom(WorkRequest* wr) {
+        lock();
+        //memset(this, 0, sizeof(WorkRequest));
+        id = wr->id;  //identifier of the work request
+
+        pid = wr->pid;  //identifier of the parent work request (used for FORWARD request)
+        pwid = wr->pwid;  //identifier of the parent worker
+        op = static_cast<Work>(0);
+
+        key = wr->key;
+        addr = wr->addr;
+        free = wr->free;
+        size = wr->size;
+        status = wr->status;
+
+        flag = wr->flag;
+        ptr = wr->ptr;
+        fd = wr->fd;
+#if	!defined(USE_PIPE_W_TO_H) || !defined(USE_PIPE_H_TO_W)
+        notify_buf = wr->notify_buf;
+#endif
+        wid = wr->wid;
+        counter.store(wr->counter.load());
+        parent = wr->parent;
+        next = wr->next;
+        dup = wr->dup;
+#ifdef GFUNC_SUPPORT
+        gfunc = wr->gfunc;
+        arg = wr->arg;
+#endif
+
+        is_cache_hit_ = wr->is_cache_hit_;
+        unlock();
+    }
 
   bool IsACopy() {
     return (flag & COPY) && (dup == nullptr);
