@@ -725,5 +725,8 @@ void Worker::ProcessRequest(Client* cli, unsigned int work_id) {
   WorkRequest* wr = GetPendingWork(work_id);
   epicAssert(wr);
   epicAssert(wr->id == work_id);
-  ProcessPendingRequest(cli, wr);
+    if (wr){
+        ProcessPendingRequest(cli, wr);
+
+    }
 }

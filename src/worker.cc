@@ -847,7 +847,7 @@ WorkRequest* Worker::GetPendingWork(unsigned int id) {
   } catch (const exception& e) {
     epicLog(LOG_WARNING, "cannot find the pending work %d (%s)", id, e.what());
     UNLOCK_MICRO(pending_works, id);
-    exit(1);
+//    exit(1);
     return nullptr;
   }
   UNLOCK_MICRO(pending_works, id);
