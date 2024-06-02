@@ -323,9 +323,9 @@ class Worker : public Server {
 //            counter++;
             if (counter++== 1000 ){
                 epicLog(LOG_WARNING, "Waiting for pending queue to finish longer than 5ms, lefted entry number is %d, force to clear the pending queue", pending_works.size());
-                pending_works.clear();
-                to_serve_requests.clear();
-                break;
+//                pending_works.clear();
+//                to_serve_requests.clear();
+//                break;
             }
         }
         counter = 0;
@@ -333,10 +333,15 @@ class Worker : public Server {
             spin_wait_us(5);
             if (counter++ ==1000 ){
                 epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, lefted entry number is %d, force to clear the to_serve queue", to_serve_requests.size());
-                to_serve_requests.clear();
-                break;
+//                to_serve_requests.clear();
+//                break;
             }
         }
+    }
+    void ClearUnfinishedRequest() {
+        std::unique_lock<std::mutex> lck(pending_works2_mutex);
+        pending_works.clear();
+        to_serve_requests.clear();
     }
 #ifdef DHT
   int ProcessLocalHTable(WorkRequest* wr);
