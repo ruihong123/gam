@@ -87,18 +87,18 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
-    bool delete_mr = false;
-    WorkRequest* new_wr = nullptr;
-    WorkRequest* old_wr = nullptr;
-    //Is it possible that some non WLock request also receive some fales notification? but the workrequest
-    // in still in the to_server request list.
-    if (wr->op == WLOCK){
-        new_wr = new WorkRequest(*wr);
-        old_wr = wr;
-        wr = new_wr;
-        delete_mr = true;
-
-    }
+//    bool delete_mr = false;
+//    WorkRequest* new_wr = nullptr;
+//    WorkRequest* old_wr = nullptr;
+//    //Is it possible that some non WLock request also receive some fales notification? but the workrequest
+//    // in still in the to_server request list.
+//    if (wr->op == WLOCK){
+//        new_wr = new WorkRequest(*wr);
+//        old_wr = wr;
+//        wr = new_wr;
+//        delete_mr = true;
+//
+//    }
 
     if (unlikely(thread_id == -1)) {
         thread_id = registered_thread_num.fetch_add(1);
@@ -132,12 +132,12 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
-        if (delete_mr){
-            old_wr->CopyFrom(wr);
-            delete new_wr;
-            wr  = old_wr;
-
-        }
+//        if (delete_mr){
+//            old_wr->CopyFrom(wr);
+//            delete new_wr;
+//            wr  = old_wr;
+//
+//        }
 
       return SUCCESS;
     } else {
@@ -184,12 +184,12 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #endif
 
 #endif
-        if (delete_mr){
-            old_wr->CopyFrom(wr);
-            delete new_wr;
-            wr  = old_wr;
-
-        }
+//        if (delete_mr){
+//            old_wr->CopyFrom(wr);
+//            delete new_wr;
+//            wr  = old_wr;
+//
+//        }
       return wr->status;
     }
   } else {
@@ -199,12 +199,12 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
           epicLog(LOG_INFO, "read hit buf %p size is %d", wr->ptr, wr->size);
       }
 #endif
-      if (delete_mr){
-          old_wr->CopyFrom(wr);
-          delete new_wr;
-          wr  = old_wr;
-
-      }
+//      if (delete_mr){
+//          old_wr->CopyFrom(wr);
+//          delete new_wr;
+//          wr  = old_wr;
+//
+//      }
     return wr->status;
   }
 #else //if not MULTITHREAD
