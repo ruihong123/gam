@@ -41,7 +41,7 @@ typedef uint64_t GAddr;
 
 struct Conf {
   bool is_master = true;  //mark whether current process is the master (obtained from conf and the current ip)
-  int master_port = 19901;
+  int master_port = 19903;
   std::string master_ip = "localhost";
   std::string master_bindaddr;
   int worker_port = 12345;

@@ -32,7 +32,7 @@ int is_master = 0;
 string ip_master = get_local_ip("eth0");
 string ip_worker = get_local_ip("eth0");
 //keep the values below the same as the default values of gam configuration.
-int port_master = 19901;
+int port_master = 19903;
 int port_worker = 12345;
 
 const char* result_file = "result.csv";
