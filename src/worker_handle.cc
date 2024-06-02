@@ -87,6 +87,9 @@ void WorkerHandle::DeRegisterThread() {
 }
 
 int WorkerHandle::SendRequest(WorkRequest* wr) {
+    WorkRequest* new_mr = new WorkRequest(*wr);
+    wr = new_mr;
+    bool delete_mr = true;
     if (unlikely(thread_id == -1)) {
         thread_id = registered_thread_num.fetch_add(1);
     }
@@ -119,6 +122,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
   int ret = worker->ProcessLocalRequest(wr);  //not complete due to remote or previously-sent similar requests
   if (ret) {  //not complete due to remote or previously-sent similar requests
     if (wr->flag & ASYNC) {
+        if (delete_mr){
+            delete wr;
+        }
+
       return SUCCESS;
     } else {
 #ifdef USE_PIPE_W_TO_H
@@ -142,6 +149,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         while (*local_notify_buf != 2){
             spin_wait_ns(1000);
             if (cnt++ > 100000 && wr->op == WLOCK && populate_end){
+                delete_mr = false;
                 break;
             }
         }
@@ -161,6 +169,9 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #endif
 
 #endif
+        if (delete_mr){
+            delete wr;
+        }
       return wr->status;
     }
   } else {
@@ -170,6 +181,9 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
           epicLog(LOG_INFO, "read hit buf %p size is %d", wr->ptr, wr->size);
       }
 #endif
+      if (delete_mr){
+          delete wr;
+      }
     return wr->status;
   }
 #else //if not MULTITHREAD
