@@ -948,11 +948,11 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 //been changed to WRITE by the home node as agreed)
                 if (!deadlock) {
 //                    if (wr->flag & LOCKED){
-//                        AddToServeRemoteRequest(wr->addr, client, wr);
-//                        epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
-//                                GetWorkerId());
-//                        cache.unlock(to_lock);
-//                        return;
+                        AddToServeRemoteRequest(wr->addr, client, wr);
+                        epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
+                                GetWorkerId());
+                        cache.unlock(to_lock);
+                        return;
 //                    }
 
                 } else {
