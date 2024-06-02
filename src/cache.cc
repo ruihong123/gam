@@ -1041,7 +1041,11 @@ int Cache::RLock(GAddr addr) {
     int ret;
   try {
     CacheLine* cline = caches.at(block);
-      ret =  RLock(cline, addr);
+      if(cline){
+          ret =  RLock(cline, addr);
+      }else{
+          ret = -1;
+      }
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
     ret =  -1;
@@ -1056,7 +1060,12 @@ int Cache::WLock(GAddr addr) {
     int ret;
   try {
     CacheLine* cline = caches.at(block);
-    ret =  WLock(cline, addr);
+      if(cline){
+          ret =  WLock(cline, addr);
+      }else{
+          ret = -1;
+      }
+
 
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
@@ -1093,6 +1102,10 @@ void Cache::UnLock(GAddr addr) {
   lock(block);
   try {
     CacheLine* cline = caches.at(block);
+    if(!cline){
+        unlock(block);
+        return;
+    }
     std::unique_lock<std::mutex> lck (cline->mtx);
     epicAssert(cline->locks.count(addr));
     if (cline->locks.at(addr) == EXCLUSIVE_LOCK_TAG) {  //exclusive lock
