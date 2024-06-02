@@ -65,6 +65,7 @@ static void spin_wait_ns(int64_t time){
         asm volatile("pause\n": : :"memory");
     }
 }
+
 struct Fence {
   bool sfenced = false;bool mfenced = false;
   atomic<int> pending_writes;

@@ -12,7 +12,7 @@
 
 using namespace Database::TpccBenchmark;
 using namespace Database;
-
+extern bool populate_end;
 void ExchPerfStatistics(ClusterConfig* config, 
     ClusterSync* synchronizer, PerfStatistics* s);
 int main(int argc, char* argv[]) {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
   //TpccSource sourcer(&tpcc_scale_params, &redirector, num_txn, SourceType::RANDOM_SOURCE, gThreadCount, dist_ratio);
   sourcer.Start();
     synchronizer.Fence_XComputes();
-
+    populate_end = true;
   {
     // warm up
     INIT_PROFILE_TIME(gThreadCount);

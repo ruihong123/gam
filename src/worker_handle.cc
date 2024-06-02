@@ -11,6 +11,8 @@
 bool buffer_is_not_all_zero(char* buf, int size);
 LockWrapper WorkerHandle::lock;
 thread_local int WorkerHandle::thread_id = -1;
+bool populate_end = false;
+
 WorkerHandle::WorkerHandle(Worker* w)
     : worker(w),
       wqueue(w->GetWorkQ()),
@@ -139,7 +141,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         int cnt = 0;
         while (*local_notify_buf != 2){
             spin_wait_ns(1000);
-            if (cnt++ > 100000 && wr->op == WLOCK){
+            if (cnt++ > 100000 && wr->op == WLOCK && populate_end){
                 break;
             }
         }

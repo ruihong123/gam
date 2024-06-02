@@ -24,7 +24,6 @@
 #endif
 
 Worker* WorkerFactory::server = nullptr;
-
 Worker::Worker(const Conf& conf, RdmaResource* res)
   : st(),
   wr_psn(0),
