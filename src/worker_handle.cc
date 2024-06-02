@@ -162,10 +162,10 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         while (*local_notify_buf != 2){
             spin_wait_ns(1000);
             if (cnt++ > 100000 && wr->op == WLOCK && populate_end){
-                epicLog(LOG_WARNING, "WLOCK Wait too long, directly release the lock");
-
-                delete_mr = false;
-                break;
+//                epicLog(LOG_WARNING, "WLOCK Wait too long, directly release the lock");
+//
+//                delete_mr = false;
+//                break;
             }
         }
 #ifndef NDEBUG
