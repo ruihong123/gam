@@ -313,7 +313,7 @@ int Worker::ProcessLocalRequest(WorkRequest* wr) {
     wr->status = UNRECOGNIZED_OP;
     epicLog(LOG_WARNING, "unrecognized op %d from local thread %d", wr->op,
             wr->fd);
-    exit(-1);
+//    exit(-1);
   }
   return ret;
 }
