@@ -163,7 +163,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
             spin_wait_ns(10000);
             if (cnt++ > 100000 && wr->op == WLOCK && populate_end){
                 worker->ClearUnfinishedRequest();
-//                epicLog(LOG_WARNING, "WLOCK Wait too long, directly release the lock");
+                epicLog(LOG_WARNING, "WLOCK Wait too long, directly release the lock");
 //
 //                delete_mr = false;
                 break;
