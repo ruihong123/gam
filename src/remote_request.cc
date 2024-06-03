@@ -1043,8 +1043,8 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 wr->op = PENDING_INVALIDATE;
                 // todo: implement the pending mechanism like the way in cache eviction write back. use send to generate a write back.
                 //  Or directly mark invalid here. no need to add to pending and mark as intermidiate state.
-                AddToPending(wr->id, wr);
-                cache.ToToInvalid(cline);
+//                AddToPending(wr->id, wr);
+//                cache.ToToInvalid(cline);
 #ifdef SELECTIVE_CACHING
                 if(wr->flag & NOT_CACHE) {
           epicAssert(BLOCK_ALIGNED(wr->addr));
