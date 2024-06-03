@@ -953,7 +953,8 @@ void Cache::ToInvalid(GAddr addr) {
   CacheLine* cline = nullptr;
   try {
     cline = caches.at(block);
-    ToInvalid(cline);
+    if (cline)
+        ToInvalid(cline);
   } catch (const exception& e) {
     epicLog(LOG_FATAL, "Unexpected: cannot find the cache line");
     epicAssert(false);
