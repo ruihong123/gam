@@ -149,6 +149,8 @@ class Worker : public Server {
 //    std::mutex to_serve_requests2_mutex;
 #else
   HashTable<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests {"to_serve_requests"};
+    std::map<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests2;
+    std::mutex to_serve_requests2_mutex;
 #endif
 
   /*

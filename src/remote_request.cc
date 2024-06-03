@@ -463,10 +463,10 @@ void Worker::ProcessRemoteReadCache(Client* client, WorkRequest* wr) {
         if (cache.InTransitionState(cline->state)) {
             if (cline->state == CACHE_TO_DIRTY) {
                 //to_serve_requests[wr->addr].push(pair<Client*, WorkRequest*>(client, wr));
-                AddToServeRemoteRequest(wr->addr, client, wr);
-                epicLog(LOG_INFO, "cache in transition state %d", cline->state);
-                cache.unlock(blk);
-                return;
+//                AddToServeRemoteRequest(wr->addr, client, wr);
+//                epicLog(LOG_INFO, "cache in transition state %d", cline->state);
+//                cache.unlock(blk);
+//                return;
             } else {
                 //deadlock: this node wants to give up the ownership
                 //meanwhile, another node wants to read
@@ -906,10 +906,10 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                     epicLog(LOG_WARNING, "!!!deadlock detected!!!");
                     deadlock = true;
                 } else {
-                    AddToServeRemoteRequest(wr->addr, client, wr);
-                    epicLog(LOG_WARNING, "cache in transition state %d", cline->state);
-                    cache.unlock(to_lock);
-                    return;
+//                    AddToServeRemoteRequest(wr->addr, client, wr);
+//                    epicLog(LOG_WARNING, "cache in transition state %d", cline->state);
+//                    cache.unlock(to_lock);
+//                    return;
                 }
             }
         }
