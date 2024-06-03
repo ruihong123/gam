@@ -160,8 +160,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #endif
         int cnt = 0;
         while (*local_notify_buf != 2){
-            spin_wait_ns(1000);
-            if (cnt++ > 1000000 && wr->op == WLOCK && populate_end){
+            spin_wait_ns(100);
+            if (cnt++ > 10000000 && wr->op == WLOCK && populate_end){
 //                worker->ClearUnfinishedRequest();
 //                epicLog(LOG_WARNING, "WLOCK Wait too long, probably a deadlock, directly release the lock and clear the pending lock");
 //
