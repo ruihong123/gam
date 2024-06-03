@@ -1056,8 +1056,8 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 cli->WriteWithImm(wr->ptr, cline->line, wr->size, wr->pid, wr->id,
                                   true);  //reply the new owner
                 client->WriteWithImm(nullptr, nullptr, 0, orig_id);  //transfer ownership
-                //mark invalidate after forward and write back
-                cache.ToInvalid(cline);
+//                //mark invalidate after forward and write back
+//                cache.ToInvalid(cline);
 #ifdef SELECTIVE_CACHING
                 }
 #endif
