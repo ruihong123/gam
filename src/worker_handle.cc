@@ -162,6 +162,8 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
         while (*local_notify_buf != 2){
             spin_wait_ns(100);
             if (cnt++ > 10000000 && wr->op == WLOCK && populate_end){
+                //TODO: if waiting for a long time, then manually process the pending request without waiting for the worker to process it.
+                // may be the deadlock can be resolved by this way.
 //                worker->ClearUnfinishedRequest();
 //                epicLog(LOG_WARNING, "WLOCK Wait too long, probably a deadlock, directly release the lock and clear the pending lock");
 //
