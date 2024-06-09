@@ -816,9 +816,11 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
       wr->op, wr);
   //TODO: how to syncrhonize the access to pending_works?
   pending_works[id] = wr;
+#ifndef NDEBUG
     pending_works2_mutex.lock();
   pending_works2.insert({id, wr});
     pending_works2_mutex.unlock();
+#endif
   UNLOCK_MICRO(pending_works, id);
 }
 
@@ -826,10 +828,12 @@ int Worker::ErasePendingWork(unsigned int id) {
   LOCK_MICRO(pending_works, id);
   epicLog(LOG_INFO, "remove pending work %d", id);
   int ret = pending_works.erase(id);
+#ifndef NDEBUG
     pending_works2_mutex.lock();
 
     pending_works2.erase(id);
     pending_works2_mutex.unlock();
+#endif
     if (ret == 0) {
         epicLog(LOG_WARNING, "Erase cannot find the pending work %d", id);
     }

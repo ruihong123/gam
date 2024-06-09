@@ -135,8 +135,10 @@ class Worker : public Server {
   //unordered_map<unsigned int, WorkRequest*> pending_works;
   HashTable<unsigned int, WorkRequest*> pending_works { "pending_works" };
 //  std::mutex pending_works_mutex;
+#ifndef NDEBUG
     std::map<unsigned int, WorkRequest*> pending_works2;
     std::mutex pending_works2_mutex;
+#endif
   /*
    * the pending work requests from remote nodes
    * because some states are in intermediate state
@@ -148,9 +150,12 @@ class Worker : public Server {
 //    std::map<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests2;
 //    std::mutex to_serve_requests2_mutex;
 #else
+
   HashTable<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests {"to_serve_requests"};
+#ifndef NDEBUG
     std::map<GAddr, queue<pair<Client*, WorkRequest*>>*> to_serve_requests2;
     std::mutex to_serve_requests2_mutex;
+#endif
 #endif
 
   /*
@@ -340,11 +345,14 @@ class Worker : public Server {
             }
         }
     }
+
+#ifndef NDEBUG
     void ClearUnfinishedRequest() {
-        std::unique_lock<std::mutex> lck(pending_works2_mutex);
+//        std::unique_lock<std::mutex> lck(pending_works2_mutex);
         pending_works.clear();
         to_serve_requests.clear();
     }
+#endif
 #ifdef DHT
   int ProcessLocalHTable(WorkRequest* wr);
 	void ProcessRemoteHTable(Client* client, WorkRequest* wr);
