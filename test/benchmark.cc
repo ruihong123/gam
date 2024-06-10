@@ -64,7 +64,7 @@ const char* result_file = "result.csv";
 //exp parameters
 // Cache can hold 4Million cache entries. Considering the random filling mechanism,
 // if we want to gurantee that the cache has been filled, we need to run 8Million iterations.
-long ITERATION_TOTAL = 8192000 + 4096000;
+long ITERATION_TOTAL = 8192000;
 long ITERATION = 0;
 //long FENCE_PERIOD = 1000;
 int no_thread = 2;
