@@ -810,7 +810,7 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
   epicAssert(
       !(wr->flag & ASYNC) || !(wr->flag & LOCAL_REQUEST) || ((wr->flag & ASYNC) && (wr->flag & COPY)));
   epicAssert(id == wr->id);
-  LOCK_MICRO(pending_works, id);
+  // LOCK_MICRO(pending_works, id);
   //epicAssert(!(wr->flag & ASYNC) || wr->IsACopy());
   epicLog(LOG_DEBUG, "add pending work %d, wr->op = %d, wr addr = %lx", id,
       wr->op, wr);
@@ -821,11 +821,11 @@ void Worker::AddToPending(unsigned int id, WorkRequest* wr) {
   pending_works2.insert({id, wr});
     pending_works2_mutex.unlock();
 #endif
-  UNLOCK_MICRO(pending_works, id);
+//  UNLOCK_MICRO(pending_works, id);
 }
 
 int Worker::ErasePendingWork(unsigned int id) {
-  LOCK_MICRO(pending_works, id);
+//  LOCK_MICRO(pending_works, id);
   epicLog(LOG_INFO, "remove pending work %d", id);
   int ret = pending_works.erase(id);
 #ifndef NDEBUG
@@ -837,12 +837,12 @@ int Worker::ErasePendingWork(unsigned int id) {
     if (ret == 0) {
         epicLog(LOG_WARNING, "Erase cannot find the pending work %d", id);
     }
-    UNLOCK_MICRO(pending_works, id);
+//    UNLOCK_MICRO(pending_works, id);
   return ret;
 }
 
 WorkRequest* Worker::GetPendingWork(unsigned int id) {
-  LOCK_MICRO(pending_works, id);
+//  LOCK_MICRO(pending_works, id);
   WorkRequest* ret = nullptr;
   epicLog(LOG_DEBUG, "get pending work %d", id);
   try {
@@ -850,11 +850,11 @@ WorkRequest* Worker::GetPendingWork(unsigned int id) {
     epicAssert(ret);
   } catch (const exception& e) {
     epicLog(LOG_WARNING, "cannot find the pending work %d (%s)", id, e.what());
-    UNLOCK_MICRO(pending_works, id);
+//    UNLOCK_MICRO(pending_works, id);
 //    exit(1);
     return nullptr;
   }
-  UNLOCK_MICRO(pending_works, id);
+//  UNLOCK_MICRO(pending_works, id);
   return ret;
 }
 
