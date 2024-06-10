@@ -160,7 +160,7 @@ int WorkerHandle::SendRequest(WorkRequest* wr) {
 #endif
         int cnt = 0;
         while (*local_notify_buf != 2){
-            spin_wait_ns(100);
+            usleep(1);
             if (cnt++ > 10000000 && wr->op == WLOCK && populate_end){
                 //TODO: if waiting for a long time, then manually process the pending request without waiting for the worker to process it.
                 // may be the deadlock can be resolved by this way.
