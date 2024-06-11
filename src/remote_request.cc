@@ -898,16 +898,16 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
             if ((INVALIDATE == wr->op || INVALIDATE_FORWARD == wr->op)
                 && cline->state == CACHE_TO_DIRTY) {
                 //deadlock case 1
-                epicLog(LOG_WARNING, "!!!deadlock detected!!!");
+                epicLog(LOG_INFO, "!!!deadlock detected!!!");
                 deadlock = true;
             } else {
                 if (cline->state == CACHE_TO_INVALID) {
                     //deadlock case 2
-                    epicLog(LOG_WARNING, "!!!deadlock detected!!!");
+                    epicLog(LOG_INFO, "!!!deadlock detected!!!");
                     deadlock = true;
                 } else {
                     AddToServeRemoteRequest(wr->addr, client, wr);
-                    epicLog(LOG_WARNING, "cache in transition state %d", cline->state);
+                    epicLog(LOG_INFO, "cache in transition state %d", cline->state);
                     cache.unlock(to_lock);
                     return;
                 }
@@ -956,7 +956,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
 //                    }
 
                 } else {
-                    epicLog(LOG_WARNING, "Deadlock detected");
+                    epicLog(LOG_INFO, "Deadlock detected");
                 }
             }
         }
