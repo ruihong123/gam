@@ -497,10 +497,10 @@ thread_range="16"
 remote_range="100" #"20 40 60 80 100"
 shared_range="100"
 read_range="0 50 95 100"
-space_range="0"
+space_range="0 50"
 time_range="0"
-op_range="1"
-workload_range="1 8"
+op_range="0 2"
+workload_range="0"
 zipfian_alpha_range="0.99" #make sure workload = 1 if we want to test zipfian.
 
 #cache_th=0.5
