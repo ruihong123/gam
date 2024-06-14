@@ -844,7 +844,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
     cache.lock(to_lock);
     CacheLine* cline = cache.GetCLine(wr->addr);
     if (!cline) {
-        epicLog(LOG_WARNING, "Cache miss");
+        epicLog(LOG_INFO, "Cache miss");
 
         if (INVALIDATE == op_orin || INVALIDATE_FORWARD == op_orin) {
             //this should because of cache line eviction from shared to invalid
@@ -949,7 +949,7 @@ void Worker::ProcessRemoteWriteCache(Client* client, WorkRequest* wr) {
                 if (!deadlock) {
 //                    if (wr->flag & LOCKED){
                         AddToServeRemoteRequest(wr->addr, client, wr);
-                        epicLog(LOG_WARNING, "addr %lx is locked by %d", wr->addr,
+                        epicLog(LOG_INFO, "addr %lx is locked by %d", wr->addr,
                                 GetWorkerId());
                         cache.unlock(to_lock);
                         return;

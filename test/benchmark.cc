@@ -16,6 +16,7 @@
 #include "util.h"
 #include "gallocator.h"
 #include "kernel.h"
+#include "zipf.h"
 
 //#define PERF_GET
 //#define PERF_MALLOC
@@ -45,6 +46,8 @@ std::atomic<uint64_t> Alloccounter = {0};
 
 //2516582ull =  48*1024*1024*1024/(2*1024)
 #define MEMSET_GRANULARITY (64*1024)
+
+#define CMU_ZIPF
 uint64_t NUMOFBLOCKS = 0;
 uint64_t SYNC_KEY = 0;
 uint64_t cache_size = 0;
@@ -415,12 +418,19 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 
   //access[0] = data[0];
   access[0] = data[GetRandom(0, STEPS, seedp)];
+    struct zipf_gen_state state;
     WorkloadGenerator* workload_gen;
     if (workload == 1){
 #ifdef EXCLUSIVE_HOTSPOT
         workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp, ddsm->GetID(), compute_num);
 #else
+
+#ifdef CMU_ZIPF
+        mehcached_zipf_init(&state, STEPS, zipfian_alpha,
+                            (rdtsc() & (0x0000ffffffffffffull)) ^ id);
+#else
         workload_gen = new ZipfianDistributionGenerator(STEPS, zipfian_alpha, *seedp);
+#endif
 #endif
     } else if (workload > 1){
         workload_gen = new MultiHotSpotGenerator(STEPS, zipfian_alpha, *seedp, workload);
@@ -447,7 +457,12 @@ void Init(GAlloc* alloc, GAddr data[], GAddr access[], bool shared[], int id,
 //            }
             next = GADD(n, GetRandom(0, items_per_block, seedp) * item_size);
         }else{
+#ifdef CMU_ZIPF
+            uint64_t pos = mehcached_zipf_next(&state);
+
+#else
             int64_t pos = workload_gen->getValue();
+#endif
             GAddr n = data[pos];
 //            while (TOBLOCK(n) == TOBLOCK(access[i - 1])) {
 //                pos = workload_gen->getValue();
@@ -586,7 +601,7 @@ void Run(GAlloc* alloc, GAddr data[], GAddr access[],
         epicAssert(item_size == ret);
         break;
       }
-      case 2:  //rlock+read/wlock+write Is this GAM PSO
+      case 2:  //rlock+read/wlock+write This is GAM sequential
       {
         if (TrueOrFalse(read_ratio, seedp)) {
           alloc->RLock(to_access, item_size);
