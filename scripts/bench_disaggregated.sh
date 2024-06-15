@@ -492,14 +492,14 @@ run_node_test() {
 # node test
 echo "**************************run node test****************************"
 result_file=$bin/results/node
-node_range="1 2 4 8"
-thread_range="16"
+node_range="8"
+thread_range="1 2 4 8 16"
 remote_range="100" #"20 40 60 80 100"
 shared_range="100"
 read_range="0 50 95 100"
-space_range="0 50"
+space_range="50"
 time_range="0"
-op_range="0 2"
+op_range="0 1"
 workload_range="0"
 zipfian_alpha_range="0.99" #make sure workload = 1 if we want to test zipfian.
 
