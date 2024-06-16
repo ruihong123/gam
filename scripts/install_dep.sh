@@ -8,6 +8,7 @@ numa_node=("0" "1")
 port=$((10000+RANDOM%1000))
 github_repo="https://github.com/ruihong123/gam"
 gitbranch="disaggregation"
+core_dump_dir="/mnt/core_dump"
 function run_bench() {
   communication_port=()
 #	memory_port=()
@@ -79,12 +80,16 @@ do
   echo "kill the zombie process on $node"
   ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark &&  sudo rm /users/Ruihong/gam/src/core" #> /dev/null 2>&1
   ssh -o StrictHostKeyChecking=no $node "pkill -f memory_server"
+  ssh ${ssh_opts} $node "echo '$core_dump_dir/core$compute' | sudo tee /proc/sys/kernel/core_pattern" &
+
 done
 for node in ${compute_shard[@]}
 do
   echo "kill the zombie process on $node"
   ssh -o StrictHostKeyChecking=no $node "pkill -f benchmark &&  sudo rm /users/Ruihong/gam/src/core"
   ssh -o StrictHostKeyChecking=no $node "pkill -f memory_server"
+  ssh ${ssh_opts} $node "echo '$core_dump_dir/core$compute' | sudo tee /proc/sys/kernel/core_pattern" &
+
 done
 for node in ${memory_shard[@]}
 do
