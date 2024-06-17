@@ -344,6 +344,15 @@ class Worker : public Server {
 //                break;
             }
         }
+        while (!to_serve_local_requests.empty()) {
+            spin_wait_us(5);
+            if (counter++ ==1000 ){
+                epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, lefted entry number is %d, force to clear the to_serve queue", to_serve_requests.size());
+//                to_serve_requests.clear();
+//                break;
+            }
+        }
+
     }
 
 #ifndef NDEBUG

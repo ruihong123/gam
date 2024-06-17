@@ -81,7 +81,7 @@ int op_type = 0;  //0: read/write; 1: rlock/wlock; 2: rlock+read/wlock+write
 int compute_num = 100;
 int memory_num = 100;
 int workload = 0;  //0: random; 1: zipfian
-double zipfian_alpha = 1;
+double zipfian_alpha = 0.99;
 float cache_th = 0.15;  //0.15
 uint64_t allocated_mem_size = 0;
 
