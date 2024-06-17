@@ -512,8 +512,6 @@ for remote_ratio in $remote_range
 do
 for shared_ratio in $shared_range
 do
-for op_type in $op_range
-do
 for read_ratio in $read_range
 do
 for space_locality in $space_range
@@ -524,6 +522,8 @@ for node in $node_range
 do
   echo $node
 for thread in $thread_range
+do
+for op_type in $op_range
 do
 #    remote_ratio=`echo "($node-1)*100/$node" | bc`
 #    echo $remote_ratio
