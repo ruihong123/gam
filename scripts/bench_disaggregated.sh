@@ -500,7 +500,7 @@ read_range="0 50 95 100"
 space_range="50"
 time_range="0"
 op_range="0 1"
-workload_range="0"
+workload_range="1"
 zipfian_alpha_range="0.99" #make sure workload = 1 if we want to test zipfian.
 
 #cache_th=0.5
