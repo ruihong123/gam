@@ -344,6 +344,8 @@ class Worker : public Server {
 //                break;
             }
         }
+        // wait for local pending to finish.
+        counter = 0;
         while (!to_serve_local_requests.empty()) {
             spin_wait_us(5);
             if (counter++ ==1000 ){
@@ -351,6 +353,22 @@ class Worker : public Server {
 //                to_serve_requests.clear();
 //                break;
             }
+        }
+        counter = 0;
+        // wait for the fence to finish
+        bool empty = false;
+        while (!empty){
+            bool temp = true;
+            for(auto iter : fences_){
+                temp = temp && (iter.second->pending_works.empty());
+
+            }
+            if (counter++ ==1000 ){
+                epicLog(LOG_WARNING, "Waiting for to serve requests to finish longer than 5ms, lefted entry number is %d, force to clear the to_serve queue", to_serve_requests.size());
+//                to_serve_requests.clear();
+//                break;
+            }
+            empty = temp;
         }
 
     }
