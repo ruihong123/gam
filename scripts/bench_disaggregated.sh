@@ -493,13 +493,13 @@ run_node_test() {
 echo "**************************run node test****************************"
 result_file=$bin/results/node
 node_range="8"
-thread_range="1 2 4 8 16"
+thread_range="2 4 8 16"
 remote_range="100" #"20 40 60 80 100"
 shared_range="100"
 read_range="0 50 95 100"
 space_range="0"
 time_range="0"
-op_range="0 1 2"
+op_range="2 1"
 workload_range="1"
 zipfian_alpha_range="0.99" #make sure workload = 1 if we want to test zipfian.
 
@@ -512,6 +512,8 @@ for remote_ratio in $remote_range
 do
 for shared_ratio in $shared_range
 do
+for op_type in $op_range
+do
 for read_ratio in $read_range
 do
 for space_locality in $space_range
@@ -523,8 +525,7 @@ do
   echo $node
 for thread in $thread_range
 do
-for op_type in $op_range
-do
+
 #    remote_ratio=`echo "($node-1)*100/$node" | bc`
 #    echo $remote_ratio
 #    if [[ $node = 1 ]]; then
