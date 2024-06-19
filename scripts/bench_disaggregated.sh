@@ -499,7 +499,7 @@ shared_range="100"
 read_range="0 50 95 100"
 space_range="50"
 time_range="0"
-op_range="2 1"
+op_range="1"
 workload_range="0"
 zipfian_alpha_range="0.99" #make sure workload = 1 if we want to test zipfian.
 
