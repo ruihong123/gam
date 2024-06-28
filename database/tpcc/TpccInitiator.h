@@ -75,6 +75,9 @@ protected:
         new ColumnInfo("w_zip", ValueType::VARCHAR, static_cast<size_t>(9)));
     columns.push_back(new ColumnInfo("w_tax", ValueType::DOUBLE));
     columns.push_back(new ColumnInfo("w_ytd", ValueType::DOUBLE));
+    //ADD padding to reduce contention.
+    columns.push_back(
+              new ColumnInfo("padding", ValueType::VARCHAR, static_cast<size_t>(1024)));
     columns.push_back(new ColumnInfo("meta", ValueType::META));
 
     schema = new RecordSchema(WAREHOUSE_TABLE_ID);
@@ -186,6 +189,9 @@ protected:
     columns.push_back(new ColumnInfo("d_id", ValueType::INT));
     columns.push_back(new ColumnInfo("w_id", ValueType::INT));
     columns.push_back(new ColumnInfo("o_id", ValueType::INT));
+    //ADD padding to reduce write contention.
+    columns.push_back(
+              new ColumnInfo("padding", ValueType::VARCHAR, static_cast<size_t>(480)));
     columns.push_back(new ColumnInfo("meta", ValueType::META));
 
     schema = new RecordSchema(DISTRICT_NEW_ORDER_TABLE_ID);
