@@ -43,8 +43,8 @@ launch () {
   echo "start tpcc for dist_ratio ${dist_ratio}"
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
   memory_file="${output_dir}/Memory.log"
-  script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} | sudo tee ${output_file}"
-  echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
+  script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio}"
+  echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host | sudo tee ${output_file} ' &"
   ssh ${ssh_opts} ${master_host} "echo '$core_dump_dir/core$master_host' | sudo tee /proc/sys/kernel/core_pattern"
 
 
@@ -55,7 +55,7 @@ launch () {
     compute=${compute_nodes[$i]}
     echo "start worker: ssh ${ssh_opts} ${compute} '$script_compute -sn$compute' &"
       ssh ${ssh_opts} ${compute} "echo '$core_dump_dir/core$compute' | sudo tee /proc/sys/kernel/core_pattern"
-    ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute" &
+    ssh ${ssh_opts} ${compute} "ulimit -S -c unlimited && $script_compute -sn$compute | sudo tee ${output_file}" &
     sleep 1
   done
   sleep 3
