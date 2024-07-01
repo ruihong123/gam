@@ -37,13 +37,13 @@ launch () {
   read -r -a memcached_node <<< $(head -n 1 $proj_dir/memcached_ip.conf)
   echo "restart memcached on ${memcached_node[0]}"
   ssh -o StrictHostKeyChecking=no ${memcached_node[0]} "sudo service memcached restart"
-  rm /proj/purduedb-PG0/logs/core
+#  rm /proj/purduedb-PG0/logs/core
 
   dist_ratio=$1
   echo "start tpcc for dist_ratio ${dist_ratio}"
   output_file="${output_dir}/${dist_ratio}_tpcc.log"
   memory_file="${output_dir}/Memory.log"
-  script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} > ${output_file} 2>&1"
+  script_compute="cd ${bin_dir} && ./tpcc ${compute_ARGS} -d${dist_ratio} | sudo tee ${output_file}"
   echo "start master: ssh ${ssh_opts} ${master_host} '$script_compute -sn$master_host' &"
   ssh ${ssh_opts} ${master_host} "echo '$core_dump_dir/core$master_host' | sudo tee /proc/sys/kernel/core_pattern"
 
