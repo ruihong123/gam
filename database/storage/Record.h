@@ -79,8 +79,9 @@ public:
 //      gallocator->MFence(); Do not use fense because it will fail WaitPendingRequest;
       gallocator->WaitPendingRequest();
 ////      usleep(10);
-      gallocator->Read(addr, data_ptr_, data_size_);
+
 #ifndef NDEBUG
+      gallocator->Read(addr, data_ptr_, data_size_);
       if (data_size_ == 152){
           int temp;
           GetColumn(10, &temp) ;
