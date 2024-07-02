@@ -1,5 +1,4 @@
-CPP = g++ -std=c++11
-#-DNDEBUG
+CPP = g++ -std=c++11 -DNDEBUG
 GAM_INCLUDE = -I../../include -I../ -I../../lib/libcuckoo/src
 DB_INCLUDE = -I.. -I../bench -I../storage -I../txn -I../utils
 INCLUDE = $(GAM_INCLUDE) $(DB_INCLUDE)
