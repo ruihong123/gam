@@ -617,7 +617,7 @@ void Worker::CompletionCheck(unsigned int id) {
   switch (wr->op) {
     case PENDING_INVALIDATE:
       epicLog(LOG_DEBUG, "start pending_invalidate");
-      cache.to_evicted.fetch_sub(1);
+      cache.to_evicted.fetch_sub(1); // this line of code was missing in the original GAM code.
       cache.lock(wr->addr);
       cache.ToInvalid(wr->addr);
       cache.unlock(wr->addr);
