@@ -617,6 +617,7 @@ void Worker::CompletionCheck(unsigned int id) {
   switch (wr->op) {
     case PENDING_INVALIDATE:
       epicLog(LOG_DEBUG, "start pending_invalidate");
+      cache.to_evicted.fetch_sub(1);
       cache.lock(wr->addr);
       cache.ToInvalid(wr->addr);
       cache.unlock(wr->addr);
