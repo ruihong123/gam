@@ -62,10 +62,10 @@ launch () {
   for ((i=0;i<${#memory_nodes[@]};i++)); do
       memory=${memory_nodes[$i]}
       memory_ARGS="--ip_master $master_host --ip_worker $memory --port_worker $port --cache_size $cache_mem_size --allocated_mem_size $remote_mem_size --compute_num ${#compute_nodes[@]} --memory_num ${#memory_nodes[@]}"
-      script_memory="cd ${bin_dir} && ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
+      script_memory="cd ${bin_dir} && numactl --physcpubind=31 ./tpcc_server ${memory_ARGS} > ${output_file} 2>&1"
       echo "start worker: ssh ${ssh_opts} ${memory} "$script_memory" &"
       ssh ${ssh_opts} ${memory} "echo '$core_dump_dir/core$memory' | sudo tee /proc/sys/kernel/core_pattern"
-      ssh ${ssh_opts} ${memory} "ulimit -S -c unlimited && numactl --physcpubind=31 $script_memory" &
+      ssh ${ssh_opts} ${memory} "ulimit -S -c unlimited &&  $script_memory" &
       sleep 1
   done
   wait
