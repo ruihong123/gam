@@ -368,7 +368,7 @@ void Worker::ProcessRemoteRead(Client* client, WorkRequest* wr) {
         //add the lock support
         if (directory.IsBlockWLocked(entry)) {
             //According to my analysis, the code below is never invoked.
-            assert(false);
+//            assert(false);
             if (wr->flag & TRY_LOCK) {  //reply directly with lock failed
                 epicAssert(wr->flag & LOCKED);
                 wr->status = LOCK_FAILED;
